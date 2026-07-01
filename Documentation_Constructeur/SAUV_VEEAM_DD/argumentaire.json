@@ -1,0 +1,67 @@
+{
+  "_description": "Argumentaire SAUVEGARDE — logiciel=veeam, cible=dd. Rendu quand l'onglet Fonctionnalité a ce logiciel et cette cible. Conditions de blocs : licence_acheter, licence_deja, cloud. Marqueur {client}. Éditable ; compléter les « à préciser ».",
+  "titre_cas": "Veeam + PowerProtect Data Domain",
+  "blocs": [
+    {
+      "t": "p",
+      "x": "Nous proposons à {client} une solution de sauvegarde reposant sur Veeam Backup & Replication, avec une cible de stockage de type baie Dell PowerProtect Data Domain. Cette solution est conçue dans le respect des bonnes pratiques de résilience et des exigences NIS2."
+    },
+    {
+      "t": "h",
+      "x": "Logiciel de sauvegarde"
+    },
+    {
+      "t": "p",
+      "x": "La sauvegarde est assurée par **Veeam Backup & Replication**, solution reconnue et indépendante du matériel : elle protège les machines virtuelles et physiques, permet une restauration granulaire (jusqu'au fichier ou à l'application), la réplication et des sauvegardes immuables."
+    },
+    {
+      "t": "sous",
+      "x": "Licences : incluses dans notre proposition.",
+      "if": "licence_acheter"
+    },
+    {
+      "t": "sous",
+      "x": "Licences : la solution s'appuie sur les licences Veeam déjà détenues par {client}.",
+      "if": "licence_deja"
+    },
+    {
+      "t": "h",
+      "x": "Cible de sauvegarde"
+    },
+    {
+      "t": "p",
+      "x": "Les données de sauvegarde sont stockées sur une **baie Dell PowerProtect Data Domain**, spécialisée dans la protection des données : **déduplication** avancée (réduction importante du volume stocké), **immuabilité** (Retention Lock) et hautes performances de sauvegarde/restauration."
+    },
+    {
+      "t": "p",
+      "x": "La baie Data Domain peut être complétée d'un dispositif **AirGap** pour isoler les sauvegardes du réseau et renforcer la protection contre les attaques."
+    },
+    {
+      "t": "h",
+      "x": "Sécurité et conformité"
+    },
+    {
+      "t": "puces",
+      "x": [
+        "Sauvegardes protégées contre les suppressions et modifications (immuabilité selon la cible retenue).",
+        "Politiques de rétention adaptées aux besoins (à préciser selon la volumétrie ci-dessus).",
+        "Démarche alignée sur les exigences NIS2."
+      ]
+    },
+    {
+      "t": "h",
+      "x": "Réplication externalisée — Cloud ONE ID",
+      "if": "cloud"
+    },
+    {
+      "t": "p",
+      "x": "Une copie des sauvegardes de {client} est répliquée vers le **Cloud ONE ID**, assurant une externalisation des données hors site (protection contre les sinistres), sans investissement matériel supplémentaire et avec une exploitation assurée par nos équipes.",
+      "if": "cloud"
+    }
+  ],
+  "sources": [
+    "Dell Technologies — PowerProtect Data Manager / Data Domain (déduplication, Retention Lock)",
+    "Veeam — Veeam Backup & Replication, documentation officielle"
+  ],
+  "avertissement": "Argumentaire commercial type. Les capacités (immuabilité, déduplication, AirGap, rétention) et le périmètre dépendent des modèles, licences et de la configuration retenue : à valider avant envoi."
+}

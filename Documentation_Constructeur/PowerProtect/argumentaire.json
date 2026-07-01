@@ -1,0 +1,94 @@
+{
+  "modele_match": [
+    "powerprotect",
+    "data domain",
+    " dd3",
+    " dd6",
+    " dd9",
+    "ddos"
+  ],
+  "titre": "Dell PowerProtect — présentation et valeur ajoutée",
+  "blocs": [
+    {
+      "t": "p",
+      "x": "Dans le cadre de la modernisation de votre infrastructure de sauvegarde, nous vous proposons {qte} baie(s) {modele_court} pour stocker et protéger les sauvegardes des données de {client}. Cette baie offre des performances élevées, une grande capacité de stockage et des fonctionnalités avancées de protection des données."
+    },
+    {
+      "t": "img"
+    },
+    {
+      "t": "vol",
+      "x": "Capacité retenue pour le stockage des sauvegardes : {capacite}."
+    },
+    {
+      "t": "h",
+      "x": "Protocole DD Boost"
+    },
+    {
+      "t": "p",
+      "x": "Le protocole DD Boost est une technologie avancée de Dell qui optimise les performances des opérations de sauvegarde et de restauration. Ses principaux avantages :"
+    },
+    {
+      "t": "puces",
+      "x": [
+        "Optimisation des performances : DD Boost distribue les tâches de déduplication et de compression entre le serveur de sauvegarde et la baie, réduisant la charge serveur et améliorant les performances globales.",
+        "Réduction de la bande passante : la déduplication côté client, avant l'envoi des données vers la baie, réduit la bande passante réseau nécessaire et accélère les sauvegardes.",
+        "Intégration avec les solutions de sauvegarde : DD Boost est intégré aux solutions du marché (notamment Veeam Backup) pour des opérations de sauvegarde et de restauration optimisées.",
+        "Gestion des données : planification des sauvegardes, gestion des politiques de rétention et des sauvegardes immuables.",
+        "Sécurité des données : chiffrement avancé des données en transit et au repos, pour répondre aux exigences de conformité."
+      ]
+    },
+    {
+      "t": "h",
+      "x": "Performances"
+    },
+    {
+      "t": "puces",
+      "x": [
+        "Débit : débit élevé permettant des opérations de sauvegarde et de restauration rapides et efficaces.",
+        "Latence : latence très faible, cruciale pour les opérations sensibles à la latence.",
+        "Déduplication : taux de déduplication élevé réduisant fortement l'espace de stockage nécessaire, pour stocker plus de données dans un espace réduit."
+      ]
+    },
+    {
+      "t": "h",
+      "x": "Qualité et fiabilité"
+    },
+    {
+      "t": "puces",
+      "x": [
+        "Retention Lock (immuabilité) : définition de périodes de rétention pendant lesquelles les sauvegardes ne peuvent pas être supprimées, répondant aux exigences de conformité.",
+        "Intégrité des données : mécanismes avancés de vérification et de correction d'erreurs garantissant des données exactes et non corrompues.",
+        "Compatibilité RGPD : fonctionnalités de protection des données conformes au Règlement Général sur la Protection des Données."
+      ]
+    },
+    {
+      "t": "h",
+      "x": "Intégration avec Veeam Backup"
+    },
+    {
+      "t": "p",
+      "x": "Combinée à DD Boost, la baie est entièrement compatible et intégrée avec Veeam Backup, solution de sauvegarde et de réplication de référence. Cette intégration permet des sauvegardes et des restaurations rapides et fiables, les fonctionnalités de déduplication, de compression et de chiffrement de Veeam étant pleinement supportées par la baie."
+    },
+    {
+      "t": "h",
+      "x": "Fonctionnalités avancées"
+    },
+    {
+      "t": "puces",
+      "x": [
+        "Protection des données : chiffrement, détection et correction des erreurs, protection contre les accès non autorisés et les corruptions.",
+        "Gestion des sauvegardes : planification, gestion des politiques de rétention et des sauvegardes immuables.",
+        "Surveillance et reporting : suivi des opérations de sauvegarde/restauration et de l'état de la baie, pour une gestion proactive."
+      ]
+    },
+    {
+      "t": "p",
+      "x": "Vous trouverez ci-dessous la configuration détaillée de la baie {modele_court} que nous vous proposons."
+    }
+  ],
+  "avertissement": "Contenu de présentation commerciale ; les niveaux de performance et de déduplication dépendent de la configuration, des données et de la solution de sauvegarde utilisée.",
+  "images_defaut": [
+    "powerprotect.png"
+  ]
+}

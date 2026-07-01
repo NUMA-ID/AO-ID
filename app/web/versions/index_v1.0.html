@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ONE ID — Appel d'offre</title>
+<style>
+  :root{--oneid:#0a3d62;--oneid2:#1e6091;--accent:#16a085;--line:#dce3ea;--muted:#6b7785;--danger:#c0392b;--bg:#f4f6f9}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:#1d2733;font-size:13.5px}
+  header{background:linear-gradient(135deg,var(--oneid),var(--oneid2));color:#fff;padding:16px 22px}
+  header h1{margin:0;font-size:19px}header p{margin:3px 0 0;font-size:12px;opacity:.85}
+  .wrap{max-width:1060px;margin:0 auto;padding:18px 18px 90px}
+  .tabs{display:flex;gap:6px;border-bottom:2px solid var(--line);margin-bottom:18px;flex-wrap:wrap}
+  .tab{padding:10px 18px;cursor:pointer;font-weight:600;color:var(--muted);border:none;background:none;border-bottom:3px solid transparent;margin-bottom:-2px;font-size:14px}
+  .tab.active{color:var(--oneid);border-bottom-color:var(--oneid)}
+  .panel{display:none}.panel.active{display:block}
+  .card{background:#fff;border:1px solid var(--line);border-radius:10px;padding:16px 18px;margin-bottom:16px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+  .card h2{margin:0 0 4px;font-size:15px;color:var(--oneid)}
+  .hint{color:var(--muted);font-size:12px;margin:0 0 12px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+  label{display:block;font-size:11.5px;font-weight:600;color:#42505e;margin-bottom:3px}
+  input,select,textarea{width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:6px;font-size:13px;font-family:inherit;background:#fff}
+  textarea{resize:vertical;min-height:46px}
+  .item{border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:8px;padding:14px 16px;margin-bottom:12px;background:#fbfdfe}
+  .item-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+  .item-head strong{color:var(--oneid)}
+  .full{grid-column:1/-1}
+  .btn{cursor:pointer;border:none;border-radius:6px;padding:9px 16px;font-size:13px;font-weight:600;font-family:inherit}
+  .btn-primary{background:var(--oneid);color:#fff}.btn-primary:hover{background:var(--oneid2)}
+  .btn-accent{background:var(--accent);color:#fff}
+  .btn-excel{background:#1d6f42;color:#fff}
+  .btn-ghost{background:#fff;border:1px solid var(--line);color:#1d2733}
+  .btn-del{background:transparent;color:var(--danger);border:1px solid #e9c4bf;padding:4px 9px;font-size:12px}
+  .badge{display:inline-block;background:var(--accent);color:#fff;border-radius:20px;padding:1px 9px;font-size:11px;font-weight:700}
+  .dz{border:1.5px dashed #b8cdde;border-radius:7px;padding:10px;text-align:center;color:var(--muted);font-size:12px;cursor:pointer;background:#fbfdff;margin-top:8px}
+  .dz.over{border-color:var(--accent);background:#eaf7f1;color:#13683f}
+  .thumbs{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+  .thumb{position:relative}.thumb img{height:50px;border:1px solid var(--line);border-radius:5px;display:block}
+  .thumb button{position:absolute;top:-6px;right:-6px;width:17px;height:17px;border-radius:50%;border:none;background:var(--danger);color:#fff;font-size:11px;cursor:pointer;padding:0}
+  .pa{display:flex;align-items:flex-start;gap:8px;padding:6px 0;border-bottom:1px solid #f0f3f6}
+  .pa input{width:15px;height:15px;margin-top:2px;flex:0 0 auto}.pa span{flex:1}
+  .clar{background:#fffbe9;border:1px solid #f0e3b0;border-radius:6px;padding:6px 10px;margin:5px 0;font-size:12.5px;color:#6b551a}
+  .spin{display:inline-block;width:15px;height:15px;border:3px solid #cfe3ef;border-top-color:var(--oneid2);border-radius:50%;animation:s .8s linear infinite;vertical-align:-3px}
+  @keyframes s{to{transform:rotate(360deg)}}
+  .foot{position:sticky;bottom:0;background:#fff;border-top:1px solid var(--line);padding:12px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap;box-shadow:0 -2px 8px rgba(0,0,0,.05)}
+  .msg{font-size:12px;color:var(--muted);align-self:center}
+  .small{font-size:11.5px;color:var(--muted)}
+  .layout{display:flex;align-items:flex-start}
+  .sidebar{width:240px;flex:0 0 240px;background:#fff;border-right:1px solid var(--line);padding:14px 12px;position:sticky;top:0;align-self:stretch;min-height:calc(100vh - 58px)}
+  .sidebar h3{font-size:13px;color:var(--oneid);margin:0 0 10px}
+  .sidebar .sb-save{display:flex;gap:6px;margin-bottom:8px}
+  .sidebar .sb-save input{font-size:12px;padding:6px 8px}
+  .sidebar #newFicheBtn{width:100%;margin-bottom:12px;font-size:12.5px;padding:7px}
+  .content{flex:1;min-width:0}
+  .fiche{display:flex;align-items:center;gap:2px;padding:6px 6px;border-radius:6px;font-size:12.5px}
+  .fiche:hover{background:#eef4f8}
+  .fiche .nm{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer}
+  .fiche .ic{border:none;background:none;cursor:pointer;font-size:13px;padding:2px;line-height:1}
+  @media(max-width:760px){.layout{flex-direction:column}.sidebar{width:auto;flex:none;position:static;min-height:0;border-right:none;border-bottom:1px solid var(--line)}}
+  .ptab{border-collapse:collapse;width:100%;font-size:12px}
+  .ptab th,.ptab td{border:1px solid var(--line);padding:3px 5px;vertical-align:middle}
+  .ptab th{background:var(--oneid);color:#fff;font-weight:600;font-size:11px}
+  .ptab input[type=text],.ptab input[type=date]{border:1px solid var(--line);border-radius:4px;padding:5px;font-size:12px;width:100%}
+  .ptab .rowact button{border:none;background:none;cursor:pointer;font-size:13px;padding:1px 2px}
+  .gtt{border-collapse:collapse;font-size:10px}
+  .gtt th,.gtt td{border:1px solid #e3e9ef;padding:2px 3px;text-align:center;white-space:nowrap;min-width:22px}
+  .gtt th.info,.gtt td.info{text-align:left;white-space:normal;min-width:90px}
+  .gtt thead th{background:var(--oneid);color:#fff}
+  .gtt .bar{background:#f4b183}
+  .gtt .conge{background:#c9b8e8}
+</style>
+</head>
+<body>
+<header>
+  <h1>ONE ID — Générateur d'appel d'offre <span style="font-size:13px;font-weight:600;opacity:.75">v1.0</span></h1>
+  <p>Analyse CCTP (Claude) · Import Excel Dell · Équipements · Génération du Word ONE ID <span style="opacity:.6">— version 1.0</span></p>
+</header>
+<div class="layout">
+<aside class="sidebar">
+  <h3>📁 Mes fiches</h3>
+  <div class="sb-save"><input id="ficheName" placeholder="Nom de la fiche"><button class="btn btn-accent" onclick="saveFiche()" title="Enregistrer la fiche courante">💾</button></div>
+  <button class="btn btn-ghost" id="newFicheBtn" onclick="newFiche()">＋ Nouvelle fiche</button>
+  <div id="fichesList"></div>
+</aside>
+<div class="content">
+<div class="wrap">
+  <div class="tabs">
+    <button class="tab active" data-t="cctp" onclick="tab('cctp')">📋 CCTP &amp; Contexte</button>
+    <button class="tab" data-t="equip" onclick="tab('equip')">🖥️ Équipements</button>
+    <button class="tab" data-t="plan" onclick="tab('plan')">📅 Planning</button>
+    <button class="tab" data-t="fonc" onclick="tab('fonc')">🛠️ Fonctionnalité</button>
+  </div>
+
+  <!-- ===== CCTP ===== -->
+  <div id="p-cctp" class="panel active">
+    <div class="card">
+      <h2>Import &amp; analyse du CCTP</h2>
+      <p class="hint">Déposez le CCTP (PDF, Word, TXT) ou collez le texte, puis lancez l'analyse : Claude en extrait le contexte et les points d'attention.</p>
+      <div class="dz" id="cctpdz">📎 Déposez le CCTP (PDF / Word / TXT) ou cliquez<input type="file" id="cctpfile" accept=".pdf,.doc,.docx,.txt" style="display:none"></div>
+      <div id="cctpname" class="small" style="margin-top:6px"></div>
+      <textarea id="cctp_text" rows="6" style="margin-top:10px" placeholder="…ou collez ici le texte du CCTP"></textarea>
+      <div style="margin-top:10px"><button class="btn btn-ghost" onclick="dicter('cctp_text',this)" title="Dictée vocale (fr-FR) — cliquez pour parler, recliquez pour arrêter">🎤 Dicter</button> <button class="btn btn-primary" id="goAnalyse">⚙️ Analyser le CCTP avec Claude</button> <button class="btn btn-accent" id="goVerif" onclick="verifierConformite()" title="Compare la demande du CCTP à la solution configurée (équipements + texte) et liste écarts / éléments à préciser.">🔍 Vérifier la conformité</button><span class="msg" id="cstatus" style="margin-left:8px"></span></div>
+    </div>
+    <div class="card" id="resCard" style="display:none">
+      <h2>Contexte du projet <span class="small">(intégré au Word)</span> <button class="btn btn-ghost" style="font-size:13px;padding:2px 8px" onclick="dicter('aff_contexte',this)" title="Dictée vocale (fr-FR) — cliquez pour parler, recliquez pour arrêter">🎤</button></h2>
+      <textarea id="aff_contexte" rows="8"></textarea>
+      <h2 style="margin-top:14px">Points d'attention <span class="badge" id="pac">0</span></h2>
+      <p class="hint">Checklist interne (non intégrée au Word).</p>
+      <div id="points"></div>
+      <div style="display:flex;gap:8px;margin-top:8px"><input id="panew" placeholder="Ajouter un point…" onkeydown="if(event.key==='Enter')addPA()"><button class="btn btn-accent" onclick="addPA()">+</button></div>
+      <div style="margin-top:12px"><label>Notes libres</label><textarea id="pa_notes" rows="3"></textarea></div>
+      <div id="clarwrap" style="display:none"><h2 style="margin-top:14px">À clarifier</h2><div id="clars"></div></div>
+      <div id="verifwrap" style="display:none"><h2 style="margin-top:14px">Vérification de conformité au CCTP <span class="small">(relecture — intégrée au Word en couleur)</span></h2>
+        <p class="hint">Comparaison de la demande du CCTP avec la solution configurée. ✅ couvert · ⚠️ écart · ❔ à préciser. Les écarts / éléments à préciser sont ajoutés au Word en couleur de relecture.</p>
+        <div id="verif"></div></div>
+    </div>
+  </div>
+
+  <!-- ===== ÉQUIPEMENTS ===== -->
+  <div id="p-equip" class="panel">
+    <div class="card" style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;background:#eaf5ee;border-color:#bfe0cb">
+      <button class="btn btn-excel" onclick="document.getElementById('xlsx').click()">📊 Importer un Excel (Dell Solutions Configurator)</button>
+      <input type="file" id="xlsx" accept=".xlsx,.xls" style="display:none">
+      <span class="small" id="xlsxmsg">Reconnaît serveurs / stockage / switches / sauvegarde et récupère la nomenclature.</span>
+    </div>
+
+    <div class="card">
+      <h2>Informations de l'affaire</h2>
+      <div class="grid">
+        <div><label>Client</label><input id="aff_client"></div>
+        <div><label>Projet / N° AO</label><input id="aff_projet"></div>
+        <div><label>Référence</label><input id="aff_ref"></div>
+        <div><label>Version</label><input id="aff_version" value="1.0"></div>
+        <div><label>Auteur</label><input id="aff_auteur"></div>
+        <div><label>Date</label><input id="aff_date" type="date"></div>
+      </div>
+      <div style="margin-top:12px"><label>Solution proposée (texte personnalisé — « - » = puce, {client} substitué)</label><textarea id="aff_solution" rows="5" placeholder="Décrivez ici la solution de manière brute (notes, points clés). Cliquez ensuite sur « Reformuler » pour obtenir un texte avant-vente prêt à relire."></textarea>
+        <div style="margin-top:6px"><button class="btn btn-ghost" onclick="dicter('aff_solution',this)" title="Dictée vocale (fr-FR) — cliquez pour parler, recliquez pour arrêter">🎤 Dicter</button> <button class="btn btn-primary" id="goSolution" onclick="ameliorerSolution()" title="Réécrit votre texte brut dans un style d'ingénieur avant-vente ONE ID (arguments commerciaux), sans inventer de fait technique.">✨ Reformuler (style avant-vente Claude)</button><span class="msg" id="solstatus" style="margin-left:8px"></span></div></div>
+      <div style="margin-top:10px"><label>Schéma d'architecture</label>
+        <div class="dz" data-imgzone="arch">📎 Déposez le schéma ou cliquez<input type="file" accept="image/*" multiple style="display:none"></div>
+        <div class="thumbs" data-thumbs="arch"></div></div>
+    </div>
+    <div id="cats"></div>
+  </div>
+
+  <!-- ===== PLANNING ===== -->
+  <div id="p-plan" class="panel">
+    <div class="card">
+      <h2>Planning prévisionnel <span class="badge" id="planCount">0</span></h2>
+      <p class="hint">Tâches intégrées au chapitre « Planning prévisionnel infra » du Word (page paysage, grille hebdomadaire). « Tél. » = télétravail possible, « Congé » colore la barre différemment.</p>
+      <div style="overflow:auto"><table id="planTable" class="ptab"></table></div>
+      <button class="btn btn-accent" style="margin-top:10px" onclick="addTask()">+ Ajouter une tâche</button>
+      <button class="btn btn-ghost" style="margin-top:10px" onclick="loadDefaultPlan()">↻ Planning type ONE ID (démarrage J+1 mois)</button>
+    </div>
+    <div class="card">
+      <h2>Aperçu Gantt</h2>
+      <p class="hint">Le bouton 🔗 d'une ligne la lie à la tâche du dessus (elle démarre après sa fin). « Appliquer » recalcule les dates des tâches liées (1er jour ouvré après la fin de la précédente, durée conservée) puis rafraîchit l'aperçu.</p>
+      <button class="btn btn-primary" style="margin-bottom:10px" onclick="recalcPlan()">✓ Appliquer (liens + aperçu)</button>
+      <div id="ganttPrev" style="overflow:auto"></div>
+    </div>
+  </div>
+
+  <!-- ===== FONCTIONNALITÉ (PRA/PCA) ===== -->
+  <div id="p-fonc" class="panel">
+    <div class="card">
+      <h2>Reprise / Continuité d'activité (PRA / PCA)</h2>
+      <p class="hint">Activez le dispositif puis renseignez les paramètres : un argumentaire adapté au cas est généré, intégrable au Word. Les valeurs spécifiques (RTO/RPO) apparaîtront en rouge dans le document (relecture).</p>
+      <div style="margin-top:8px"><label>Dispositif</label>
+        <select id="pra_mode" onchange="praToggle();save()">
+          <option value="aucun">Aucun</option>
+          <option value="pra">PRA — Plan de Reprise d'Activité</option>
+          <option value="pca">PCA — Plan de Continuité d'Activité</option>
+        </select></div>
+      <div id="praFields" style="display:none">
+        <div class="grid" style="margin-top:10px">
+          <div><label>RTO (délai de reprise visé)</label><input id="pra_rto" placeholder="ex : 4 heures" oninput="save()"></div>
+          <div><label>RPO (perte de données max admise)</label><input id="pra_rpo" placeholder="ex : 15 minutes" oninput="save()"></div>
+        </div>
+        <div style="margin-top:10px"><label>Cible de réplication</label>
+          <select id="pra_cible" onchange="save()">
+            <option value="ancien">Ancien matériel (reconditionné en site de repli)</option>
+            <option value="nouveau">Nouveau matériel dédié</option>
+            <option value="cloud">Cloud ONE ID</option>
+          </select></div>
+        <div style="margin-top:10px"><label>Méthode de réplication</label>
+          <select id="pra_methode" onchange="save()">
+            <option value="veeam">Veeam (logiciel, indépendant du matériel)</option>
+            <option value="natif">Native à la baie de stockage</option>
+          </select></div>
+        <div style="margin-top:12px">
+          <button class="btn btn-accent" onclick="genPra()">⚙️ Générer l'argumentaire</button>
+          <button class="btn btn-ghost" onclick="dicter('pra_text',this)" title="Dictée vocale (fr-FR)">🎤 Dicter</button>
+          <button class="btn btn-primary" id="goPra" onclick="reformulerPra()" title="Réécrit l'argumentaire dans un style avant-vente ONE ID, sans inventer de fait.">✨ Reformuler (Claude)</button>
+          <span class="msg" id="prastatus" style="margin-left:8px"></span>
+        </div>
+        <div style="margin-top:10px"><label>Argumentaire PRA/PCA (intégré au Word — « - » = puce, {client} substitué)</label>
+          <textarea id="pra_text" rows="10" oninput="save()" placeholder="Cliquez sur « Générer l'argumentaire » pour produire un texte adapté au cas, puis ajustez-le / reformulez-le."></textarea></div>
+      </div>
+    </div>
+    <div class="card">
+      <h2>Contexte sauvegarde <span class="small">(chapitre auto PowerStore + PowerProtect)</span></h2>
+      <p class="hint">Active les blocs correspondants de l'argumentaire de sauvegarde, généré automatiquement quand la configuration contient à la fois une baie PowerStore et une PowerProtect. Veeam est aussi détecté automatiquement s'il figure dans les équipements.</p>
+      <label style="display:block;margin-top:6px"><input type="checkbox" id="sauv_veeam" onchange="save()"> Veeam déjà en place (sauvegardes quotidiennes)</label>
+      <label style="display:block;margin-top:6px"><input type="checkbox" id="sauv_datadomain" onchange="save()"> Baie Data Domain existante (synchronisation / compatibilité)</label>
+    </div>
+  </div>
+</div>
+</div>
+</div>
+
+<div class="foot">
+  <button class="btn btn-primary" onclick="generer('standard')">📄 Générer le Word (modèle existant)</button>
+  <button class="btn btn-primary" onclick="generer('design')" title="Réécrit l'intro / le contexte / la solution proposée et applique un thème, via l'API Claude. Les caractéristiques techniques, tableaux et argumentaires restent inchangés.">✨ Générer (Design Claude)</button>
+  <button class="btn btn-ghost" onclick="expFiche()">⬇ Exporter la fiche (JSON)</button>
+  <button class="btn btn-ghost" onclick="document.getElementById('loadf').click()">📂 Charger une fiche</button>
+  <input type="file" id="loadf" accept="application/json" style="display:none">
+  <span class="msg" id="msg">Prêt.</span>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+// Empêche le navigateur d'ouvrir le fichier quand on dépose à côté d'une zone
+['dragenter','dragover','drop'].forEach(ev=>window.addEventListener(ev,e=>{e.preventDefault();},false));
+function tab(n){document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));$('p-'+n).classList.add('active');document.querySelector('.tab[data-t='+n+']').classList.add('active');}
+
+const CATS=[
+ {key:'serveurs',label:'Serveurs',fields:[['Rôle/désignation','role'],['Quantité','qte'],['Modèle','modele'],['Nb de VM','nb_vm'],['Facteur de forme','format'],['CPU','cpu_detail'],['RAM','ram'],['Type disques','disq_type'],['Config disques','disq_detail'],['RAID','raid'],['Réseau','reseau'],['Alimentation','alim'],['OS','os'],['Garantie','garantie'],['Remarques','remarques']]},
+ {key:'stockages',label:'Stockage',fields:[['Désignation','role'],['Quantité','qte'],['Modèle','modele'],['Mode','mode'],['Type disque','disq_type'],['Protocoles','protocoles'],['Taille RAW','raw'],['Taille utile','utile'],['Brute/baie (argu.)','raw_baie'],['Effective/baie (argu.)','effective_baie'],['Utile cluster (argu.)','utile_cluster'],['Compression/Dedup','dedup'],['Protection/RAID','raid'],['Contrôleurs','controleurs'],['Ports','ports'],['Évolutivité','eval'],['Garantie','garantie'],['Remarques','remarques']]},
+ {key:'switches',label:'Switches',fields:[['Désignation','role'],['Quantité','qte'],['Modèle','modele'],['Ports','ports'],['Débit','debit'],['PoE','poe'],['Stacking','stacking'],['L2/L3','l2l3'],['Garantie','garantie'],['Remarques','remarques']]},
+ {key:'sauvegardes',label:'Baies de sauvegarde',fields:[['Désignation','role'],['Quantité','qte'],['Modèle','modele'],['Type','type'],['Capacité','capacite'],['Capacité brute','raw'],['Capacité utile','utile'],['Dedup','dedup'],['Rétention','retention'],['Protocoles','protocoles'],['Garantie','garantie'],['Remarques','remarques']]},
+ {key:'logiciels_services',label:'Logiciels & Services',fields:[['Désignation','role'],['Quantité','qte'],['Produit','modele'],['Remarques','remarques']]}
+];
+const idx={}; CATS.forEach(c=>idx[c.key]=0);
+const imgStore={arch:[]};
+
+function buildCats(){const root=$('cats');root.innerHTML='';CATS.forEach(c=>{const card=document.createElement('div');card.className='card';card.innerHTML=`<h2>${c.label} <span class="badge" id="b-${c.key}">0</span></h2><div id="list-${c.key}"></div><button class="btn btn-accent" onclick="addItem('${c.key}')">+ Ajouter</button>`;root.appendChild(card);});}
+function addItem(key,data){
+  const c=CATS.find(x=>x.key===key);idx[key]++;const id=key+'-'+idx[key];
+  const div=document.createElement('div');div.className='item';div.id=id;div.dataset.key=key;
+  let g='<div class="grid">';
+  c.fields.forEach(f=>{g+=`<div${f[1]==='remarques'?' class="full"':''}><label>${f[0]}</label>`+(f[1]==='remarques'?`<textarea data-f="remarques"></textarea>`:`<input data-f="${f[1]}">`)+`</div>`;});
+  g+='</div>';
+  const zid='img-'+id;
+  div.innerHTML=`<div class="item-head"><strong class="ititle">${c.label}</strong><button class="btn btn-del" onclick="this.closest('.item').remove();recount();save()">Supprimer</button></div>${g}
+    <div class="dz" data-imgzone="${zid}">📎 Images produit (déposez ou cliquez)<input type="file" accept="image/*" multiple style="display:none"></div>
+    <div class="thumbs" data-thumbs="${zid}"></div>`;
+  $('list-'+key).appendChild(div);imgStore[zid]=[];bindZone(div.querySelector('[data-imgzone]'));
+  if(data)fill(div,data,zid);recount();save();
+}
+function fill(div,d,zid){
+  div.querySelectorAll('[data-f]').forEach(el=>{const k=el.getAttribute('data-f');if(d[k]!==undefined&&d[k]!==null)el.value=d[k];});
+  div._extra={composants:d.composants||null,specs_extraites:d.specs_extraites||null,prix_unitaire:d.prix_unitaire||'',prix_etendu:d.prix_etendu||''};
+  div._source=d._source||'datasheet';
+  imgStore[zid]=d.images||[];renderThumbs(zid);updHead(div);
+}
+function readItem(div){const o={};o._source=div._source||'datasheet';
+  div.querySelectorAll('[data-f]').forEach(el=>{const v=el.value.trim();if(v)o[el.getAttribute('data-f')]=v;});
+  if(div._extra){if(div._extra.composants)o.composants=div._extra.composants;if(div._extra.specs_extraites)o.specs_extraites=div._extra.specs_extraites;if(div._extra.prix_unitaire)o.prix_unitaire=div._extra.prix_unitaire;if(div._extra.prix_etendu)o.prix_etendu=div._extra.prix_etendu;}
+  const z=div.querySelector('[data-thumbs]');if(z){const im=imgStore[z.getAttribute('data-thumbs')];if(im&&im.length)o.images=im;}
+  return o;}
+function recount(){CATS.forEach(c=>{const b=$('b-'+c.key);if(b)b.textContent=document.querySelectorAll('#list-'+c.key+' .item').length;});}
+function updHead(div){const cat=CATS.find(c=>c.key===div.dataset.key);const m=((div.querySelector('[data-f="modele"]')||{}).value||'').trim();const q=((div.querySelector('[data-f="qte"]')||{}).value||'').trim();let t=m||(cat?cat.label:'');if(q&&q!=='1')t+=' ×'+q;const el=div.querySelector('.ititle');if(el)el.textContent=t;}
+
+/* images */
+let activeZone=null;
+function bindZone(dz){const zid=dz.getAttribute('data-imgzone');const input=dz.querySelector('input');
+  dz.onclick=()=>{activeZone=zid;input.click();};dz.onmousedown=()=>{activeZone=zid;};
+  dz.ondragover=e=>{e.preventDefault();dz.classList.add('over');};dz.ondragleave=()=>dz.classList.remove('over');
+  dz.ondrop=e=>{e.preventDefault();dz.classList.remove('over');addImgs(zid,[...e.dataTransfer.files]);};
+  input.onchange=e=>{addImgs(zid,[...e.target.files]);e.target.value='';};}
+function addImgs(zid,files){files=files.filter(f=>f.type.startsWith('image/'));if(!files.length)return;imgStore[zid]=imgStore[zid]||[];let p=files.length;
+  files.forEach(f=>{const r=new FileReader();r.onload=()=>{imgStore[zid].push({name:f.name,data:r.result});if(--p===0){renderThumbs(zid);save();}};r.readAsDataURL(f);});}
+function renderThumbs(zid){const c=document.querySelector('[data-thumbs="'+zid+'"]');if(!c)return;c.innerHTML='';
+  (imgStore[zid]||[]).forEach((im,i)=>{const t=document.createElement('span');t.className='thumb';const g=document.createElement('img');g.src=im.data;const b=document.createElement('button');b.textContent='×';b.onclick=()=>{imgStore[zid].splice(i,1);renderThumbs(zid);save();};t.appendChild(g);t.appendChild(b);c.appendChild(t);});}
+document.addEventListener('paste',e=>{if(!activeZone)return;const files=[];for(const it of (e.clipboardData||{}).items||[]){if(it.type&&it.type.startsWith('image/')){const f=it.getAsFile();if(f)files.push(f);}}if(files.length){e.preventDefault();addImgs(activeZone,files);}});
+
+/* CCTP */
+const cdz=$('cctpdz'),cfile=$('cctpfile');let cctpFile=null;
+cdz.onclick=()=>cfile.click();
+cdz.ondragover=e=>{e.preventDefault();cdz.classList.add('over');};cdz.ondragleave=()=>cdz.classList.remove('over');
+cdz.ondrop=e=>{e.preventDefault();cdz.classList.remove('over');const f=e.dataTransfer.files[0];if(f){cctpFile=f;$('cctpname').textContent='Fichier : '+f.name;if(/\.txt$/i.test(f.name))f.text().then(t=>$('cctp_text').value=t);}};
+cfile.onchange=e=>{const f=e.target.files[0];if(f){cctpFile=f;$('cctpname').textContent='Fichier : '+f.name;if(/\.txt$/i.test(f.name))f.text().then(t=>$('cctp_text').value=t);}};
+let points=[],clars=[],verif=[];
+$('goAnalyse').onclick=async()=>{
+  const fd=new FormData();const txt=$('cctp_text').value.trim();
+  if(cctpFile)fd.append('file',cctpFile); else if(txt)fd.append('text',txt); else{alert('Fournissez un CCTP (fichier ou texte).');return;}
+  fd.append('solution',JSON.stringify(buildData()));
+  $('cstatus').innerHTML='<span class="spin"></span> Analyse + vérification en cours…';$('goAnalyse').disabled=true;
+  try{
+    const r=await fetch('/api/analyse-cctp',{method:'POST',body:fd});
+    if(!r.ok){throw new Error((await r.json()).detail||r.statusText);}
+    const d=await r.json();
+    $('resCard').style.display='block';
+    $('aff_contexte').value=(d.contexte||'').trim();
+    if(!txt&&d.cctp_text)$('cctp_text').value=d.cctp_text;
+    points=(d.points||[]).map(p=>({label:typeof p==='string'?p:(p.label||''),checked:false}));
+    clars=d.clarifications||[];verif=(d.verification||[]).filter(v=>v&&(v.exigence||v.suggestion||v.theme));
+    renderPA();renderClars();renderVerif();
+    $('cstatus').textContent='✔ Analyse terminée.';save();
+  }catch(err){$('cstatus').textContent='Erreur : '+(err.message||err);}
+  $('goAnalyse').disabled=false;
+};
+function renderPA(){const c=$('points');c.innerHTML='';points.forEach((it,i)=>{const d=document.createElement('div');d.className='pa';const cb=document.createElement('input');cb.type='checkbox';cb.checked=it.checked;cb.onchange=()=>{it.checked=cb.checked;pac();save();};const s=document.createElement('span');s.textContent=it.label;const x=document.createElement('button');x.className='btn btn-del';x.textContent='×';x.onclick=()=>{points.splice(i,1);renderPA();save();};d.appendChild(cb);d.appendChild(s);d.appendChild(x);c.appendChild(d);});pac();}
+function renderClars(){const cw=$('clarwrap');if(!cw)return;if(clars&&clars.length){cw.style.display='block';$('clars').innerHTML='';clars.forEach(c=>{const x=document.createElement('div');x.className='clar';x.textContent='⚠ '+(typeof c==='string'?c:JSON.stringify(c));$('clars').appendChild(x);});}else{cw.style.display='none';}}
+function renderVerif(showEmpty){const w=$('verifwrap');if(!w)return;const c=$('verif');
+  if(!verif||!verif.length){if(showEmpty){w.style.display='block';c.innerHTML='<div class="small" style="color:#1e7e34">✅ Aucun écart détecté entre le CCTP et la solution configurée.</div>';}else{w.style.display='none';c.innerHTML='';}return;}
+  w.style.display='block';c.innerHTML='';
+  const ICON={couvert:'✅',ecart:'⚠️',a_preciser:'❔'};const COL={couvert:'#1e7e34',ecart:'#c0392b',a_preciser:'#b8860b'};
+  verif.forEach(v=>{const st=(v.statut||'a_preciser');const d=document.createElement('div');d.style.cssText='border-left:4px solid '+(COL[st]||'#888')+';padding:6px 10px;margin:6px 0;background:#fafafa;border-radius:4px';
+    const head=document.createElement('div');head.innerHTML='<b>'+(ICON[st]||'•')+' '+esch(v.theme||'')+'</b>';d.appendChild(head);
+    if(v.exigence){const e=document.createElement('div');e.className='small';e.textContent='Exigence : '+v.exigence;d.appendChild(e);}
+    if(v.suggestion){const s=document.createElement('div');s.style.color=(COL[st]||'#555');s.textContent=(st==='couvert'?'✔ ':'➕ ')+v.suggestion;d.appendChild(s);}
+    c.appendChild(d);});}
+function pac(){$('pac').textContent=points.filter(p=>p.checked).length+' / '+points.length;}
+function addPA(){const v=$('panew').value.trim();if(!v)return;points.push({label:v,checked:true});$('panew').value='';renderPA();save();}
+async function verifierConformite(){
+  const cctp=$('cctp_text').value.trim();
+  if(!cctp){alert("Collez ou analysez d'abord le CCTP (zone de texte) avant de vérifier la conformité.");return;}
+  const btn=$('goVerif');if(btn)btn.disabled=true;
+  $('cstatus').innerHTML='<span class="spin"></span> Vérification de conformité…';$('resCard').style.display='block';
+  try{
+    const r=await fetch('/api/verifier',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({cctp_text:cctp,solution:buildData()})});
+    if(!r.ok)throw new Error((await r.json()).detail||r.statusText);
+    const d=await r.json();
+    verif=(d.verification||[]).filter(v=>v&&(v.exigence||v.suggestion||v.theme));
+    renderVerif(true);save();
+    $('cstatus').textContent='✔ Vérification terminée ('+verif.length+' élément'+(verif.length>1?'s':'')+').';
+  }catch(err){$('cstatus').textContent='Erreur : '+(err.message||err);}
+  if(btn)btn.disabled=false;
+}
+/* Dictée vocale (Web Speech API, fr-FR) — sans dépendance ni coût serveur */
+let _rec=null,_recTarget=null,_recBtn=null;
+function stopDicter(){if(_recBtn){_recBtn.textContent='🎤';_recBtn.style.background='';_recBtn.style.color='';}_rec=null;_recTarget=null;_recBtn=null;}
+function dicter(targetId,btn){
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){alert("La dictée vocale n'est pas prise en charge par ce navigateur. Utilisez Chrome ou Edge.");return;}
+  if(_rec){_rec.stop();return;}            // 2e clic = arrêt
+  const ta=$(targetId);if(!ta)return;_recTarget=ta;_recBtn=btn;
+  _rec=new SR();_rec.lang='fr-FR';_rec.interimResults=true;_rec.continuous=true;
+  let base=ta.value;if(base&&!/\s$/.test(base))base+=' ';
+  btn.textContent='⏺ Dictée…';btn.style.background='#c00';btn.style.color='#fff';
+  _rec.onresult=e=>{let fin='',interim='';for(let i=e.resultIndex;i<e.results.length;i++){const t=e.results[i][0].transcript;if(e.results[i].isFinal)fin+=t+' ';else interim+=t;}if(fin)base+=fin;ta.value=base+interim;};
+  _rec.onerror=ev=>{$('msg')&&($('msg').textContent='Dictée : '+(ev.error||''));};
+  _rec.onend=()=>{if(_recTarget){_recTarget.value=_recTarget.value.trim();try{save();}catch(e){}}stopDicter();};
+  try{_rec.start();}catch(e){stopDicter();}
+}
+async function ameliorerSolution(){
+  const ta=$('aff_solution');const txt=ta.value.trim();
+  if(!txt){alert('Saisissez d\'abord une description (même brute) de la solution.');return;}
+  const btn=$('goSolution');btn.disabled=true;
+  $('solstatus').innerHTML='<span class="spin"></span> Reformulation par Claude…';
+  try{
+    const r=await fetch('/api/ameliorer-solution',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:txt,client:val('aff_client'),projet:val('aff_projet')})});
+    if(!r.ok)throw new Error((await r.json()).detail||r.statusText);
+    const d=await r.json();
+    if(d.text){ta.value=d.text;save();}
+    $('solstatus').textContent='✔ Texte reformulé — à relire avant génération.';
+  }catch(err){$('solstatus').textContent='Erreur : '+(err.message||err);}
+  btn.disabled=false;
+}
+
+/* Import Excel via backend */
+$('xlsx').onchange=async e=>{const f=e.target.files[0];if(!f)return;$('xlsxmsg').innerHTML='<span class="spin"></span> Import…';
+  const fd=new FormData();fd.append('file',f);
+  try{const r=await fetch('/api/import-excel',{method:'POST',body:fd});if(!r.ok)throw new Error((await r.json()).detail||r.statusText);
+    const d=await r.json();
+    const a=d.affaire||{};['aff_projet','aff_ref'].forEach(()=>{});if(a.projet)$('aff_projet').value=a.projet;if(a.reference)$('aff_ref').value=a.reference;
+    clearAll();CATS.forEach(c=>(d[c.key]||[]).forEach(it=>addItem(c.key,it)));recount();
+    const n=CATS.reduce((s,c)=>s+(d[c.key]||[]).length,0);$('xlsxmsg').textContent='✔ '+n+' équipements importés.';save();
+  }catch(err){$('xlsxmsg').textContent='Erreur import : '+(err.message||err);}
+  e.target.value='';};
+
+/* Fiche : build / export / load / generate / autosave */
+function val(id){return $(id).value.trim();}
+function buildData(){return{_type:'fiche_specs_oneid',_version:3,genere_le:new Date().toISOString(),
+  affaire:{client:val('aff_client'),projet:val('aff_projet'),reference:val('aff_ref'),version:val('aff_version'),auteur:val('aff_auteur'),date:val('aff_date'),
+    contexte:val('aff_contexte'),solution_proposee:val('aff_solution'),
+    points_attention:points.map(p=>({label:p.label,checked:p.checked})),points_notes:val('pa_notes'),
+    clarifications:clars||[],verification:verif||[],cctp_text:$('cctp_text').value,images_architecture:imgStore.arch||[],
+    sauv_veeam:$('sauv_veeam').checked,sauv_datadomain:$('sauv_datadomain').checked,
+    pra_pca:{mode:$('pra_mode').value,actif:$('pra_mode').value!=='aucun',rto:val('pra_rto'),rpo:val('pra_rpo'),cible:$('pra_cible').value,methode:$('pra_methode').value,texte:$('pra_text').value}},
+  serveurs:items('serveurs'),stockages:items('stockages'),switches:items('switches'),sauvegardes:items('sauvegardes'),logiciels_services:items('logiciels_services'),
+  planning:planTasks.map(t=>({nom:t.nom,debut:t.debut,fin:t.fin,duree:t.duree,linkPrev:!!t.linkPrev,equipes:t.equipes,teletravail:t.teletravail,conge:!!t.conge}))};}
+function items(key){return [...document.querySelectorAll('#list-'+key+' .item')].map(readItem);}
+function clearAll(){CATS.forEach(c=>{$('list-'+c.key).innerHTML='';idx[c.key]=0;});}
+function loadData(d){const a=d.affaire||{};
+  [['aff_client','client'],['aff_projet','projet'],['aff_ref','reference'],['aff_version','version'],['aff_auteur','auteur'],['aff_date','date'],['aff_contexte','contexte'],['aff_solution','solution_proposee']].forEach(p=>{if(a[p[1]]!==undefined)$(p[0]).value=a[p[1]];});
+  imgStore.arch=a.images_architecture||[];renderThumbs('arch');
+  if(a.points_notes!==undefined)$('pa_notes').value=a.points_notes;
+  if(a.cctp_text!==undefined)$('cctp_text').value=a.cctp_text;
+  points=(a.points_attention||[]).map(p=>({label:p.label,checked:!!p.checked}));renderPA();
+  clars=a.clarifications||[];renderClars();
+  verif=a.verification||[];renderVerif();
+  $('sauv_veeam').checked=!!a.sauv_veeam;$('sauv_datadomain').checked=!!a.sauv_datadomain;
+  const pp=a.pra_pca||{};if(pp.mode)$('pra_mode').value=pp.mode;$('pra_rto').value=pp.rto||'';$('pra_rpo').value=pp.rpo||'';if(pp.cible)$('pra_cible').value=pp.cible;if(pp.methode)$('pra_methode').value=pp.methode;$('pra_text').value=pp.texte||'';praToggle();
+  if(points.length||a.contexte||clars.length||verif.length)$('resCard').style.display='block';
+  planTasks=(d.planning||[]).map(t=>Object.assign({nom:'',debut:'',fin:'',duree:'',linkPrev:false,equipes:'',teletravail:'',conge:false},t));renderPlan();
+  clearAll();CATS.forEach(c=>(d[c.key]||[]).forEach(it=>addItem(c.key,it)));recount();}
+$('loadf').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{loadData(JSON.parse(r.result));$('msg').textContent='✔ Fiche chargée.';save();}catch(err){alert('JSON invalide : '+err.message);}};r.readAsText(f);e.target.value='';};
+function expFiche(){const d=buildData();const name='fiche_specs_'+((d.affaire.client||d.affaire.projet||'client').replace(/[^a-z0-9]/gi,'_').slice(0,40))+'.json';const b=new Blob([JSON.stringify(d,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=name;a.click();}
+async function generer(mode){mode=mode||'standard';
+  $('msg').innerHTML='<span class="spin"></span> '+(mode==='design'?'Génération Design (réécriture par Claude)…':'Génération du Word…');
+  try{const r=await fetch('/api/generer',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(Object.assign({mode:mode},buildData()))});
+    if(!r.ok)throw new Error((await r.json()).detail||r.statusText);
+    const blob=await r.blob();const cd=r.headers.get('Content-Disposition')||'';const m=cd.match(/filename="?([^"]+)"?/);const name=m?m[1]:'AO_ONEID.docx';
+    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();
+    $('msg').textContent='✔ Word généré : '+name+' (aussi enregistré dans Documents_Generes).';
+  }catch(err){$('msg').textContent='Erreur génération : '+(err.message||err);}}
+/* Fonctionnalité : PRA / PCA */
+function praToggle(){const e=$('pra_mode');if(!e)return;$('praFields').style.display=(e.value==='aucun')?'none':'block';}
+function buildPraText(){
+  const m=$('pra_mode').value;if(m==='aucun')return '';
+  const rto=val('pra_rto')||'à préciser',rpo=val('pra_rpo')||'à préciser';
+  const cible=$('pra_cible').value,meth=$('pra_methode').value;const P=[];
+  if(m==='pra')P.push("Dans le cadre de ce projet, nous proposons à {client} un Plan de Reprise d'Activité (PRA) destiné à redémarrer le système d'information dans les meilleurs délais en cas de sinistre majeur. Les objectifs retenus sont un RTO (délai de reprise visé) de "+rto+" et un RPO (perte de données maximale admissible) de "+rpo+".");
+  else P.push("Dans le cadre de ce projet, nous proposons à {client} un Plan de Continuité d'Activité (PCA) visant à maintenir les services critiques disponibles sans interruption perceptible pour les utilisateurs, y compris en cas de défaillance d'un site. Les objectifs retenus sont un RTO de "+rto+" et un RPO de "+rpo+", au plus près d'une continuité de service.");
+  const CIB={ancien:"La réplication s'appuiera sur le matériel existant de {client}, reconditionné en site de repli. Cette approche optimise l'investissement en réutilisant une infrastructure déjà amortie pour héberger les données répliquées.",
+    nouveau:"La réplication sera assurée vers un nouvel équipement dédié au site de repli, garantissant des performances homogènes avec la production et une capacité dimensionnée pour la reprise.",
+    cloud:"La réplication sera hébergée sur le Cloud de ONE ID, assurant une externalisation des données hors site, sans investissement matériel supplémentaire, avec un modèle de coûts maîtrisé (OPEX) et une exploitation assurée par nos équipes."};
+  P.push(CIB[cible]||'');
+  let METH;
+  if(meth==='veeam')METH="La réplication sera mise en œuvre avec Veeam, solution logicielle indépendante du matériel : elle réplique les machines virtuelles vers une infrastructure même hétérogène, orchestre les bascules et permet une restauration granulaire (jusqu'au fichier ou à l'application).";
+  else METH=(m==='pca')?"La réplication s'appuiera sur les fonctions natives de la baie de stockage, avec une réplication synchrone (de type Metro) au niveau bloc, adaptée aux RPO les plus exigeants recherchés dans un PCA.":"La réplication s'appuiera sur les fonctions natives de la baie de stockage : une réplication au niveau bloc, cohérente et performante, pilotée directement par la baie (mode asynchrone, ou synchrone selon le besoin).";
+  P.push(METH);
+  P.push("Cette architecture permet à {client} de sécuriser durablement ses données et la continuité de ses services, avec un dispositif éprouvé et l'accompagnement des équipes ONE ID sur l'ensemble du cycle de vie.");
+  return P.join("\n\n");
+}
+function genPra(){if($('pra_mode').value==='aucun'){alert('Sélectionnez PRA ou PCA.');return;}$('pra_text').value=buildPraText();save();$('prastatus').textContent='✔ Argumentaire généré — à relire / reformuler.';}
+async function reformulerPra(){
+  const txt=$('pra_text').value.trim();if(!txt){alert("Générez d'abord l'argumentaire (bouton « Générer »).");return;}
+  const btn=$('goPra');if(btn)btn.disabled=true;$('prastatus').innerHTML='<span class="spin"></span> Reformulation…';
+  try{const r=await fetch('/api/ameliorer-solution',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:txt,client:val('aff_client'),projet:val('aff_projet')})});
+    if(!r.ok)throw new Error((await r.json()).detail||r.statusText);const d=await r.json();if(d.text){$('pra_text').value=d.text;save();}
+    $('prastatus').textContent='✔ Reformulé — à relire avant génération.';
+  }catch(err){$('prastatus').textContent='Erreur : '+(err.message||err);}
+  if(btn)btn.disabled=false;
+}
+/* Planning / Gantt */
+let planTasks=[];
+function esch(s){return (s==null?'':String(s)).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');}
+function pdate(s){if(!s)return null;const d=new Date(s+'T00:00:00');return isNaN(d)?null:d;}
+function startMonday(d){const x=new Date(d);const wd=(x.getDay()+6)%7;x.setDate(x.getDate()-wd);return x;}
+function fmtjm(d){return ('0'+d.getDate()).slice(-2)+'/'+('0'+(d.getMonth()+1)).slice(-2);}
+function dureeFromDates(deb,fin){
+  const a=pdate(deb),b=pdate(fin); if(!a||!b||b<a) return '';
+  let n=0; const cur=new Date(a);
+  while(cur<=b){const wd=cur.getDay(); if(wd!==0&&wd!==6)n++; cur.setDate(cur.getDate()+1);}
+  if(n<=0) return '0j';
+  const w=Math.floor(n/5), d=n%5;
+  if(w>0&&d>0) return w+'s '+d+'j';
+  if(w>0) return w+'s';
+  return d+'j';
+}
+function updDuree(i,el){const t=planTasks[i];const d=dureeFromDates(t.debut,t.fin);if(!d)return;t.duree=d;const row=el&&el.closest('tr');const di=row&&row.querySelector('input.dur');if(di)di.value=d;}
+function isod(d){return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2);}
+function nextWorkday(d){const x=new Date(d);while(x.getDay()===0||x.getDay()===6)x.setDate(x.getDate()+1);return x;}
+function addWorkdays(d,k){const x=new Date(d);let c=0;while(c<k){x.setDate(x.getDate()+1);if(x.getDay()!==0&&x.getDay()!==6)c++;}return x;}
+function parseDureeJours(s){if(!s)return 0;s=String(s).toLowerCase().replace(',', '.');const sm=s.match(/([\d.]+)\s*s/);const jm=s.match(/([\d.]+)\s*j/);let n=0;if(sm)n+=Math.round(parseFloat(sm[1])*5);if(jm)n+=Math.ceil(parseFloat(jm[1]));if(!sm&&!jm){const f=parseFloat(s);if(!isNaN(f))n=Math.ceil(f);}return n;}
+/* Lien Fin->Début avec la tâche du dessus : la tâche démarre après la fin de la précédente. */
+function applyLinks(){
+  for(let pass=0;pass<planTasks.length+1;pass++){
+    planTasks.forEach((t,i)=>{
+      if(!t.linkPrev||i===0)return;
+      const latest=pdate(planTasks[i-1].fin); if(!latest)return;
+      let dur=parseDureeJours(t.duree);
+      if(!dur){const a=pdate(t.debut),b=pdate(t.fin);if(a&&b){let n=0;const c=new Date(a);while(c<=b){if(c.getDay()!==0&&c.getDay()!==6)n++;c.setDate(c.getDate()+1);}dur=n;}}
+      if(!dur)dur=1;
+      const start=addWorkdays(latest,1);          // 1er jour ouvré après la fin de la tâche précédente
+      const end=addWorkdays(start,dur-1);          // fin = début + durée (jours ouvrés)
+      t.debut=isod(start);t.fin=isod(end);t.duree=dureeFromDates(t.debut,t.fin);
+    });
+  }
+}
+function toggleLink(i){if(i<=0)return;planTasks[i].linkPrev=!planTasks[i].linkPrev;applyLinks();renderPlan();save();}
+function recalcPlan(){applyLinks();renderPlan();save();$('msg').textContent='Planning recalculé selon les liens entre tâches.';}
+function addTask(d){planTasks.push(Object.assign({nom:'',debut:'',fin:'',duree:'',linkPrev:false,equipes:'',teletravail:'',conge:false},d||{}));renderPlan();save();}
+function delTask(i){planTasks.splice(i,1);renderPlan();save();}
+function moveTask(i,dir){const j=i+dir;if(j<0||j>=planTasks.length)return;const x=planTasks[i];planTasks[i]=planTasks[j];planTasks[j]=x;renderPlan();save();}
+function renderPlan(){
+  const head=['ID','Nom de tâche','Début','Fin','Durée','Équipes','Tél.','Congé',''];
+  let h='<thead><tr>'+head.map(x=>'<th>'+x+'</th>').join('')+'</tr></thead><tbody>';
+  planTasks.forEach((t,i)=>{
+    h+='<tr><td>'+(i+1)+'</td>'+
+      '<td><input type="text" value="'+esch(t.nom)+'" oninput="planTasks['+i+'].nom=this.value;save()"></td>'+
+      '<td><input type="date" value="'+esch(t.debut)+'" oninput="planTasks['+i+'].debut=this.value;updDuree('+i+',this);save()"></td>'+
+      '<td><input type="date" value="'+esch(t.fin)+'" oninput="planTasks['+i+'].fin=this.value;updDuree('+i+',this);save()"></td>'+
+      '<td><input type="text" class="dur" style="width:55px" value="'+esch(t.duree)+'" oninput="planTasks['+i+'].duree=this.value;save()"></td>'+
+      '<td><input type="text" value="'+esch(t.equipes)+'" oninput="planTasks['+i+'].equipes=this.value;save()"></td>'+
+      '<td style="text-align:center"><input type="checkbox" '+(t.teletravail?'checked':'')+' onchange="planTasks['+i+'].teletravail=this.checked?\'X\':\'\';save()"></td>'+
+      '<td style="text-align:center"><input type="checkbox" '+(t.conge?'checked':'')+' onchange="planTasks['+i+'].conge=this.checked;save()"></td>'+
+      '<td class="rowact" style="white-space:nowrap"><button title="Lier à la tâche du dessus (démarre après sa fin)" '+(i===0?'disabled':'')+' onclick="toggleLink('+i+')" style="'+((t.linkPrev&&i>0)?'background:#0a3d62;color:#fff':'')+'">🔗</button><button title="Monter" onclick="moveTask('+i+',-1)">▲</button><button title="Descendre" onclick="moveTask('+i+',1)">▼</button><button title="Supprimer" onclick="delTask('+i+')">🗑</button></td></tr>';
+  });
+  h+='</tbody>';
+  $('planTable').innerHTML=h; $('planCount').textContent=planTasks.length; ganttPreview();
+}
+function ganttPreview(){
+  const c=$('ganttPrev'); if(!c)return; const ds=[];
+  planTasks.forEach(t=>{const a=pdate(t.debut),b=pdate(t.fin);if(a)ds.push(+a);if(b)ds.push(+b);});
+  if(!planTasks.length||!ds.length){c.innerHTML='<div class="small">Renseignez des tâches avec dates pour afficher le Gantt.</div>';return;}
+  let mn=startMonday(new Date(Math.min(...ds))); const mx=new Date(Math.max(...ds)); const weeks=[]; let cur=new Date(mn);
+  while(cur<=mx&&weeks.length<60){weeks.push(new Date(cur));cur.setDate(cur.getDate()+7);}
+  let h='<table class="gtt"><thead><tr><th class="info">ID</th><th class="info">Tâche</th>';
+  weeks.forEach(w=>h+='<th>'+fmtjm(w)+'</th>'); h+='</tr></thead><tbody>';
+  planTasks.forEach((t,i)=>{const a=pdate(t.debut),b=pdate(t.fin);
+    h+='<tr><td class="info">'+(i+1)+'</td><td class="info">'+esch(t.nom)+'</td>';
+    weeks.forEach(w=>{const we=new Date(w);we.setDate(we.getDate()+6);let cls='';if(a&&b&&a<=we&&b>=w)cls=t.conge?'conge':'bar';h+='<td class="'+cls+'"></td>';});
+    h+='</tr>';});
+  h+='</tbody></table>'; c.innerHTML=h;
+}
+function defaultPlan(){
+  const base=new Date(); base.setMonth(base.getMonth()+1); const s=startMonday(base);
+  const iso=off=>{const x=new Date(s);x.setDate(x.getDate()+off);return x.toISOString().slice(0,10);};
+  const T=[
+   ["Réception du matériel",0,25,"4s","",false,false],
+   ["Réunion d'init",25,25,",5j","ONE-ID / Client",false,false],
+   ["Réunion de validation",25,25,",5j","ONE ID / Client",true,false],
+   ["Configuration du système de virtualisation",28,28,"1j","ONE ID",false,false],
+   ["Intégration des équipements salle Prod",38,38,"1j","ONE ID / Client",false,false],
+   ["Migration des VM VMware (23 VM) multi OS (Linux, VMware)",39,43,"3j","ONE ID",true,false],
+   ["Reconditionnement de l'ancienne infra en PRA",35,36,"2j","ONE ID",false,false],
+   ["Administratifs (Garantie, ESRS, CloudIQ…)",37,37,"1j","ONE ID / Client",true,false],
+   ["Configuration du backup",38,38,"1j","ONE ID",true,false],
+   ["Validations des tests PRA / BACKUP",39,39,"1j","ONE ID / Client",true,false],
+   ["Réunion init supervision",42,42,",5j","ONE ID / Client",true,false],
+   ["Mise en place supervision",42,43,"1j","ONE ID",true,false],
+   ["Congé ONE ID",0,8,"1s 2j","",false,true],
+   ["Congé Client",-38,-38,"0s","",false,true],
+   ["Livrable fin de projet",60,60,"1j","ONE ID / Client",false,false]
+  ];
+  return T.map(r=>({nom:r[0],debut:iso(r[1]),fin:iso(r[2]),duree:r[3],equipes:r[4],teletravail:r[5]?'X':'',conge:r[6]}));
+}
+function loadDefaultPlan(){
+  if(planTasks.length && !confirm("Remplacer le planning actuel par le planning type ONE ID (dates calées à aujourd'hui + 1 mois) ?"))return;
+  planTasks=defaultPlan(); renderPlan(); save(); $('msg').textContent='Planning type chargé (démarrage à J+1 mois).';
+}
+function save(){try{localStorage.setItem('ao_oneid_app',JSON.stringify(buildData()));}catch(e){}}
+
+/* Barre latérale : bibliothèque de fiches (persistées côté serveur) */
+async function loadFichesList(){
+  const c=$('fichesList'); if(!c)return;
+  try{
+    const r=await fetch('/api/fiche/list'); if(!r.ok)throw new Error('http '+r.status); const d=await r.json(); c.innerHTML='';
+    const arr=(d.fiches||[]).map(f=>typeof f==='string'?{name:f}:f);
+    arr.forEach(f=>{
+      const row=document.createElement('div'); row.className='fiche';
+      const nm=document.createElement('span'); nm.className='nm'; nm.textContent=f.name.replace(/\.json$/i,''); nm.title='Ouvrir'; nm.onclick=()=>openFiche(f.name);
+      const re=document.createElement('button'); re.className='ic'; re.textContent='✎'; re.title='Renommer'; re.onclick=ev=>{ev.stopPropagation();renameFiche(f.name);};
+      const de=document.createElement('button'); de.className='ic'; de.textContent='🗑'; de.title='Supprimer'; de.onclick=ev=>{ev.stopPropagation();delFiche(f.name);};
+      row.appendChild(nm); row.appendChild(re); row.appendChild(de); c.appendChild(row);
+    });
+    if(!(d.fiches||[]).length) c.innerHTML='<div class="small">Aucune fiche enregistrée.</div>';
+  }catch(e){ c.innerHTML='<div class="small">Bibliothèque indisponible (serveur).</div>'; }
+}
+async function saveFiche(){
+  const nm=$('ficheName').value.trim()||val('aff_client')||val('aff_projet');
+  if(!nm){alert('Donnez un nom à la fiche.');return;}
+  try{const r=await fetch('/api/fiche/save',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:nm,spec:buildData()})});
+    if(!r.ok)throw new Error();const d=await r.json();$('ficheName').value=d.name.replace(/\.json$/i,'');$('msg').textContent='✔ Fiche enregistrée : '+d.name;loadFichesList();
+  }catch(e){$('msg').textContent='Erreur d\'enregistrement de la fiche.';}
+}
+async function openFiche(name){
+  try{const r=await fetch('/api/fiche/get?name='+encodeURIComponent(name));if(!r.ok)throw new Error();
+    loadData(await r.json());$('ficheName').value=name.replace(/\.json$/i,'');$('msg').textContent='✔ Fiche ouverte : '+name;save();
+  }catch(e){alert('Impossible d\'ouvrir la fiche.');}
+}
+async function renameFiche(name){
+  const cur=name.replace(/\.json$/i,''); const nv=prompt('Nouveau nom de la fiche :',cur); if(!nv||nv===cur)return;
+  const r=await fetch('/api/fiche/rename',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({old:name,new:nv})});
+  if(r.ok){loadFichesList();if($('ficheName').value===cur)$('ficheName').value=nv;}else{let m='';try{m=(await r.json()).detail;}catch(e){}alert('Renommage impossible. '+(m||''));}
+}
+async function delFiche(name){
+  if(!confirm('Supprimer la fiche « '+name.replace(/\.json$/i,'')+' » ?'))return;
+  await fetch('/api/fiche/delete',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name})});loadFichesList();
+}
+function newFiche(){
+  if(!confirm('Démarrer une nouvelle fiche vide ?'))return;
+  clearAll();['aff_client','aff_projet','aff_ref','aff_auteur','aff_contexte','aff_solution','pa_notes','ficheName','cctp_text','cctpname'].forEach(id=>{const e=$(id);if(e)e.value='';});
+  $('aff_version').value='1.0';points=[];clars=[];verif=[];renderPA();renderClars();renderVerif();imgStore.arch=[];renderThumbs('arch');$('resCard').style.display='none';
+  ['pra_rto','pra_rpo','pra_text'].forEach(id=>{const e=$(id);if(e)e.value='';});$('pra_mode').value='aucun';$('sauv_veeam').checked=false;$('sauv_datadomain').checked=false;praToggle();
+  addItem('serveurs');addItem('stockages');save();$('msg').textContent='Nouvelle fiche.';
+}
+
+/* init */
+buildCats();
+document.querySelectorAll('[data-imgzone="arch"]').forEach(bindZone);
+document.addEventListener('input',e=>{if(e.target.closest('.wrap')){const it=e.target.closest('.item');if(it)updHead(it);save();}});
+$('aff_date').valueAsDate=new Date();
+try{const s=localStorage.getItem('ao_oneid_app');if(s)loadData(JSON.parse(s));}catch(e){}
+if(!document.querySelector('#list-serveurs .item')){addItem('serveurs');addItem('stockages');}
+if(!planTasks.length)planTasks=defaultPlan();
+renderPlan();praToggle();
+loadFichesList();
+</script>
+</body>
+</html>

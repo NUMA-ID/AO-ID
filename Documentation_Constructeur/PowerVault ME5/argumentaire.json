@@ -1,0 +1,29 @@
+{
+  "modele_match": ["powervault", "me5"],
+  "titre": "Dell PowerVault ME5 — présentation et valeur ajoutée",
+  "blocs": [
+    {"t": "p", "x": "Votre nouvelle infrastructure de stockage sera basée sur {qte} baies {modele_court} réparties sur chaque site. Cette solution vous offre des performances élevées et une évolutivité simple pour répondre aux besoins de {client} aujourd'hui et demain."},
+    {"t": "img"},
+    {"t": "p", "x": "Haute performance : {modele_court} est la nouvelle référence du stockage SAN/DAS d'entrée de gamme. Elle apporte, par rapport à la génération précédente (ME4), des performances jusqu'à 2 fois supérieures (IOPS), une bande passante en hausse d'environ 70 % et des pools virtuels jusqu'à 4 fois plus grands — des caractéristiques adaptées aux applications exigeantes mentionnées dans les besoins de {client}."},
+    {"t": "p", "x": "Abordable et simple : conçue pour les budgets des PME (configurations validées à partir de 12 000 $ US), la baie PowerVault ME5 est facile à commander, rapide à installer et simple à exploiter, sans compromis sur les fonctionnalités."},
+    {"t": "p", "x": "Polyvalence : la plateforme prend en charge un large éventail de charges applicatives à forte valeur ajoutée — virtualisation, VDI, bases de données SQL, calcul haute performance (HPC), sauvegarde/archivage et vidéosurveillance. Plus de 50 000 systèmes PowerVault sont installés dans le monde."},
+    {"t": "p", "x": "Fiabilité : son architecture à deux contrôleurs actifs, ses processeurs multicœurs Intel Xeon et une disponibilité de 99,999 % combinent les performances de la technologie Flash et les avantages économiques du disque."},
+    {"t": "p", "x": "Flexibilité de configuration : la baie peut être déployée en 100 % Flash, en Flash hybride ou en 100 % disques durs, aux formats 2U ou 5U, pour s'ajuster au plus près du besoin et du budget."},
+    {"t": "p", "x": "Logiciel complet inclus : l'ensemble des fonctionnalités logicielles nécessaires pour stocker, gérer et protéger les données est fourni sans frais de licence, incluant la réplication multigénération et la gestion via PowerVault Manager."},
+    {"t": "p", "x": "Supervision et exploitation : un large écosystème de gestion est disponible (PowerVault Manager, OpenManage Enterprise, Nagios, CLI et API REST). Les clients sous garantie ProSupport accèdent sans frais à CloudIQ, l'application AIOps de Dell, qui fournit télémétrie, analytique prédictive, détection d'anomalies et projections de capacité."},
+    {"t": "p", "x": "Intégration serveurs : PowerVault ME5 est validé en DAS avec les serveurs Dell PowerEdge (compatible 16G). En séparant serveurs et stockage, les mises à niveau et la maintenance des serveurs peuvent intervenir sans déplacement des données."},
+    {"t": "h", "x": "Évolutivité"},
+    {"t": "puces", "x": [
+      "Architecture à deux contrôleurs actifs avec une disponibilité de 99,999 %.",
+      "Configurable en All-Flash, Flash hybride ou 100 % disques durs (formats 2U ou 5U).",
+      "Capacité hautement évolutive jusqu'à 8 Po, avec un modèle d'achat « Pay as you grow ».",
+      "Jusqu'à 4 fois plus de capacité et des pools virtuels 4 fois plus grands que la génération ME4."
+    ]},
+    {"t": "p", "x": "De plus, PowerVault ME5 est pris en charge par les services Dell ProSupport, ce qui facilite l'adoption et la gestion de votre nouvelle infrastructure."},
+    {"t": "vol", "x": "Vous trouverez ci-dessous la configuration détaillée des baies {modele_court} que nous vous proposons, pour une volumétrie brute de {raw_baie} par baie. La volumétrie utile sur l'ensemble de l'infrastructure sera supérieure à {utile_cluster}."}
+  ],
+  "sources": [
+    "Dell Technologies — « Fiche technique — Stockage Dell PowerVault ME5 », © 2022 (fichier : datasheet-me5.pdf)"
+  ],
+  "avertissement": "Contenu de présentation commerciale ; les comparaisons de performances (2x IOPS, +70 % de débit, 4x capacité) sont indiquées par Dell par rapport à la génération PowerVault ME4 et peuvent varier selon la configuration."
+}

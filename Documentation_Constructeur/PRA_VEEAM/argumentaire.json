@@ -1,0 +1,71 @@
+{
+  "_description": "Argumentaire détaillé pour le CAS PRA hébergé sur le Cloud ONE ID avec Veeam. Rendu automatiquement dans le chapitre PRA quand, dans l'onglet Fonctionnalité, dispositif = PRA, cible = Cloud ONE ID et méthode = Veeam. Marqueurs substitués : {client}, {rto}, {rpo} (repris de l'onglet). Version client épurée : sans tarification. Éditable librement.",
+  "titre_cas": "PRA hébergé ONE ID avec Veeam",
+  "blocs": [
+    {
+      "t": "p",
+      "x": "Nous proposons à {client} une offre de Plan de Reprise d'Activité (PRA) hébergée dans le datacenter ONE ID, alignée sur les exigences NIS2 et les bonnes pratiques de résilience."
+    },
+    { "t": "h", "x": "Périmètre et fonctionnalités" },
+    {
+      "t": "table",
+      "headers": ["Élément", "Détail"],
+      "rows": [
+        ["Sauvegarde", "Stockage des données directement dans le datacenter ONE ID."],
+        ["Logiciel de sauvegarde", "Veeam Backup & Replication (licence Enterprise Plus), avec réplication continue (CDP — Continuous Data Protection)."],
+        ["Tests de restauration", "Tests réguliers inclus (1 fois par an), portant sur quelques machines virtuelles."],
+        ["Rétention", "1,5× le volume de production (pour 5 points de rétention)."],
+        ["Restauration", "Machines virtuelles déjà présentes dans notre infrastructure, avec réservation permanente des ressources."],
+        ["RTO (Recovery Time Objective)", "{rto} (en jours ouvrés), garanti contractuellement."],
+        ["RPO (Recovery Point Objective)", "{rpo}, modulable jusqu'à moins d'une heure avec le CDP et une bande passante adéquate."],
+        ["Support", "Priorité élevée en cas de sinistre ; restauration gérée par le service support ONE ID ; rapport d'audit post-restauration."]
+      ]
+    },
+    { "t": "h", "x": "Ressources réseau incluses" },
+    {
+      "t": "puces",
+      "x": [
+        "1 VPN nomade.",
+        "1 VLAN dédié.",
+        "1 VRF isolé.",
+        "1 adresse IP publique IPv4.",
+        "Sécurisation des flux de réplication via FortiGate."
+      ]
+    },
+    { "t": "h", "x": "Support et exploitation" },
+    {
+      "t": "puces",
+      "x": [
+        "Priorité élevée de traitement en cas de sinistre.",
+        "Tests de restauration réguliers (1 par an inclus) avec rapport d'audit post-restauration.",
+        "Restauration assurée par le service support ONE ID."
+      ]
+    },
+    { "t": "h", "x": "Prérequis techniques" },
+    {
+      "t": "puces",
+      "x": [
+        "Licence Veeam Enterprise Plus (nécessaire à la réplication CDP, à l'orchestration des tests de restauration et à la priorisation des VM critiques lors de la reprise).",
+        "Compte de liaison Active Directory.",
+        "Déploiement du FortiClient sur les postes (via GPO), avec une procédure de VPN nomade testée régulièrement.",
+        "Rétention dimensionnée à 1,5× la taille réelle des VM de production pour 5 points (28 points de rétention au maximum — attention au stockage provisionné).",
+        "Pour le CDP, une VM proxy dédiée (dimensionnement estimatif : 3 vCPU, environ 2 Go de RAM par To de données, environ 4 Mb/s de bande passante par To).",
+        "Intégration à l'extranet (à préciser)."
+      ]
+    },
+    {
+      "t": "sous",
+      "x": "Note : lors d'un test de restauration, la réplication de l'ensemble des VM est mise en pause."
+    },
+    { "t": "h", "x": "Exclusions" },
+    {
+      "t": "puces",
+      "x": [
+        "PRA/DRP côté client.",
+        "Astreinte.",
+        "Sécurisation avancée de Veeam (prestation supplémentaire)."
+      ]
+    }
+  ],
+  "avertissement": "Offre indicative alignée sur les exigences NIS2. Les engagements (RTO/RPO, rétention, ressources) et le dimensionnement CDP sont à confirmer contractuellement selon la configuration retenue et la bande passante disponible."
+}

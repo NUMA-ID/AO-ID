@@ -1,0 +1,104 @@
+{
+  "_description": "Argumentaire AUTOMATIQUE de sauvegarde, inséré dans le Word UNIQUEMENT si la configuration contient à la fois une baie PowerStore et une baie PowerProtect. Éditable librement. Marqueurs substitués : {client}, {nps} (quantité PowerStore en toutes lettres), {ps} (modèle PowerStore détecté), {pp} (modèle PowerProtect détecté).",
+  "trigger": {
+    "all_of": ["powerstore", "powerprotect"]
+  },
+  "modele_match": [],
+  "titre": "Solution de Sauvegarde intégrant une nouvelle baie PowerProtect",
+  "blocs": [
+    {
+      "t": "p",
+      "x": "Grâce au choix des nouveaux équipements, notamment l'ajout de {nps} baie(s) {ps} et d'une nouvelle baie de sauvegarde {pp}, ainsi que la compatibilité avec l'existant, il sera possible de moderniser et de sécuriser considérablement le système de sauvegarde de {client}."
+    },
+    { "t": "h", "x": "Nouvelle architecture de sauvegarde" },
+    { "t": "sous", "x": "Baies {ps} :" },
+    {
+      "t": "puces",
+      "x": [
+        "Performances élevées et grande capacité de stockage, idéales pour les environnements de production.",
+        "Création de snapshots immuables, offrant une première couche de protection contre les suppressions ou modifications, accidentelles ou malveillantes."
+      ]
+    },
+    { "t": "sous", "x": "Baie {pp} :" },
+    {
+      "t": "puces",
+      "x": [
+        "Spécialement conçue pour la sauvegarde et la protection des données.",
+        "Grande capacité de stockage, déduplication avancée et performances élevées pour les opérations de sauvegarde et de restauration."
+      ]
+    },
+    { "t": "sous", "x": "Compatibilité avec l'existant :", "if": "datadomain" },
+    {
+      "t": "puces",
+      "if": "datadomain",
+      "x": [
+        "Intégration transparente dans l'infrastructure de sauvegarde existante (compatible avec une baie Data Domain en place).",
+        "Valorisation des investissements existants tout en modernisant l'infrastructure de sauvegarde."
+      ]
+    },
+    { "t": "h", "x": "Processus de sauvegarde modernisé" },
+    { "t": "sous", "x": "Snapshots immuables :" },
+    {
+      "t": "puces",
+      "x": [
+        "Les snapshots immuables sont créés directement sur les baies {ps}, protégés contre les suppressions ou modifications (première couche de protection).",
+        "Ces snapshots sont ensuite sauvegardés sur la baie {pp}, assurant une protection supplémentaire."
+      ]
+    },
+    { "t": "img", "x": "[ Schéma : snapshots immuables PowerStore → PowerProtect ]" },
+    { "t": "sous", "x": "Sauvegardes quotidiennes avec Veeam :", "if": "veeam" },
+    {
+      "t": "puces",
+      "if": "veeam",
+      "x": [
+        "Le processus de sauvegarde quotidien avec Veeam est maintenu, assurant la continuité des opérations.",
+        "Veeam, solution de sauvegarde et de réplication reconnue, offre des fonctionnalités avancées de sauvegarde, de réplication et de restauration."
+      ]
+    },
+    { "t": "sous", "x": "Synchronisation entre la baie {pp} et la baie Data Domain existante :", "if": "datadomain" },
+    {
+      "t": "puces",
+      "if": "datadomain",
+      "x": [
+        "La synchronisation réplique les sauvegardes sur les deux baies.",
+        "Cette redondance protège contre les défaillances matérielles ou les sinistres."
+      ]
+    },
+    { "t": "sous", "x": "Système AirGap avec isolation du backup :" },
+    {
+      "t": "puces",
+      "x": [
+        "Le système AirGap isole les sauvegardes sur le réseau, offrant une protection supplémentaire contre les attaques.",
+        "L'isolation du backup garantit que les sauvegardes restent protégées contre les accès non autorisés ou les attaques malveillantes."
+      ]
+    },
+    { "t": "img", "x": "[ Schéma : isolation AirGap du backup ]" },
+    { "t": "h", "x": "Avantages de la nouvelle architecture" },
+    {
+      "t": "puces",
+      "x": [
+        "Modernisation : l'architecture tire parti des dernières technologies de stockage et de sauvegarde.",
+        "Sécurité : snapshots immuables, synchronisation entre baies et AirGap offrent des couches multiples de protection.",
+        "Compatibilité : l'intégration avec l'existant permet une transition en douceur.",
+        "Performance : les nouvelles baies assurent des opérations de sauvegarde et de restauration rapides.",
+        "Redondance : la synchronisation entre baies protège contre les défaillances et les sinistres."
+      ]
+    },
+    { "t": "h", "x": "Conclusion" },
+    {
+      "t": "p",
+      "x": "La modernisation et la sécurisation de la sauvegarde grâce à l'ajout des nouvelles baies {ps} et {pp}, ainsi que la compatibilité avec l'existant, offrent à {client} une solution de sauvegarde performante, sécurisée et moderne."
+    },
+    {
+      "t": "p",
+      "x": "Les snapshots immuables, la synchronisation entre les baies et le système AirGap assurent une protection multiple des données, tandis que la compatibilité avec l'existant permet une intégration transparente. Cette architecture répond aux besoins des infrastructures modernes en matière de performance, de sécurité et de fiabilité (compatible NIS2)."
+    },
+    { "t": "img", "x": "[ Schéma : architecture globale de sauvegarde ]" }
+  ],
+  "sources": [
+    "Dell Technologies — PowerProtect DD / Data Domain : déduplication, Retention Lock (immuabilité), réplication",
+    "Dell Technologies — PowerStore : snapshots et réplication",
+    "Veeam — Veeam Backup & Replication, documentation officielle"
+  ],
+  "avertissement": "Argumentaire commercial type. Les capacités citées (immuabilité, AirGap, synchronisation Data Domain, déduplication) dépendent des modèles, des licences et de l'existant : à valider selon la configuration retenue."
+}

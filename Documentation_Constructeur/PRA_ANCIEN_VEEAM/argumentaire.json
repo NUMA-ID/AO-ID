@@ -1,0 +1,64 @@
+{
+  "_description": "SQUELETTE éditable — CAS PRA sur ancien matériel reconditionné (site de repli) avec Veeam. Rendu automatiquement quand, dans l'onglet Fonctionnalité, dispositif = PRA, cible = Ancien matériel, méthode = Veeam. Marqueurs : {client}, {rto}, {rpo}. Les mentions « à préciser » sont à compléter avec vos engagements réels (ne pas laisser de valeurs inventées).",
+  "titre_cas": "PRA sur matériel reconditionné avec Veeam",
+  "blocs": [
+    {
+      "t": "p",
+      "x": "Nous proposons à {client} un Plan de Reprise d'Activité (PRA) s'appuyant sur le matériel existant, reconditionné en site de repli, avec une réplication assurée par Veeam. Cette approche optimise l'investissement en réutilisant une infrastructure déjà amortie, tout en modernisant le dispositif de reprise. L'offre est conçue dans le respect des bonnes pratiques de résilience et des exigences NIS2."
+    },
+    { "t": "h", "x": "Périmètre et fonctionnalités" },
+    {
+      "t": "table",
+      "headers": ["Élément", "Détail"],
+      "rows": [
+        ["Site de repli", "Matériel existant de {client} reconditionné et dédié à la reprise."],
+        ["Logiciel de réplication", "Veeam Backup & Replication (édition à préciser)."],
+        ["Réplication", "Assurée par Veeam, indépendamment du matériel (compatible avec une infrastructure hétérogène)."],
+        ["Rétention", "À préciser (nombre de points de rétention et volumétrie associée)."],
+        ["Restauration", "À préciser (orchestration Veeam, priorisation des VM critiques)."],
+        ["RTO (Recovery Time Objective)", "{rto} (à confirmer contractuellement)."],
+        ["RPO (Recovery Point Objective)", "{rpo} (à confirmer selon la fréquence de réplication et la bande passante)."],
+        ["Support", "À préciser (niveau de priorité, tests de restauration inclus, rapport d'audit)."]
+      ]
+    },
+    { "t": "h", "x": "Ressources réseau" },
+    {
+      "t": "puces",
+      "x": [
+        "Liaison réseau entre le site de production et le site de repli (à préciser : VPN, débit).",
+        "Sécurisation des flux de réplication (FortiGate).",
+        "Segmentation dédiée (VLAN / VRF) à préciser."
+      ]
+    },
+    { "t": "h", "x": "Support et exploitation" },
+    {
+      "t": "puces",
+      "x": [
+        "Priorité de traitement en cas de sinistre (niveau à préciser).",
+        "Tests de restauration réguliers (fréquence à préciser) avec rapport d'audit.",
+        "Modalités d'exploitation (autonomie client / gestion ONE ID) à préciser."
+      ]
+    },
+    { "t": "h", "x": "Prérequis techniques" },
+    {
+      "t": "puces",
+      "x": [
+        "Licence Veeam (édition à préciser ; Enterprise Plus requise pour CDP et orchestration des tests).",
+        "Capacité du matériel reconditionné suffisante pour héberger les VM répliquées (à valider).",
+        "Compte de liaison Active Directory.",
+        "Procédure de bascule et de retour arrière documentée et testée régulièrement.",
+        "Dimensionnement de la rétention et de la bande passante à valider selon la volumétrie."
+      ]
+    },
+    { "t": "h", "x": "Exclusions" },
+    {
+      "t": "puces",
+      "x": [
+        "PRA/DRP côté client.",
+        "Astreinte.",
+        "Prestations de sécurisation avancée (à préciser)."
+      ]
+    }
+  ],
+  "avertissement": "Squelette à compléter. Les éléments « à préciser » doivent être renseignés avec les engagements réels avant envoi au client ; RTO/RPO et capacités sont à confirmer contractuellement selon la configuration et le matériel reconditionné retenus."
+}

@@ -1,0 +1,106 @@
+{
+  "_description": "SQUELETTE éditable — CAS PCA / cible cloud / méthode veeam. Rendu auto quand l'onglet Fonctionnalité a dispositif=PCA, cible correspondante et méthode correspondante. Marqueurs : {client}, {rto}, {rpo}. Compléter les « à préciser » avec vos engagements réels (ne rien inventer).",
+  "titre_cas": "Plan de Continuité d'Activité (PCA) — Cloud ONE ID + Veeam",
+  "blocs": [
+    {
+      "t": "p",
+      "x": "Nous proposons à {client} un Plan de Continuité d'Activité (PCA) hébergé sur le Cloud ONE ID, avec une réplication assurée par Veeam. Ce dispositif vise à maintenir les services critiques disponibles sans interruption perceptible, y compris en cas de défaillance d'un site, dans le respect des bonnes pratiques de résilience et des exigences NIS2."
+    },
+    {
+      "t": "h",
+      "x": "Périmètre et fonctionnalités"
+    },
+    {
+      "t": "table",
+      "headers": [
+        "Élément",
+        "Détail"
+      ],
+      "rows": [
+        [
+          "Site de repli",
+          "Données hébergées dans le datacenter ONE ID."
+        ],
+        [
+          "Logiciel / mécanisme de réplication",
+          "Veeam Backup & Replication (édition à préciser)."
+        ],
+        [
+          "Réplication",
+          "Assurée par Veeam, indépendamment du matériel (infrastructure hétérogène possible)."
+        ],
+        [
+          "Rétention",
+          "À préciser (nombre de points et volumétrie associée)."
+        ],
+        [
+          "Restauration",
+          "À préciser (orchestration, priorisation des VM critiques)."
+        ],
+        [
+          "RTO (Recovery Time Objective)",
+          "{rto} (à confirmer contractuellement)."
+        ],
+        [
+          "RPO (Recovery Point Objective)",
+          "{rpo} (à confirmer selon la fréquence de réplication et la bande passante)."
+        ],
+        [
+          "Support",
+          "À préciser (priorité en cas de sinistre, tests de restauration inclus, rapport d'audit)."
+        ]
+      ]
+    },
+    {
+      "t": "h",
+      "x": "Ressources réseau"
+    },
+    {
+      "t": "puces",
+      "x": [
+        "Liaison réseau entre production et site de repli (à préciser : type, débit).",
+        "Sécurisation des flux de réplication (FortiGate).",
+        "Segmentation dédiée (VLAN / VRF) à préciser."
+      ]
+    },
+    {
+      "t": "h",
+      "x": "Support et exploitation"
+    },
+    {
+      "t": "puces",
+      "x": [
+        "Priorité de traitement en cas de sinistre (niveau à préciser).",
+        "Tests de restauration réguliers (fréquence à préciser) avec rapport d'audit.",
+        "Modalités d'exploitation (autonomie client / gestion ONE ID) à préciser."
+      ]
+    },
+    {
+      "t": "h",
+      "x": "Prérequis techniques"
+    },
+    {
+      "t": "puces",
+      "x": [
+        "Licence Veeam (édition à préciser ; Enterprise Plus requise pour le CDP et l'orchestration des tests).",
+        "Compte de liaison Active Directory.",
+        "Liaison réseau site-à-site dimensionnée (débit à préciser).",
+        "Procédure de bascule et de retour arrière documentée et testée régulièrement.",
+        "Dimensionnement de la rétention et de la bande passante à valider selon la volumétrie."
+      ]
+    },
+    {
+      "t": "h",
+      "x": "Exclusions"
+    },
+    {
+      "t": "puces",
+      "x": [
+        "PRA/DRP côté client.",
+        "Astreinte.",
+        "Prestations de sécurisation avancée (à préciser)."
+      ]
+    }
+  ],
+  "avertissement": "Squelette à compléter. Les éléments « à préciser » doivent être renseignés avec les engagements réels avant envoi au client ; RTO/RPO et capacités sont à confirmer contractuellement selon la configuration retenue."
+}

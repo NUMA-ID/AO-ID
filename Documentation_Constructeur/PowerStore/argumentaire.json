@@ -1,0 +1,97 @@
+{
+  "modele_match": [
+    "powerstore"
+  ],
+  "titre": "Dell PowerStore — présentation et valeur ajoutée",
+  "blocs": [
+    {
+      "t": "p",
+      "x": "Votre nouvelle infrastructure sera basée sur {qte} baies PowerStore réparties sur chaque site. Cette baie vous offre de hautes performances et une évolutivité facile pour répondre à vos besoins d'aujourd'hui et de demain."
+    },
+    {
+      "t": "img"
+    },
+    {
+      "t": "p",
+      "x": "Haute performance : {modele_court} offre des performances exceptionnelles, idéales pour les applications exigeantes mentionnées dans les besoins de {client}."
+    },
+    {
+      "t": "p",
+      "x": "Évolutivité : cette solution permet une expansion facile et flexible du stockage, ce qui est crucial pour répondre aux besoins de stockage croissants de {client} sur les deux prochaines années et au-delà."
+    },
+    {
+      "t": "p",
+      "x": "Dell PowerStore est une appliance de stockage moderne conçue pour offrir à votre entreprise un avantage technologique à long terme dans un monde en constante évolution. Cette plateforme révolutionnaire basée sur des logiciels libère la puissance des données, quel que soit leur emplacement ou leur structure, pour vous aider à vous adapter et à transformer votre informatique sans perturber les opérations en cours."
+    },
+    {
+      "t": "p",
+      "x": "PowerStore consolide et accélère les charges applicatives traditionnelles et modernes, en commençant par la prise en charge d'une plateforme unique pour les applications en mode bloc, fichier, vVols et basées sur des conteneurs. Les performances NVMe de bout en bout (médias et E/S réseau) vous offrent une véritable marge de manœuvre pour vos besoins futurs, tandis que l'extension scale-up et scale-out permet d'équilibrer les besoins en matière de performances et de capacité au fil du temps."
+    },
+    {
+      "t": "p",
+      "x": "Quelle que soit la façon dont vous évoluez, vos données restent mobiles, sécurisées et hautement disponibles avec la réplication native, l'intégration de sauvegarde multicloud, les fonctionnalités de cybersécurité Zero-Trust et bien plus encore. La conception à auto-optimisation de PowerStore optimise automatiquement l'efficacité, les performances et la disponibilité sans intervention manuelle de votre part, même lorsque vous effectuez des changements de stratégie rapides."
+    },
+    {
+      "t": "p",
+      "x": "Tous les services de stockage sont configurés automatiquement lorsque vous insérez un nouveau disque. À mesure que la solution évolue, les coûts des supports et de l'énergie associée restent toujours faibles, avec une réduction intelligente des données toujours active offrant un DRR moyen garanti de 5:1 sans compromettre les performances."
+    },
+    {
+      "t": "p",
+      "x": "Les intégrations étendues des DevOps, de VMware et d'autres écosystèmes vous aident à automatiser l'ensemble des workflows pour une innovation accélérée, et l'application CloudIQ AIOps incluse offre une analytique proactive de l'intégrité et de la cybersécurité pour surveiller, analyser et dépanner facilement votre environnement multiplateforme."
+    },
+    {
+      "t": "p",
+      "x": "Le système d'exploitation basé sur des conteneurs et le modèle logiciel complet de PowerStore permettent la fourniture rapide de nouvelles fonctionnalités sans interruption, ce qui permet à la plateforme de répondre aux besoins de votre entreprise. L'achat et la maintenance ne sont pas soumis à une licence, et toutes les améliorations logicielles sont fournies sans frais, pendant toute la durée de vie du produit."
+    },
+    {
+      "t": "h",
+      "x": "Programme Anytime Upgrade"
+    },
+    {
+      "t": "p",
+      "x": "Le programme Anytime Upgrade de PowerStore vous offre une confiance supplémentaire dans l'exécution de vos charges applicatives sur les dernières technologies matérielles. Il est conçu pour offrir une flexibilité et une évolutivité maximales aux utilisateurs de solutions de stockage PowerStore."
+    },
+    {
+      "t": "p",
+      "x": "Flexibilité des mises à jour : le programme Anytime Upgrade permet de mettre à jour les contrôleurs de stockage de manière flexible et sans interruption des applications. Les entreprises peuvent ainsi améliorer les capacités de leurs systèmes en fonction de l'évolution de leurs besoins, sans perturbation de la production. La mise à niveau du contrôleur vers la génération suivante s'effectue sans frais supplémentaires."
+    },
+    {
+      "t": "p",
+      "x": "Protection des investissements : en offrant des options de mise à niveau flexibles et en permettant de moderniser les systèmes de stockage au fil du temps, le programme Anytime Upgrade aide à protéger les investissements et à maintenir l'infrastructure de stockage à la pointe de la technologie."
+    },
+    {
+      "t": "p",
+      "x": "De plus, PowerStore est pris en charge par les services Dell ProSupport, ce qui rend votre nouvelle solution d'infrastructure encore plus facile à adopter et à gérer."
+    },
+    {
+      "t": "h",
+      "x": "Évolutivité"
+    },
+    {
+      "t": "puces",
+      "x": [
+        "Chaque appliance dispose de deux nœuds de stockage actif-actif dans le boîtier de base.",
+        "L'unité de base peut être étendue avec jusqu'à trois boîtiers d'extension supplémentaires, et jusqu'à quatre appliances peuvent être liées dans des clusters scale-out intelligents.",
+        "La capacité augmente de façon aussi granulaire qu'un seul disque à la fois, avec tous les services de stockage configurés automatiquement par le moteur Dynamic Resiliency Engine.",
+        "Chaque modèle peut atteindre une capacité supérieure à 18 PBe."
+      ]
+    },
+    {
+      "t": "p",
+      "x": "Basé sur une plateforme polyvalente utilisant les microprocesseurs Intel Xeon et les technologies de stockage les plus avancées d'aujourd'hui, y compris les disques Flash NVMe et la réduction constante des données inline avec assistance matérielle, PowerStore utilise de puissants outils d'analytique, d'automatisation et d'équilibrage de ressources actives pour optimiser les performances et éliminer les frais de gestion."
+    },
+    {
+      "t": "vol",
+      "x": "Vous trouverez ci-dessous la configuration détaillée des baies PowerStore que nous vous proposons, pour une volumétrie brute de {raw_baie} par baie soit {effective_baie} effective avec la data reduction. Comme demandé, la volumétrie utile sur l'ensemble du cluster sera donc supérieure à {utile_cluster}."
+    }
+  ],
+  "sources": [
+    "Dell Technologies — « Les principales raisons pour lesquelles les clients choisissent Dell PowerStore », réf. H18144, © 2023",
+    "ESG — « Dell PowerStore Data Efficiency » (étude commanditée par Dell)",
+    "Omdia / ESG — « PowerStore for Modern Storage », 2025 (à la demande de Dell Technologies)"
+  ],
+  "avertissement": "Contenu de présentation commerciale ; certaines valeurs (DRR 5:1, 18 PBe, efficacité énergétique) sont des données constructeur Dell, susceptibles de varier selon la configuration et les charges.",
+  "images_defaut": [
+    "powerstore.png"
+  ]
+}

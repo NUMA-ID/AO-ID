@@ -1,0 +1,25 @@
+services:
+  ao-oneid:
+    build: .
+    container_name: ao-oneid
+    ports:
+      - "8080:8000"
+    # Rechargement auto : les modifs de main.py / engine s'appliquent sans reconstruire ni redémarrer manuellement
+    command: ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload", "--reload-dir", "/app"]
+    env_file:
+      - .env
+    environment:
+      BASE_DOCX: /app/assets/TEMPLATE_BASE_ONEID.docx
+      DOC_BASE: /data/Documentation_Constructeur
+      OUT_DIR: /data/Documents_Generes
+      FICHES_DIR: /data/Fiches_Specs
+    volumes:
+      # Base documentaire (argumentaires + images produit) et sorties, montées depuis le dossier projet
+      - ../Documentation_Constructeur:/data/Documentation_Constructeur
+      - ../Fiches_Specs:/data/Fiches_Specs
+      - ../Documents_Generes:/data/Documents_Generes
+      # Code servi à chaud : les modifs du frontend/moteur/backend s'appliquent sans reconstruire l'image
+      - ./web:/app/web
+      - ./engine:/app/engine
+      - ./main.py:/app/main.py
+    restart: unless-stopped

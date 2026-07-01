@@ -1,0 +1,98 @@
+{
+  "modele_match": [
+    "r650"
+  ],
+  "titre": "Dell PowerEdge R650 — présentation et valeur ajoutée",
+  "blocs": [
+    {
+      "t": "p",
+      "x": "Les serveurs {modele_court} constituent le socle de calcul de votre nouvelle infrastructure. Conçus pour offrir une haute performance et une grande polyvalence, ils sont adaptés à une large variété d'applications d'entreprise, y compris les environnements fortement virtualisés."
+    },
+    {
+      "t": "img"
+    },
+    {
+      "t": "vol",
+      "x": "Ces serveurs sont dimensionnés pour gérer efficacement les {nb_vm} serveurs virtuels de {client}, et pour accompagner la continuité d'activité (PCA) en cas d'incident majeur sur le site principal."
+    },
+    {
+      "t": "h",
+      "x": "Performance et puissance de calcul"
+    },
+    {
+      "t": "puces",
+      "x": [
+        "Processeurs puissants : le {modele_court} peut être équipé de processeurs Intel Xeon Scalable de 3ᵉ génération, offrant des performances élevées pour les charges de travail les plus exigeantes.",
+        "Support de la mémoire : une grande capacité de mémoire RAM, essentielle pour les applications gourmandes en ressources et la virtualisation."
+      ]
+    },
+    {
+      "t": "h",
+      "x": "Stockage et gestion des données"
+    },
+    {
+      "t": "puces",
+      "x": [
+        "Capacité de stockage flexible : différentes options de stockage interne permettant une adaptation facile aux besoins de stockage.",
+        "Options de disques : prise en charge des disques durs (HDD) et SSD, pour un équilibre entre capacité, vitesse et coût."
+      ]
+    },
+    {
+      "t": "h",
+      "x": "Réseau et connectivité"
+    },
+    {
+      "t": "puces",
+      "x": [
+        "Options réseau étendues : plusieurs choix de cartes réseau pour une intégration fluide et la prise en charge des charges réseau intensives."
+      ]
+    },
+    {
+      "t": "h",
+      "x": "Sécurité et fiabilité"
+    },
+    {
+      "t": "puces",
+      "x": [
+        "Sécurité intégrée : fonctionnalités de sécurité avancées protégeant les données et le matériel contre les menaces.",
+        "Fiabilité et haute disponibilité : composants redondants et options de récupération rapide pour minimiser les temps d'arrêt."
+      ]
+    },
+    {
+      "t": "h",
+      "x": "Gestion et maintenance"
+    },
+    {
+      "t": "puces",
+      "x": [
+        "Gestion système intégrée : iDRAC (Integrated Dell Remote Access Controller) pour une surveillance et une maintenance à distance simplifiées."
+      ]
+    },
+    {
+      "t": "h",
+      "x": "Évolutivité et éco-efficacité"
+    },
+    {
+      "t": "puces",
+      "x": [
+        "Évolutivité : conçu pour accompagner l'évolution des besoins, avec des mises à niveau et une extension de capacité facilitées.",
+        "Efficacité énergétique : conception éco-efficace réduisant les coûts d'énergie et soutenant les initiatives de durabilité."
+      ]
+    },
+    {
+      "t": "p",
+      "x": "En synthèse, le {modele_court} est un serveur rack polyvalent combinant performance, sécurité et évolutivité, adapté aux applications d'entreprise et aux environnements fortement virtualisés."
+    },
+    {
+      "t": "p",
+      "x": "Vous trouverez ci-dessous la configuration détaillée des serveurs {modele_court} que nous prévoyons de déployer pour votre nouvelle infrastructure."
+    }
+  ],
+  "images_defaut": [
+    "poweredge.png"
+  ],
+  "sources": [
+    "Dell Technologies — page produit et fiche technique Dell PowerEdge R650 (dell.com)"
+  ],
+  "avertissement": "Contenu de présentation commerciale ; les caractéristiques précises (processeurs, mémoire, disques) sont à confirmer selon la configuration retenue et la fiche technique Dell du modèle."
+}

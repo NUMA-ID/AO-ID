@@ -1,0 +1,24 @@
+# --- Secrets : NE JAMAIS versionner ---
+.env
+app/.env
+
+# --- Python ---
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+venv/
+
+# --- Sorties générées (documents Word) ---
+Documents_Generes/
+
+# --- Fiches clients (données) : exclues par défaut ---
+# Retirez la ligne suivante si vous souhaitez versionner les fiches.
+Fiches_Specs/
+
+# --- Divers ---
+*.log
+.DS_Store
+Thumbs.db
+*.tmp
