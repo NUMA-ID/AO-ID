@@ -164,12 +164,13 @@ def style_table(doc, t):
         try: t.style = doc.styles[st]; return
         except KeyError: continue
 
-def set_cell(cell, text, red=False, bold=False):
+def set_cell(cell, text, red=False, bold=False, size=None):
     cell.text = ""
     r = cell.paragraphs[0].add_run("" if text is None else str(text))
     if red: r.font.color.rgb = RED
     if bold: r.bold = True
     _afont(r)
+    if size: r.font.size = Pt(size)
 
 def kv_table(doc, rows, headers=("Caractéristique","Valeur"), red_values=False, widths=None):
     rows = [(k, v) for k, v in rows if v not in (None,"","À préciser")]
@@ -187,11 +188,11 @@ def nomenclature_table(doc, comps):
     if not comps: return
     t = doc.add_table(rows=1, cols=4); style_table(doc, t)
     for i, h in enumerate(("Module","Description","Référence (SKU)","Qté")):
-        set_cell(t.rows[0].cells[i], h, bold=True)
+        set_cell(t.rows[0].cells[i], h, bold=True, size=8)
     for c in comps:
         r = t.add_row().cells
-        set_cell(r[0], c.get("module","")); set_cell(r[1], c.get("description",""))
-        set_cell(r[2], c.get("sku","")); set_cell(r[3], c.get("qte",""))
+        set_cell(r[0], c.get("module",""), size=8); set_cell(r[1], c.get("description",""), size=8)
+        set_cell(r[2], c.get("sku",""), size=8); set_cell(r[3], c.get("qte",""), size=8)
     _set_widths(t, [Cm(3.5), Cm(10.0), Cm(2.0), Cm(1.0)])
 
 def insert_images(doc, item, arg=None):
@@ -248,7 +249,7 @@ def ctx_item(item):
 
 def section_commerciale(doc, arg, item):
     ctx = ctx_item(item)
-    add_heading(doc, "Présentation & valeur ajoutée", 3)
+    add_para(doc, "Présentation & valeur ajoutée", bold=True)
     if arg.get("blocs"):
         for b in arg["blocs"]:
             t = b.get("t")
@@ -260,6 +261,21 @@ def section_commerciale(doc, arg, item):
                 for it in b.get("x", []):
                     p = doc.add_paragraph(); sstyle(doc, p, "Bullet 1"); _fill_runs(p, it, ctx)
             elif t == "img": insert_images(doc, item, arg)
+            elif t == "image":
+                if not _img_b64(doc, b.get("data"), b.get("width_cm") or 13):
+                    insert_images(doc, item, arg)
+            elif t == "sous":
+                pp = doc.add_paragraph(); sstyle(doc, pp, BODY); _fill_runs(pp, b.get("x",""), ctx)
+                for rr in pp.runs: rr.bold = True
+            elif t == "table":
+                headers = b.get("headers", ["Élément", "Détail"])
+                tb = doc.add_table(rows=1, cols=2); style_table(doc, tb)
+                set_cell(tb.rows[0].cells[0], headers[0], bold=True); set_cell(tb.rows[0].cells[1], headers[1], bold=True)
+                for row in b.get("rows", []):
+                    if isinstance(row, (list, tuple)) and len(row) >= 2:
+                        c = tb.add_row().cells
+                        c[0].text = ""; _fill_runs(c[0].paragraphs[0], str(row[0]), ctx)
+                        c[1].text = ""; _fill_runs(c[1].paragraphs[0], str(row[1]), ctx)
             elif t == "vol":
                 keys = re.findall(r"\{(\w+)\}", b.get("x",""))
                 if keys and all(ctx.get(k) for k in keys): add_subst(doc, b.get("x",""), ctx)
@@ -280,7 +296,7 @@ def render_item(doc, item, fields, cat_label):
     if re.match(r"(?i)^group\s*\d+$", titre.strip()): titre = ""
     modele = item.get("modele", "")
     head = (titre + " — " + modele).strip(" —") or cat_label
-    add_heading(doc, head, 2, qte=item.get("qte", "1"))
+    add_heading(doc, head, 3, qte=item.get("qte", "1"))
 
     arg = match_arg(ARGS, modele)
     if arg and arg.get("titre") not in SHOWN_ARGS:
@@ -290,17 +306,13 @@ def render_item(doc, item, fields, cat_label):
     if any(v not in (None,"","À préciser") for _, v in rows):
         add_heading(doc, "Configuration proposée", 3)
         kv_table(doc, rows, red_values=True)
-    se = item.get("specs_extraites") or {}
-    if se:
-        add_heading(doc, "Synthèse des caractéristiques constructeur", 3)
-        kv_table(doc, [(SPEC_LABEL.get(k, k.capitalize()), v) for k, v in se.items()])
     if item.get("comparatif"):
         add_heading(doc, "Comparatif constructeur", 3)
         # (rendu simple)
         for row in item["comparatif"]:
             add_para(doc, "• " + str(row.get("carac","")) + " : " + str(row.get("retenu","")))
     if item.get("composants"):
-        add_heading(doc, "Configuration détaillée (nomenclature)", 3)
+        add_para(doc, "Configuration détaillée (nomenclature)", bold=True)
         nomenclature_table(doc, item["composants"])
 
 def section_presentation_oneid(doc):
@@ -351,6 +363,7 @@ def inventaire_table(doc, spec):
     for dom, eq, q in lignes:
         c = t.add_row().cells
         set_cell(c[0], dom); set_cell(c[1], eq, red=True); set_cell(c[2], q, red=True)
+    _set_widths(t, [Cm(4.0), Cm(11.0), Cm(1.4)])
 
 
 def render_solution_text(doc, txt, ctx):
@@ -384,10 +397,10 @@ def section_solution_proposee(doc, aff, spec):
     ctx = {"client": (aff.get("client") or "").strip() or "votre collectivité"}
     if aff.get("solution_proposee"):
         render_solution_text(doc, aff["solution_proposee"], ctx)
-    add_heading(doc, "Inventaire de la solution", 3)
+    add_heading(doc, "Inventaire de la solution", 2)
     add_para(doc, "Vue d'ensemble des équipements proposés dans le cadre de ce dossier :")
     inventaire_table(doc, spec)
-    add_heading(doc, "Architecture proposée", 3)
+    add_heading(doc, "Architecture proposée", 2)
     insert_arch_image(doc, aff)
 
 
@@ -462,6 +475,7 @@ def _gantt_buf(tasks):
     # Couleurs (alignées sur l'aperçu HTML)
     NAVY = ("#" + HDR_HEX) if DESIGN_ON else "#21425f"
     ORANGE, PURPLE, GRID = "#f4b183", "#c9b7e4", "#dfe3e8"
+    RECEP, TELE = "#8bc98b", "#6aaed6"   # réception matériel (vert), télétravail (bleu)
     # Largeurs de colonnes en unités arbitraires
     ID_W, TASK_W, WK_W, ROW_H = 0.7, 7.0, 0.95, 1.0
     total_w = ID_W + TASK_W + WK_W * nW
@@ -497,7 +511,14 @@ def _gantt_buf(tasks):
         ax.text(ID_W + 0.12, y + ROW_H / 2, nm, ha="left", va="center", fontsize=6, color="#222", zorder=2)
         d0, d1 = _pdate(tk.get("debut")), _pdate(tk.get("fin"))
         if d0 and d1:
-            color = PURPLE if tk.get("conge") else ORANGE
+            if tk.get("conge"):
+                color = PURPLE
+            elif re.search(r"r[ée]ception", tk.get("nom") or "", re.I):
+                color = RECEP
+            elif tk.get("teletravail"):
+                color = TELE
+            else:
+                color = ORANGE
             for i, w in enumerate(weeks):
                 we = w + datetime.timedelta(days=6)
                 if d0 <= we and d1 >= w:
@@ -517,7 +538,8 @@ def section_planning(doc, spec):
     ONEID_HX = HDR_HEX
     add_heading(doc, "Planning prévisionnel infra", 1)
     add_para(doc, "Planning prévisionnel des interventions. Le diagramme ci-dessous présente "
-                  "l'enchaînement hebdomadaire des tâches (cases orange ; congés en violet).", size=9)
+                  "l'enchaînement hebdomadaire des tâches — orange : tâche ; vert : réception matériel ; "
+                  "bleu : télétravail ; violet : congé.", size=9)
     info = ["ID", "Nom de tâche", "Début", "Fin", "Durée", "Équipes", "Tél."]
     t = doc.add_table(rows=1, cols=len(info))
     try:
@@ -560,6 +582,20 @@ def _img_ph(doc, label="[ Schéma à insérer ]"):
     return p
 
 
+def _img_b64(doc, data, width_cm=13):
+    """Insère une image encodée en base64 (data-URL ou brute), centrée. True si insérée."""
+    if not data:
+        return False
+    if "," in data and "base64" in data[:40]:
+        data = data.split(",", 1)[1]
+    try:
+        doc.add_picture(io.BytesIO(base64.b64decode(data)), width=Cm(width_cm))
+        doc.paragraphs[-1].alignment = WD_ALIGN_PARAGRAPH.CENTER
+        return True
+    except Exception:
+        return False
+
+
 def _load_arg(folder):
     """Charge un argumentaire éditable Documentation_Constructeur/<folder>/argumentaire.json."""
     base = DOC_BASE or os.path.join(os.getcwd(), "Documentation_Constructeur")
@@ -584,7 +620,7 @@ def render_blocs(doc, blocs, ctx, conditions=None):
         if t == "p":
             add_subst(doc, b.get("x", ""), ctx)
         elif t in ("h", "h2"):
-            add_heading(doc, b.get("x", ""), 2)
+            add_heading(doc, b.get("x", ""), 3)
         elif t == "sous":
             p = doc.add_paragraph(); sstyle(doc, p, BODY)
             _fill_runs(p, b.get("x", ""), ctx)
@@ -595,6 +631,9 @@ def render_blocs(doc, blocs, ctx, conditions=None):
                 _bullet(doc, it, ctx)
         elif t == "img":
             _img_ph(doc, b.get("x", "[ Schéma à insérer ]"))
+        elif t == "image":
+            if not _img_b64(doc, b.get("data"), b.get("width_cm") or 13):
+                _img_ph(doc, "[ Image à insérer ]")
         elif t == "table":
             headers = b.get("headers", ["Élément", "Détail"])
             tb = doc.add_table(rows=1, cols=2); style_table(doc, tb)
@@ -665,7 +704,7 @@ def section_sauvegarde_combo(doc, spec):
         "datadomain": bool(aff.get("sauv_datadomain")) or bool(detect("datadomain")) or bool(detect("data domain")),
     }
 
-    add_heading(doc, arg.get("titre", "Solution de Sauvegarde"), 1)
+    add_heading(doc, arg.get("titre", "Solution de Sauvegarde"), 2)
     render_blocs(doc, arg.get("blocs", []), ctx, conditions)
     if arg.get("sources"):
         add_para(doc, "Sources : " + " ; ".join(arg["sources"]), italic=True, size=8)
@@ -717,7 +756,7 @@ def section_sauvegarde_offre(doc, spec):
     if not (log and cib) and not sites:
         return
     cl = (spec.get("affaire", {}).get("client") or "").strip() or "votre collectivité"
-    add_heading(doc, "Solution de sauvegarde", 1)
+    add_heading(doc, "Solution de sauvegarde", 2)
     if sites:
         add_para(doc, "Volumétrie et typologie des données à protéger :", bold=True)
         for s in sites:
@@ -758,6 +797,35 @@ def _append_admin(doc):
         return None
 
 
+def section_prestations(doc, spec):
+    """Chapitre Prestations et méthodologie : intitulé + durée (rouge) + méthodologie."""
+    prs = [p for p in (spec.get("prestations") or [])
+           if isinstance(p, dict) and (p.get("intitule") or "").strip()]
+    if not prs:
+        return
+    cl = (spec.get("affaire", {}).get("client") or "").strip() or "votre collectivité"
+    add_heading(doc, "Prestations et méthodologie", 1)
+    for p in prs:
+        # 1) Intitulé
+        add_heading(doc, (p.get("intitule") or "").strip(), 2)
+        # 2) Argumentaire lié (sélectionné dans l'onglet Prestations)
+        folder = (p.get("argumentaire") or "").strip()
+        if folder:
+            arg = _load_arg(folder)
+            if arg:
+                render_blocs(doc, arg.get("blocs", []), {"client": cl}, {})
+                if arg.get("sources"):
+                    add_para(doc, "Sources : " + " ; ".join(arg["sources"]), italic=True, size=8)
+        # 3) Complément / options
+        comp = p.get("complement") or p.get("methodo") or ""
+        if comp.strip():
+            render_solution_text(doc, comp, {"client": cl})
+        # 4) Durée estimée (en dernier)
+        duree = (p.get("duree") or "").strip()
+        if duree:
+            add_para(doc, "Durée estimée : " + duree, bold=True, red=True)
+
+
 def section_chapitres(doc, spec):
     """Chapitres rédigés issus du Kanban : titre + texte éditable + points à traiter (puces rouges).
     Rendus dans l'ordre défini dans le Kanban."""
@@ -770,7 +838,16 @@ def section_chapitres(doc, spec):
         if not titre:
             continue
         add_heading(doc, titre, 1)
-        texte = ch.get("texte") or ""
+        # 1) Argumentaire lié (sélectionné dans la description du chapitre)
+        folder = (ch.get("argumentaire") or "").strip()
+        if folder:
+            arg = _load_arg(folder)
+            if arg:
+                render_blocs(doc, arg.get("blocs", []), {"client": cl}, {})
+                if arg.get("sources"):
+                    add_para(doc, "Sources : " + " ; ".join(arg["sources"]), italic=True, size=8)
+        # 2) Complément d'info / options / prérequis (ou ancien champ « texte »)
+        texte = ch.get("complement") or ch.get("texte") or ""
         if texte.strip():
             render_solution_text(doc, texte, {"client": cl})
         for im in (ch.get("images") or []):
@@ -799,6 +876,10 @@ def section_chapitres(doc, spec):
                 r = p.add_run(("✔ " if ok else "") + lab)
                 r.font.color.rgb = RGBColor(0x1E, 0x7E, 0x34) if ok else RED   # vert = validé, rouge = à traiter
                 _afont(r)
+        # 3) Durée d'installation estimée (en dernier)
+        duree = (ch.get("duree") or "").strip()
+        if duree:
+            add_para(doc, "Durée d'installation estimée : " + duree, bold=True, red=True)
 
 
 def section_pra_pca(doc, aff):
@@ -813,13 +894,13 @@ def section_pra_pca(doc, aff):
               "nouveau": "Nouveau matériel dédié", "cloud": "Cloud ONE ID"}
     METHODES = {"veeam": "Veeam (logiciel, indépendant du matériel)",
                 "natif": "Réplication native de la baie de stockage"}
-    add_heading(doc, titre_mode, 1)
+    add_heading(doc, titre_mode, 2)
     info = [("Dispositif", titre_mode),
             ("RTO (délai de reprise visé)", pp.get("rto", "")),
             ("RPO (perte de données max admise)", pp.get("rpo", "")),
             ("Cible de réplication", CIBLES.get(pp.get("cible"), pp.get("cible", ""))),
             ("Méthode de réplication", METHODES.get(pp.get("methode"), pp.get("methode", "")))]
-    kv_table(doc, info, headers=("Paramètre", "Valeur"), red_values=True)
+    kv_table(doc, info, headers=("Paramètre", "Valeur"), red_values=True, widths=[Cm(6.5), Cm(9.5)])
     add_para(doc, "")
     texte = pp.get("texte") or ""
     if texte.strip():
@@ -933,19 +1014,20 @@ def main():
         add_heading(doc, "Contexte", 2)
         render_solution_text(doc, contexte, {"client": cl})
     section_solution_proposee(doc, aff, spec)
-    section_pra_pca(doc, aff)
 
     for key, label, intro, fields in CATS:
         items = spec.get(key) or []
         if not items: continue
-        add_heading(doc, label, 1)
+        add_heading(doc, label, 2)
         if intro: add_para(doc, intro)
         for it in items:
             render_item(doc, it, fields, label)
 
+    section_pra_pca(doc, aff)
     section_sauvegarde_combo(doc, spec)
     section_sauvegarde_offre(doc, spec)
     section_chapitres(doc, spec)
+    section_prestations(doc, spec)
     section_planning(doc, spec)
     composer = _append_admin(doc)        # chapitres administratifs figés, à la fin
     section_verification(doc, spec)

@@ -1,6 +1,14 @@
 # --- Secrets : NE JAMAIS versionner ---
 .env
 app/.env
+.env.*
+app/.env.*
+!.env.example
+!app/.env.example
+*.env.bak*
+
+# --- Sauvegardes frontend automatiques ---
+app/web/versions/index_backup_*.html
 
 # --- Python ---
 __pycache__/
