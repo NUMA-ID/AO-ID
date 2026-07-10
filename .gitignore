@@ -10,6 +10,9 @@ app/.env.*
 # --- Sauvegardes frontend automatiques ---
 app/web/versions/index_backup_*.html
 
+# --- Sauvegardes de template Word ---
+**/TEMPLATE_BASE_ONEID.backup_*.docx
+
 # --- Python ---
 __pycache__/
 *.pyc

@@ -23,3 +23,15 @@ services:
       - ./engine:/app/engine
       - ./main.py:/app/main.py
     restart: unless-stopped
+
+  # Éditeur de schémas d'architecture draw.io (web, 100 % local)
+  drawio:
+    image: jgraph/drawio:30.3.6
+    container_name: ao-drawio
+    ports:
+      - "8081:8080"
+    environment:
+      # Fonctionnement autonome / hors-ligne : pas d'intégrations cloud externes
+      DRAWIO_GOOGLE_CLIENT_ID: ""
+      DRAWIO_MSGRAPH_CLIENT_ID: ""
+    restart: unless-stopped

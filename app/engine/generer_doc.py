@@ -981,6 +981,61 @@ def patch_cover(path, aff):
             zout.writestr(it, data)
     shutil.move(tmp, path)
 
+def _cover_write(cell, text, red=True):
+    """Écrit dans une cellule du template en conservant son style ; valeur en rouge (à vérifier)."""
+    text = "" if text is None else str(text)
+    p = cell.paragraphs[0]
+    if p.runs:
+        p.runs[0].text = text
+        for r in p.runs[1:]:
+            r.text = ""
+        r = p.runs[0]
+    else:
+        r = p.add_run(text)
+    if red and text.strip():
+        r.font.color.rgb = RED
+    return r
+
+def fill_cover(doc, aff, contacts):
+    """Remplit les tableaux de la page de garde du template ONE ID :
+    Vos contacts, Propriétés (Document/Version/Auteur/Date), Historique des évolutions."""
+    contacts = [c for c in (contacts or []) if isinstance(c, dict) and any((c.get(k) or "").strip()
+                for k in ("nom", "prenom", "fonction", "telephone", "email"))]
+    for t in doc.tables:
+        try:
+            hdr = " ".join(c.text.strip().lower() for c in t.rows[0].cells)
+        except Exception:
+            continue
+        # --- Vos contacts : Nom / Prénom / Fonction / Téléphone / E-mail ---
+        if "nom" in hdr and ("mail" in hdr or "courriel" in hdr):
+            while len(t.rows) - 1 < len(contacts):
+                t.add_row()
+            for i, ct in enumerate(contacts):
+                cells = t.rows[i + 1].cells
+                vals = [ct.get("nom", ""), ct.get("prenom", ""), ct.get("fonction", ""),
+                        ct.get("telephone", ""), ct.get("email", "")]
+                for j in range(min(len(vals), len(cells))):
+                    _cover_write(cells[j], vals[j])
+        # --- Propriétés : libellés en colonne 0, valeurs en colonne 1 ---
+        elif "document" in hdr:
+            vmap = {"document": aff.get("projet", ""), "version": aff.get("version", ""),
+                    "auteur": aff.get("auteur", ""), "date": aff.get("date", "")}
+            for row in t.rows:
+                if len(row.cells) < 2:
+                    continue
+                lbl = row.cells[0].text.strip().lower()
+                for k, v in vmap.items():
+                    if lbl.startswith(k):
+                        _cover_write(row.cells[1], v)
+                        break
+        # --- Historique des évolutions : 1re ligne = création ---
+        elif "version" in hdr and ("commentair" in hdr or "date" in hdr) and "auteur" in hdr:
+            if len(t.rows) > 1:
+                cells = t.rows[1].cells
+                vals = [aff.get("version", ""), aff.get("date", ""), aff.get("auteur", ""), "Création du document"]
+                for j in range(min(len(vals), len(cells))):
+                    _cover_write(cells[j], vals[j])
+
 def main():
     global ARGS, AFF, DOC_BASE
     spec = json.load(open(sys.argv[1], encoding="utf-8")); out_path = sys.argv[2]
@@ -995,17 +1050,14 @@ def main():
 
     apply_theme(spec.get("_theme"))
     doc = Document(BASE)
-    # Intro engageante (réécrite par le mode Design si présent)
+    # Page de garde du template : remplissage auto (Vos contacts, Propriétés, Historique)
+    fill_cover(doc, aff, aff.get("contacts") or spec.get("contacts") or [])
+    # Intro engageante (réécrite par le mode Design si présent), à la suite du titre « Introduction »
     DEFAULT_INTRO = ("ONE ID a le plaisir de vous présenter la solution d'infrastructure conçue "
                      "pour {client} dans le cadre du projet {projet}. Ce document détaille les équipements "
                      "proposés, leurs caractéristiques techniques et la valeur apportée à votre organisation.")
     render_solution_text(doc, aff.get("intro_override") or DEFAULT_INTRO, actx)
-    # Bloc affaire (table propre, valeurs en rouge)
-    info = [("Client", actx["client"]), ("Projet", actx["projet"]),
-            ("Référence", actx["reference"]), ("Prix catalogue de la solution", actx["prix"]),
-            ("Date", aff.get("date","")), ("Version", aff.get("version",""))]
-    kv_table(doc, info, headers=("Informations du dossier","Valeur"), red_values=True, widths=[Cm(5.0), Cm(11.4)])
-    # Legende relecture
+    # Legende relecture (les valeurs en rouge — y compris la page de garde — sont à vérifier)
     add_para(doc, "Note de relecture : les éléments affichés en rouge sont personnalisés "
              "(spécifiques à ce dossier) et sont à vérifier avant envoi au client.", red=True, italic=True, size=9)
     section_presentation_oneid(doc)

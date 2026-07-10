@@ -1,5 +1,10 @@
 # Journal des versions — Générateur d'appel d'offre ONE ID
 
+## v2.2
+- **Nouveau template Word ONE ID** (page de garde, sommaire, en-têtes/pieds). Le générateur remplit automatiquement la page de garde : tableau *Propriétés* (Document/Version/Auteur/Date), 1re ligne de l'*Historique des évolutions*, tableau *Vos contacts* ; suppression du tableau « Informations du dossier » en doublon ; le contenu s'écrit à la suite du titre *Introduction*.
+- **Saisie des contacts** dans l'assistant (Nom/Prénom/Fonction/Téléphone/E-mail), reportée dans la page de garde.
+- **Éditeur de schémas draw.io intégré** (service Docker `jgraph/drawio:30.3.6`, port 8081, 100 % local) : bouton « Dessiner (draw.io) » dans la section Schéma d'architecture ; le schéma est exporté en PNG (XML ré-éditable embarqué) et inséré dans le chapitre « Architecture proposée » du Word.
+
 ## v2.1
 - **Fusion Structure du dossier + Prestations** : assistant ramené à 6 étapes. La popup « Décrire l'offre » de chaque chapitre propose la liste déroulante des argumentaires, le complément d'info / options / prérequis (saisie, dictée, reformulation Claude) et le nombre de jours d'installation estimé.
 - Rendu Word de chaque chapitre dans l'ordre **titre → argumentaire → complément → durée** ; génération du planning « depuis les chapitres ».

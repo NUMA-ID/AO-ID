@@ -95,7 +95,7 @@ def llm_complete(system, user, max_tokens=4000, provider="claude", model=""):
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 FICHES_DIR.mkdir(parents=True, exist_ok=True)
 
-APP_VERSION = "2.1"
+APP_VERSION = "2.2"
 
 
 def _archive_frontend():

@@ -6,6 +6,7 @@ Application web complète (backend Python + frontend) qui réunit **tout** au m�
 - **Import Excel Dell Solutions Configurator** : classement automatique + nomenclature.
 - **Saisie des équipements** (serveurs, stockage, switches, sauvegarde, logiciels), solution proposée, images, schéma d'architecture.
 - **Génération du document Word ONE ID** (modèle, argumentaires sourcés, mise en forme, images) — directement depuis l'interface.
+- **Éditeur de schémas draw.io intégré** (100 % local) : dessin du schéma d'architecture directement dans l'interface, inséré automatiquement dans le Word.
 
 ## Prérequis
 
@@ -35,6 +36,13 @@ Application web complète (backend Python + frontend) qui réunit **tout** au m�
 - Onglet **Équipements** : importer l'Excel Dell ou saisir manuellement, renseigner la solution proposée, déposer les images.
 - Bouton **« Générer le Word ONE ID »** : le document est téléchargé et enregistré dans `Documents_Generes\`.
 
+### Schéma d'architecture (draw.io)
+
+- Étape **CCTP & Contexte** → section **Schéma d'architecture** → bouton **« ✏️ Dessiner (draw.io) »**.
+- L'éditeur draw.io s'ouvre en plein écran. Dessinez, puis cliquez sur **Enregistrer** (disquette) : le schéma est ajouté aux images d'architecture (vignette) et sera inséré dans le chapitre « Architecture proposée » du Word.
+- Le schéma reste **ré-éditable** : cliquez sur **✏️** sur sa vignette pour le rouvrir dans draw.io.
+- draw.io tourne dans son propre conteneur, accessible directement sur **http://localhost:8081** si besoin. Aucune donnée n'est envoyée à l'extérieur.
+
 ## Données partagées avec le dossier projet
 
 Le conteneur monte (en lecture/écriture) les dossiers du projet :
@@ -46,6 +54,8 @@ Le conteneur monte (en lecture/écriture) les dossiers du projet :
 | `..\Documents_Generes` | `/data/Documents_Generes` | Documents Word générés |
 
 Le modèle Word et l'image de présentation ONE ID sont embarqués dans `app\assets\`.
+
+Deux services sont démarrés : l'application (**port 8080**) et l'éditeur **draw.io** (**port 8081**, image officielle `jgraph/drawio:30.3.6`). Le premier `docker compose up -d` télécharge l'image draw.io (nécessite Internet une seule fois) ; ensuite tout fonctionne hors-ligne.
 
 ## Commandes utiles
 
