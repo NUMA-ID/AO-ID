@@ -95,7 +95,7 @@ def llm_complete(system, user, max_tokens=4000, provider="claude", model=""):
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 FICHES_DIR.mkdir(parents=True, exist_ok=True)
 
-APP_VERSION = "2.0"
+APP_VERSION = "2.1"
 
 
 def _archive_frontend():
@@ -146,6 +146,19 @@ def health():
 
 
 # ---------------------------------------------------------------- Extraction texte
+def extract_docx_text(path) -> str:
+    """Extrait le texte (paragraphes + tableaux) d'un .docx généré, pour la comparaison CCTP."""
+    import docx
+    d = docx.Document(str(path))
+    out = [p.text.strip() for p in d.paragraphs if p.text.strip()]
+    for t in d.tables:
+        for row in t.rows:
+            cells = [c.text.strip() for c in row.cells]
+            if any(cells):
+                out.append(" | ".join(cells))
+    return "\n".join(out)
+
+
 def extract_text(filename: str, data: bytes) -> str:
     name = (filename or "").lower()
     if name.endswith(".txt"):
@@ -176,6 +189,38 @@ def parse_json_loose(s: str):
             except Exception:
                 return None
     return None
+
+
+def _unesc(x):
+    return (x or "").replace("\\n", "\n").replace("\\r", "").replace("\\t", " ").replace('\\"', '"').replace("\\/", "/").strip()
+
+
+def parse_cctp(raw):
+    """Extraction robuste de l'analyse CCTP : JSON propre, sinon récupération tolérante (JSON mal formé)."""
+    s = (raw or "").strip()
+    s = re.sub(r"```(?:json)?", "", s).replace("```", "").strip()   # retire les fences, même non fermés
+    data = parse_json_loose(s)
+    if isinstance(data, dict) and (data.get("contexte") or data.get("points")):
+        return {"contexte": (data.get("contexte") or "").strip(),
+                "points": data.get("points") or [],
+                "clarifications": data.get("clarifications") or [],
+                "verification": data.get("verification") or [], "ok": True}
+    # Récupération tolérante (sauts de ligne non échappés, guillemets, sortie tronquée…)
+    ctx = ""
+    m = re.search(r'"contexte"\s*:\s*"(.*?)"\s*,\s*"(?:points|clarifications|verification)"', s, re.S)
+    if not m:
+        m = re.search(r'"contexte"\s*:\s*"(.*)$', s, re.S)   # contexte tronqué en fin de sortie
+    if m:
+        ctx = _unesc(m.group(1)).rstrip('"}').strip()
+
+    def arr(name):
+        am = re.search(r'"' + name + r'"\s*:\s*\[(.*?)\]', s, re.S)
+        if not am:
+            return []
+        return [_unesc(x) for x in re.findall(r'"((?:[^"\\]|\\.)*)"', am.group(1)) if x.strip()]
+
+    return {"contexte": ctx, "points": arr("points"), "clarifications": arr("clarifications"),
+            "verification": [], "ok": bool(ctx or arr("points"))}
 
 
 CCTP_PROMPT = (
@@ -232,6 +277,29 @@ def summarize_solution(sol):
                 parts.append(label)
         if parts:
             lines.append(lab + " : " + " ; ".join(parts))
+    # PRA / PCA
+    pp = aff.get("pra_pca") or {}
+    if pp.get("actif"):
+        lines.append("Dispositif %s : RTO %s, RPO %s, cible %s, méthode %s" % (
+            (pp.get("mode") or "").upper(), pp.get("rto") or "?", pp.get("rpo") or "?",
+            pp.get("cible") or "?", pp.get("methode") or "?"))
+    # Sauvegarde (module Fonctionnalité)
+    sv = d.get("sauvegarde") or {}
+    if sv.get("logiciel") or sv.get("cible"):
+        lines.append("Sauvegarde : logiciel %s, cible %s, licence %s%s" % (
+            sv.get("logiciel") or "?", sv.get("cible") or "?", sv.get("licence") or "?",
+            ", réplication Cloud ONE ID" if sv.get("cloud") else ""))
+        for s in (sv.get("sites") or []):
+            cells = s.get("cells") or {}
+            tb = cells.get("TB") or {}
+            if tb:
+                lines.append("  Volumétrie %s (TB) : %s" % (s.get("nom") or "site",
+                             ", ".join("%s=%s" % (k, v) for k, v in tb.items() if v)))
+    # Chapitres rédigés (Kanban)
+    chaps = d.get("chapitres") or []
+    titres = [c.get("titre") for c in chaps if isinstance(c, dict) and (c.get("titre") or "").strip()]
+    if titres:
+        lines.append("Chapitres rédigés : " + " ; ".join(titres))
     return "\n".join(lines)
 
 
@@ -253,23 +321,15 @@ async def analyse_cctp(file: UploadFile = File(None), text: str = Form(None), so
     else:
         user += "\n\n(Aucune solution configurée pour le moment : marque les exigences en 'a_preciser'.)"
     raw = llm_complete(sysp(CCTP_PROMPT), user, 8000, provider, model)
-
-    # Nettoyage des éventuelles balises markdown ```json ... ```
-    cleaned = raw.strip()
-    m = re.search(r"```(?:json)?\s*(.*?)```", cleaned, re.S)
-    if m:
-        cleaned = m.group(1).strip()
-    data = parse_json_loose(cleaned) or {}
-    contexte = (data.get("contexte") or "").strip()
-    points = data.get("points") or []
-    clarifications = data.get("clarifications") or []
-    verification = data.get("verification") or []
-    # Repli : si le JSON n'a pas pu être exploité, on renvoie au moins le texte brut
-    if not contexte and not points:
-        contexte = raw.strip()
+    p = parse_cctp(raw)
+    contexte, points = p["contexte"], p["points"]
+    clarifications, verification = p["clarifications"], p["verification"]
+    if not p["ok"]:
+        contexte = contexte or ("L'analyse n'a pas pu être structurée automatiquement. "
+                                "Réessayez, ou changez de moteur IA (barre du bas).")
     return {"contexte": contexte, "points": points,
             "clarifications": clarifications, "verification": verification, "cctp_text": cctp,
-            "raw": "" if (contexte or points) and parse_json_loose(cleaned) else raw}
+            "raw": "" if p["ok"] else raw}
 
 
 # ---------------------------------------------------------------- Import Excel Dell
@@ -335,10 +395,21 @@ async def verifier(payload: dict):
     cctp = (payload.get("cctp_text") or "").strip()
     if not cctp:
         raise HTTPException(400, "Analysez ou collez d'abord le CCTP avant de vérifier la conformité.")
-    sol = summarize_solution(payload.get("solution"))
+    # Priorité : lire le VRAI document Word généré si fourni ; sinon repli sur le résumé configuré.
+    doc_text, source = "", ""
+    gen = payload.get("generated_file")
+    if gen:
+        p = OUT_DIR / Path(str(gen)).name
+        if p.exists() and p.suffix.lower() == ".docx":
+            try:
+                doc_text = extract_docx_text(p); source = "document Word généré"
+            except Exception:
+                doc_text = ""
+    if not doc_text:
+        doc_text = summarize_solution(payload.get("solution")); source = "solution configurée"
     user = "TEXTE DU CCTP :\n\n" + cctp[:120000]
-    user += ("\n\nSOLUTION ACTUELLEMENT CONFIGURÉE :\n" + sol[:20000]) if sol else \
-            "\n\n(Aucune solution configurée : marque les exigences en 'a_preciser'.)"
+    user += ("\n\nCONTENU DE L'AO (%s) :\n%s" % (source, doc_text[:80000])) if doc_text else \
+            "\n\n(Aucun contenu d'AO fourni : marque les exigences en 'a_preciser'.)"
     raw = llm_complete(sysp(VERIF_PROMPT), user, 6000, payload.get("provider"), payload.get("model"))
     cleaned = raw.strip()
     m = re.search(r"```(?:json)?\s*(.*?)```", cleaned, re.S)
@@ -416,6 +487,203 @@ async def ameliorer_solution(payload: dict):
     user = (("\n".join(ctx) + "\n\n") if ctx else "") + "Description brute à réécrire :\n" + texte
     out = llm_complete(sysp(SOLUTION_PROMPT), user, 3000, payload.get("provider"), payload.get("model")).strip()
     return {"text": out}
+
+
+# ---------------------------------------------------------------- Chiffrage (Excel)
+def _duree_jours(s):
+    s = str(s or "").lower().replace(",", ".")
+    import re as _re
+    n = 0.0
+    sm = _re.search(r"([\d.]+)\s*s", s); jm = _re.search(r"([\d.]+)\s*j", s)
+    if sm: n += float(sm.group(1)) * 5
+    if jm: n += float(jm.group(1))
+    if not sm and not jm:
+        try: n = float(s)
+        except Exception: n = 0
+    return round(n, 2)
+
+
+def build_chiffrage_xlsx(spec, path):
+    from openpyxl import Workbook
+    from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
+    aff = spec.get("affaire", {}) or {}
+    wb = Workbook(); ws = wb.active; ws.title = "Chiffrage"
+    NAVY = "0A3D62"; RED = "C00000"
+    hdr_fill = PatternFill("solid", fgColor=NAVY)
+    sec_fill = PatternFill("solid", fgColor="D6E4EF")
+    thin = Side(style="thin", color="D9D9D9"); border = Border(left=thin, right=thin, top=thin, bottom=thin)
+    money = "#,##0.00 €"
+    ws.column_dimensions["A"].width = 46
+    for col in ("B", "C", "D", "E"):
+        ws.column_dimensions[col].width = 16
+    r = 1
+    ws.cell(r, 1, "Chiffrage — %s / %s" % (aff.get("client") or "", aff.get("projet") or "")).font = Font(bold=True, size=14, color=NAVY)
+    r += 2
+
+    def section_header(title):
+        nonlocal r
+        c = ws.cell(r, 1, title); c.font = Font(bold=True, color=NAVY); c.fill = sec_fill
+        for col in range(2, 6):
+            ws.cell(r, col).fill = sec_fill
+        r += 1
+
+    def col_headers(cols):
+        nonlocal r
+        for i, h in enumerate(cols, 1):
+            c = ws.cell(r, i, h); c.font = Font(bold=True, color="FFFFFF"); c.fill = hdr_fill
+            c.alignment = Alignment(horizontal="center"); c.border = border
+        r += 1
+
+    # --- Matériel ---
+    section_header("MATÉRIEL")
+    col_headers(["Désignation", "Référence (SKU)", "Qté", "PU HT", "Total HT"])
+    first_mat = r
+    cats = [("serveurs",), ("stockages",), ("switches",), ("sauvegardes",), ("logiciels_services",)]
+    any_mat = False
+    for (key,) in cats:
+        for it in (spec.get(key) or []):
+            if not isinstance(it, dict):
+                continue
+            desig = it.get("modele") or it.get("role") or it.get("designation") or it.get("nom") or ""
+            if not str(desig).strip():
+                continue
+            any_mat = True
+            try: qte = int(str(it.get("qte") or it.get("quantite") or 1))
+            except Exception: qte = 1
+            pu = it.get("prix") or it.get("pu") or it.get("prix_unitaire") or ""
+            ws.cell(r, 1, str(desig)).border = border
+            ws.cell(r, 2, str(it.get("sku") or "")).border = border
+            ws.cell(r, 3, qte).border = border
+            cpu = ws.cell(r, 4); cpu.border = border; cpu.number_format = money
+            try: cpu.value = float(str(pu).replace(",", ".").replace("€", "").strip())
+            except Exception: pass
+            ct = ws.cell(r, 5, "=C%d*D%d" % (r, r)); ct.border = border; ct.number_format = money
+            r += 1
+    if not any_mat:
+        ws.cell(r, 1, "(aucun équipement)").border = border; r += 1
+    last_mat = r - 1
+    ws.cell(r, 1, "Sous-total matériel HT").font = Font(bold=True)
+    st_mat = ws.cell(r, 5, "=SUM(E%d:E%d)" % (first_mat, last_mat)); st_mat.font = Font(bold=True); st_mat.number_format = money
+    row_mat = r; r += 2
+
+    # --- Prestations ---
+    section_header("PRESTATIONS")
+    col_headers(["Désignation", "Durée (j)", "Tarif/j HT", "Total HT"])
+    first_pr = r
+    prs = [p for p in (spec.get("prestations") or []) if isinstance(p, dict) and (p.get("intitule") or "").strip()]
+    for p in prs:
+        ws.cell(r, 1, p.get("intitule")).border = border
+        ws.cell(r, 2, _duree_jours(p.get("duree"))).border = border
+        ct = ws.cell(r, 3); ct.border = border; ct.number_format = money
+        tot = ws.cell(r, 4, "=B%d*C%d" % (r, r)); tot.border = border; tot.number_format = money
+        r += 1
+    if not prs:
+        ws.cell(r, 1, "(aucune prestation)").border = border; r += 1
+    last_pr = r - 1
+    ws.cell(r, 1, "Sous-total prestations HT").font = Font(bold=True)
+    st_pr = ws.cell(r, 4, "=SUM(D%d:D%d)" % (first_pr, last_pr)); st_pr.font = Font(bold=True); st_pr.number_format = money
+    row_pr = r; r += 2
+
+    # --- Totaux ---
+    ws.cell(r, 1, "TOTAL HT").font = Font(bold=True, color=NAVY)
+    tht = ws.cell(r, 5, "=E%d+D%d" % (row_mat, row_pr)); tht.font = Font(bold=True, color=NAVY); tht.number_format = money
+    total_row = r; r += 1
+    ws.cell(r, 1, "TVA 20%")
+    tva = ws.cell(r, 5, "=E%d*0.2" % total_row); tva.number_format = money; r += 1
+    ws.cell(r, 1, "TOTAL TTC").font = Font(bold=True)
+    ttc = ws.cell(r, 5, "=E%d*1.2" % total_row); ttc.font = Font(bold=True); ttc.number_format = money
+    r += 2
+    ws.cell(r, 1, "Prix indicatifs à compléter (PU matériel, tarif/jour prestations). Valeurs en euros HT.").font = Font(italic=True, size=9, color=RED)
+    wb.save(path)
+
+
+@app.post("/api/chiffrage")
+async def chiffrage(spec: dict):
+    aff = spec.get("affaire", {}) or {}
+    name = "Chiffrage_" + slug(aff.get("client") or aff.get("projet")) + "_" + \
+           datetime.datetime.now().strftime("%Y%m%d_%H%M%S") + ".xlsx"
+    out_path = OUT_DIR / name
+    try:
+        build_chiffrage_xlsx(spec, str(out_path))
+    except Exception as e:
+        raise HTTPException(500, "Échec de la génération du chiffrage : " + str(e))
+    return FileResponse(str(out_path),
+                        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                        filename=name)
+
+
+# ---------------------------------------------------------------- Cadre de mémoire technique (IA)
+MEMOIRE_PROMPT = (
+    "Tu remplis un CADRE DE MÉMOIRE TECHNIQUE fourni par un client dans le cadre d'un appel d'offre. "
+    "On te donne (1) la TRAME du client (sections, critères notés, questions, champs à compléter) et "
+    "(2) les DONNÉES DE L'AO produites par ONE ID. Produis le mémoire technique COMPLÉTÉ, en français, "
+    "en respectant FIDÈLEMENT la structure, l'ordre et les intitulés de la trame. Pour chaque "
+    "section/critère, rédige la réponse à partir des DONNÉES DE L'AO, en ingénieur avant-vente ONE ID, "
+    "de façon claire et argumentée. "
+    "RÈGLES STRICTES : ne JAMAIS inventer ; pour toute valeur non disponible dans les données fournies "
+    "(ex. taux de plastique/métal recyclé, données constructeur, emballages, chiffres non présents), "
+    "écris EXACTEMENT « à préciser » ; conserve les intitulés des critères et leurs points (ex. « - 20 points »). "
+    "FORMAT de sortie : titres de niveau 1 préfixés par '# ', niveau 2 par '## ', niveau 3 par '### ', "
+    "puces par '- '. N'ajoute aucun commentaire hors du mémoire."
+)
+
+
+def build_memoire_docx(client, text, path):
+    import docx
+    d = docx.Document()
+    d.add_heading("Mémoire technique" + (" — " + client if client else ""), 0)
+    for raw in (text or "").split("\n"):
+        s = raw.strip().replace("**", "")
+        if not s:
+            continue
+        if s.startswith("### "):
+            d.add_heading(s[4:], 3)
+        elif s.startswith("## "):
+            d.add_heading(s[3:], 2)
+        elif s.startswith("# "):
+            d.add_heading(s[2:], 1)
+        elif s[:2] in ("- ", "* "):
+            d.add_paragraph(s[2:], style="List Bullet")
+        else:
+            d.add_paragraph(s)
+    d.save(path)
+
+
+@app.post("/api/memoire")
+async def memoire(file: UploadFile = File(...), cctp: str = Form(""), solution: str = Form(""),
+                  generated_file: str = Form(""), client: str = Form(""),
+                  provider: str = Form("claude"), model: str = Form("")):
+    fname = (file.filename or "").lower()
+    if fname.endswith(".doc") and not fname.endswith(".docx"):
+        raise HTTPException(400, "Format .doc non pris en charge : enregistrez la trame en .docx (ou .pdf/.txt).")
+    cadre = extract_text(file.filename, await file.read()).strip()
+    if not cadre:
+        raise HTTPException(400, "Trame illisible : fournissez un .docx, .pdf ou .txt.")
+    ao = ""
+    if generated_file:
+        p = OUT_DIR / Path(str(generated_file)).name
+        if p.exists() and p.suffix.lower() == ".docx":
+            try:
+                ao = extract_docx_text(p)
+            except Exception:
+                ao = ""
+    if not ao:
+        ao = summarize_solution(solution)
+    user = "CADRE DE MÉMOIRE TECHNIQUE (trame client à compléter) :\n" + cadre[:60000]
+    user += "\n\nDONNÉES DE L'AO (à utiliser pour remplir) :\n" + (ao[:60000] or "(aucune)")
+    if cctp.strip():
+        user += "\n\nCONTEXTE CCTP :\n" + cctp[:20000]
+    filled = llm_complete(sysp(MEMOIRE_PROMPT), user, 8000, provider, model)
+    name = "Memoire_technique_" + slug(client or "client") + "_" + \
+           datetime.datetime.now().strftime("%Y%m%d_%H%M%S") + ".docx"
+    out_path = OUT_DIR / name
+    try:
+        build_memoire_docx(client, filled, str(out_path))
+    except Exception as e:
+        raise HTTPException(500, "Échec de la génération du mémoire : " + str(e))
+    return FileResponse(str(out_path),
+                        media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                        filename=name)
 
 
 # ---------------------------------------------------------------- Génération Word
@@ -509,3 +777,64 @@ async def fiche_delete(payload: dict):
     if p.exists():
         p.unlink()
     return {"ok": True}
+
+
+# ---------------------------------------------------------------- Éditeur d'argumentaires
+def safe_folder(name):
+    base = re.sub(r"[^\w .\-]+", "_", (name or "").strip(), flags=re.UNICODE).strip(" .")
+    return Path(base).name[:80]   # un seul segment, pas de traversée
+
+
+@app.get("/api/argumentaires")
+def argumentaires_list():
+    base = Path(DOC_BASE)
+    out = []
+    if base.is_dir():
+        for p in sorted(base.glob("*/argumentaire.json")):
+            try:
+                j = json.loads(p.read_text(encoding="utf-8"))
+            except Exception:
+                j = {}
+            out.append({"folder": p.parent.name,
+                        "titre": j.get("titre") or j.get("titre_cas") or p.parent.name,
+                        "blocs": len(j.get("blocs") or [])})
+    return {"items": out}
+
+
+@app.get("/api/argumentaire")
+def argumentaire_get(folder: str):
+    p = Path(DOC_BASE) / safe_folder(folder) / "argumentaire.json"
+    if not p.exists():
+        raise HTTPException(404, "Argumentaire introuvable")
+    return JSONResponse(json.loads(p.read_text(encoding="utf-8")))
+
+
+@app.post("/api/argumentaire/save")
+async def argumentaire_save(payload: dict):
+    folder = safe_folder(payload.get("folder", ""))
+    data = payload.get("data")
+    if not folder or not isinstance(data, dict):
+        raise HTTPException(400, "Requête invalide (dossier ou données manquants).")
+    d = Path(DOC_BASE) / folder
+    d.mkdir(parents=True, exist_ok=True)
+    (d / "argumentaire.json").write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
+    return {"ok": True, "folder": folder}
+
+
+@app.get("/api/argumentaire/images")
+def argumentaire_images(folder: str):
+    """Liste les fichiers image présents dans le dossier de l'argumentaire."""
+    d = Path(DOC_BASE) / safe_folder(folder)
+    exts = (".png", ".jpg", ".jpeg", ".gif", ".webp")
+    names = []
+    if d.is_dir():
+        names = sorted(p.name for p in d.iterdir() if p.suffix.lower() in exts)
+    return {"images": names}
+
+
+@app.get("/api/argumentaire/image")
+def argumentaire_image(folder: str, name: str):
+    p = Path(DOC_BASE) / safe_folder(folder) / Path(name).name
+    if not p.exists() or p.suffix.lower() not in (".png", ".jpg", ".jpeg", ".gif", ".webp"):
+        raise HTTPException(404, "Image introuvable")
+    return FileResponse(str(p))
