@@ -45,11 +45,14 @@ def sysp(specific: str) -> str:
 
 MAMMOUTH_API_KEY = os.environ.get("MAMMOUTH_API_KEY", "")
 MAMMOUTH_BASE = os.environ.get("MAMMOUTH_BASE", "https://api.mammouth.ai/v1")
+# Moteur IA par défaut quand la requête n'en précise pas : "mammouth" ou "claude".
+# Repasser à "claude" dans l'environnement dès que le solde Anthropic est rechargé.
+DEFAULT_PROVIDER = os.environ.get("DEFAULT_PROVIDER", "mammouth").lower()
 
 
-def llm_complete(system, user, max_tokens=4000, provider="claude", model=""):
+def llm_complete(system, user, max_tokens=4000, provider="", model=""):
     """Appelle le moteur IA choisi : 'claude' (Anthropic) ou 'mammouth' (OpenAI-compatible)."""
-    provider = (provider or "claude").lower()
+    provider = (provider or DEFAULT_PROVIDER).lower()
     if provider == "mammouth":
         if not MAMMOUTH_API_KEY:
             raise HTTPException(400, "MAMMOUTH_API_KEY non configurée (voir fichier .env).")
@@ -63,7 +66,12 @@ def llm_complete(system, user, max_tokens=4000, provider="claude", model=""):
             headers={"Authorization": "Bearer " + MAMMOUTH_API_KEY,
                      "Content-Type": "application/json",
                      "Accept": "application/json",
-                     "User-Agent": "ONEID-AO/1.0 (+https://one-id.fr)"})
+                     # Cloudflare (Browser Integrity Check) renvoie une erreur 1010 sur les
+                     # signatures non-navigateur (ex. Python-urllib ou un UA maison). UA
+                     # navigateur validé en test depuis le pod (voir diagnostic 2026-07-15).
+                     "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) "
+                                   "AppleWebKit/537.36 (KHTML, like Gecko) "
+                                   "Chrome/126.0 Safari/537.36"})
         try:
             with urllib.request.urlopen(req, timeout=180) as resp:
                 d = json.loads(resp.read().decode("utf-8"))
@@ -95,7 +103,7 @@ def llm_complete(system, user, max_tokens=4000, provider="claude", model=""):
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 FICHES_DIR.mkdir(parents=True, exist_ok=True)
 
-APP_VERSION = "2.2"
+APP_VERSION = "2.3"
 
 
 def _archive_frontend():
@@ -305,7 +313,7 @@ def summarize_solution(sol):
 
 @app.post("/api/analyse-cctp")
 async def analyse_cctp(file: UploadFile = File(None), text: str = Form(None), solution: str = Form(None),
-                       provider: str = Form("claude"), model: str = Form("")):
+                       provider: str = Form(DEFAULT_PROVIDER), model: str = Form("")):
     cctp = ""
     if file is not None:
         cctp = extract_text(file.filename, await file.read())
@@ -437,7 +445,7 @@ DESIGN_PROMPT = (
 )
 
 
-def design_enhance(aff: dict, provider="claude", model="") -> dict:
+def design_enhance(aff: dict, provider="", model="") -> dict:
     payload = {
         "intro": aff.get("intro_override") or "",
         "contexte": aff.get("contexte") or aff.get("notes") or "",
@@ -652,7 +660,7 @@ def build_memoire_docx(client, text, path):
 @app.post("/api/memoire")
 async def memoire(file: UploadFile = File(...), cctp: str = Form(""), solution: str = Form(""),
                   generated_file: str = Form(""), client: str = Form(""),
-                  provider: str = Form("claude"), model: str = Form("")):
+                  provider: str = Form(DEFAULT_PROVIDER), model: str = Form("")):
     fname = (file.filename or "").lower()
     if fname.endswith(".doc") and not fname.endswith(".docx"):
         raise HTTPException(400, "Format .doc non pris en charge : enregistrez la trame en .docx (ou .pdf/.txt).")
@@ -690,7 +698,7 @@ async def memoire(file: UploadFile = File(...), cctp: str = Form(""), solution: 
 @app.post("/api/generer")
 async def generer(spec: dict):
     mode = spec.pop("mode", "standard")
-    ai_provider = spec.pop("ai_provider", "claude")
+    ai_provider = spec.pop("ai_provider", "") or DEFAULT_PROVIDER
     ai_model = spec.pop("ai_model", "")
     if mode == "design":
         affd = spec.setdefault("affaire", {})

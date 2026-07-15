@@ -1,5 +1,11 @@
 # Journal des versions — Générateur d'appel d'offre ONE ID
 
+## v2.3
+- **Mammouth devient le moteur IA par défaut** (API OpenAI-compatible). Nouveau paramètre d'environnement `DEFAULT_PROVIDER` (`mammouth` par défaut, `claude` au choix) : c'est le moteur utilisé quand la requête n'en précise pas. Sélecteur « Moteur IA » de l'interface pré-réglé sur Mammouth.
+- **Correctif appels Mammouth / Cloudflare** : les requêtes envoyaient une signature `Python-urllib`, rejetée par le Browser Integrity Check de Cloudflare (erreur 1010). Ajout d'un User-Agent navigateur validé côté cluster ; les appels passent désormais jusqu'à l'authentification.
+- **Boutons IA harmonisés** : les libellés et infobulles des boutons affichent « IA » au lieu de « Claude », le moteur étant choisi dynamiquement (le sélecteur de moteur et le nom de modèle « Claude Sonnet 4.6 » restent explicites).
+- **Correctif bug d'interface** : une apostrophe non échappée dans une chaîne JavaScript (« l'IA ») cassait le script et bloquait la navigation par onglets, les boutons « Suivant » et la fenêtre d'ajout de pièces jointes. Corrigé.
+
 ## v2.2
 - **Nouveau template Word ONE ID** (page de garde, sommaire, en-têtes/pieds). Le générateur remplit automatiquement la page de garde : tableau *Propriétés* (Document/Version/Auteur/Date), 1re ligne de l'*Historique des évolutions*, tableau *Vos contacts* ; suppression du tableau « Informations du dossier » en doublon ; le contenu s'écrit à la suite du titre *Introduction*.
 - **Saisie des contacts** dans l'assistant (Nom/Prénom/Fonction/Téléphone/E-mail), reportée dans la page de garde.
