@@ -44,6 +44,17 @@ image officielle open source, fonctionnement 100 % hors-ligne (variables
 ré-éditable embarqué directement exploitable par `python-docx`. Écarté : service SaaS
 externe (fuite de données client vers un tiers, dépendance réseau).
 
+## 2026-08-21 — `.gitattributes` : normalisation LF pour le code, binaire protégé pour les documents
+Ajout d'un `.gitattributes` fixant `eol=lf` pour tous les fichiers texte (py, html, js,
+css, json, md, yml, txt, Dockerfile) et `binary` explicite pour les formats Office/image
+(docx, dotx, xlsx, png, jpg, pdf, pptx, zip). Justification : le poste Windows source
+enregistre en CRLF, ce qui produisait des diffs de plusieurs milliers de lignes sans
+changement de contenu réel à chaque synchronisation (observé dans le commit `5a18b30` du
+2026-08-21). Écarté : laisser `core.autocrlf` géré uniquement côté client (fragile,
+dépend de la configuration de chaque poste qui clone/synchronise le dépôt) ; normaliser
+aussi les binaires (aurait corrompu les .docx/.xlsx — `text=auto` ne s'applique jamais
+aux fichiers marqués `binary`).
+
 ## 2026-08-21 — Passage de pilotage Claude Code → Hermes, environnements PREPROD/PROD
 Le projet, jusque-là développé en itératif sur le poste Windows de l'utilisateur (git
 local + push manuel vers GitHub, historique de commits portant la trace d'un
