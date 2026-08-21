@@ -5,6 +5,28 @@ Une entrée par problème. Les entrées ne sont jamais supprimées, seulement pa
 
 ---
 
+## 2026-08-21 — Disque `/var` saturé pendant le premier build Docker sur Hermes Linux (résolu)
+**Description factuelle** : premier `docker compose up -d --build` exécuté sur la
+machine Linux Hermes (`djinn-bot`) après le passage au pilotage 100% Linux. Le build a
+échoué avec `OSError: [Errno 28] No space left on device` pendant `pip install`. `df -h`
+montrait `/var` (`/dev/sda5`, 5,9 Go) à 100% d'utilisation, 0 disponible ; Docker stockait
+ses images/cache dans `/var/lib/docker` par défaut.
+**Cause** : trois images Docker préexistantes sur la machine (dont
+`nousresearch/hermes-agent:latest`, 3,86 Go) plus le cache de build consommaient déjà la
+totalité de la petite partition `/var`. La partition `/srv` (175 Go, 166 Go libres)
+n'était pas utilisée par Docker.
+**Impact** : impossible de construire ou démarrer un conteneur tant que l'espace n'était
+pas libéré ; bloquant pour tout le nouveau workflow "Linux uniquement".
+**État** : résolu.
+**Contournement en place** :
+1. `docker system prune -af` a libéré 5,4 Go immédiatement (build cache + images
+   inutilisées).
+2. Changement durable : `data-root` de Docker déplacé vers `/srv/docker` via
+   `/etc/docker/daemon.json` (`{"data-root": "/srv/docker"}`), ancien contenu de
+   `/var/lib/docker` copié puis supprimé, service `docker` redémarré. Confirmé par
+   `docker info | grep "Docker Root Dir"` → `/srv/docker`.
+   `/var` est repassé à 12% d'utilisation après le déplacement.
+
 ## 2026-08-21 — PROD non définie
 **Description factuelle** : au moment de la reprise du projet sous pilotage Hermes,
 seul l'environnement PREPROD a été confirmé par l'utilisateur

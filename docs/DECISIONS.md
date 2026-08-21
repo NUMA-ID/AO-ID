@@ -66,3 +66,17 @@ via tunnel SSH depuis `C:\Projets\Appel D'offre` (poste Windows, hôte
 `docs/BLOCAGES.md`, entrée ouverte). Écarté à ce stade : clonage direct depuis GitHub
 (le HEAD distant `origin/main` était derrière la dernière modification locale
 non commitée — `app/main.py` ligne 61, valeur du modèle Mammouth par défaut).
+
+## 2026-08-21 — Développement et exécution exclusivement sur la machine Linux Hermes
+Décision de l'utilisateur : ne plus jamais démarrer, builder ou modifier le projet
+directement sur le poste Windows. Tout le cycle (édition, `docker compose up`, tests,
+commits) se fait désormais sur la machine Linux Hermes (`djinn-bot`) où tourne le
+présent agent. Justification : élimine à la source la classe de problèmes rencontrée le
+même jour (drift CRLF/Windows vs dépôt Git, working tree local en avance sur
+`origin/main` sans traçabilité, poste Windows non contrôlé par le pilotage Hermes).
+Vérifié opérationnel le jour même : build Docker complet exécuté sur `djinn-bot`,
+conteneurs `ao-oneid` et `ao-drawio` démarrés, `/api/health` répond `ok:true`. Écarté :
+garder un développement mixte Windows/Linux (aurait reproduit le problème que ce
+changement vise justement à éliminer). Le poste Windows n'est plus qu'un point
+d'origine historique ; il n'est plus une cible de déploiement ni un environnement de
+travail.
