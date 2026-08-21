@@ -1,0 +1,122 @@
+{
+  "_description": "Argumentaire Location Fortinet (offre MSP ONE ID : pare-feu FortiGate managé + licence UTP, bornes Wi-Fi FortiAP en option). Sans prix — descriptif technique, performances, avantages concurrentiels et bénéfices client. Sources : fiches produit Fortinet et périmètre catalogue ONE ID (00-LOCATION FORTINET). Marqueur {client}. Éditable.",
+  "modele_match": [
+    "location fortinet",
+    "locationfortinet",
+    "loyer fortinet",
+    "fortinet loyer",
+    "msp fortinet",
+    "fortigate location",
+    "fortigate loyer",
+    "00-location fortinet"
+  ],
+  "titre": "Location Fortinet — pare-feu FortiGate managé (MSP)",
+  "blocs": [
+    {
+      "t": "p",
+      "x": "L'offre **Location Fortinet** met à disposition de {client} un pare-feu **FortiGate** neuf, protégé par la licence de sécurité **UTP** et exploité de bout en bout par ONE ID. La sécurité périmétrique est fournie comme un service managé : {client} bénéficie d'un équipement de dernière génération, configuré, supervisé et maintenu par nos équipes certifiées Fortinet, avec la possibilité d'y adjoindre un réseau Wi-Fi Fortinet piloté par le même boîtier."
+    },
+    {
+      "t": "img",
+      "x": "[ Visuel : offre Location Fortinet — FortiGate managé ]"
+    },
+    {
+      "t": "h",
+      "x": "Descriptif technique"
+    },
+    {
+      "t": "puces",
+      "x": [
+        "Pare-feu FortiGate NGFW (modèle dimensionné selon le débit de {client} : 30G, 40F, 50G, 70G, 90G, 120G ou 200F).",
+        "Système d'exploitation unique FortiOS, commun à toute la gamme, pour une configuration et une exploitation homogènes.",
+        "Licence UTP (Unified Threat Protection) active pendant toute la durée du contrat.",
+        "Configuration et supervision du pare-feu assurées par ONE ID.",
+        "Option Wi-Fi : bornes FortiAP pilotées directement par le FortiGate, ou modèles FortiWiFi (30G, 40F, 50G) intégrant le point d'accès au pare-feu."
+      ]
+    },
+    {
+      "t": "h",
+      "x": "Performances et sécurité"
+    },
+    {
+      "t": "puces",
+      "x": [
+        "Accélération matérielle par processeur de sécurité Fortinet (ASIC/SoC FortiSP5 sur les modèles G) : le chiffrement et l'inspection sont déchargés du CPU, ce qui maintient le débit même avec l'inspection SSL et l'IPS activés.",
+        "IPS — prévention des intrusions et blocage des tentatives d'exploitation.",
+        "Advanced Malware Protection — antivirus et analyse comportementale (sandbox) contre les malwares évolués.",
+        "Application Control — maîtrise des applications autorisées sur le réseau.",
+        "Filtrage Web, DNS et Vidéo — blocage des sites et des menaces véhiculées par le DNS et le web.",
+        "Antispam — filtrage de la messagerie.",
+        "FortiCare Premium — support constructeur 24/7 avec temps de réponse contractuel."
+      ]
+    },
+    {
+      "t": "h",
+      "x": "Avantages concurrentiels"
+    },
+    {
+      "t": "puces",
+      "x": [
+        "Architecture Security Fabric : pare-feu, Wi-Fi et services de sécurité s'intègrent dans un même écosystème, pilotable depuis une console unique.",
+        "ASIC propriétaire : à service équivalent, les FortiGate offrent un rapport performance/sécurité élevé grâce à l'accélération matérielle, là où beaucoup de concurrents reposent uniquement sur du logiciel.",
+        "SD-WAN intégré nativement dans FortiOS, sans licence additionnelle, pour les sites multi-liens.",
+        "Services de sécurité FortiGuard alimentés par l'IA, mis à jour en continu via la licence UTP.",
+        "Une seule console pour le pare-feu et le Wi-Fi : pas de contrôleur tiers à administrer."
+      ]
+    },
+    {
+      "t": "h",
+      "x": "Bénéfices pour {client}"
+    },
+    {
+      "t": "puces",
+      "x": [
+        "Sécurité gérée par ONE ID : configuration, supervision et maintien en conditions opérationnelles pris en charge, sans mobiliser les équipes de {client}.",
+        "Interlocuteur unique : le matériel, la licence et l'exploitation sont réunis dans un seul contrat, avec un seul contact.",
+        "Équipement toujours à niveau : {client} dispose d'un pare-feu de génération courante, renouvelable en fin d'engagement.",
+        "Modèle en service : la sécurité périmétrique est consommée en loyer, sans investissement matériel à porter.",
+        "Réseau cohérent : le Wi-Fi Fortinet optionnel est administré sous la même console que le pare-feu, avec la sécurité sans fil WIDS/WIPS.",
+        "Cohérence avec les offres de sécurité managée ONE ID (SOC / SIEM) pour aller au-delà du pare-feu si besoin."
+      ]
+    },
+    {
+      "t": "h",
+      "x": "Le Wi-Fi Fortinet en option"
+    },
+    {
+      "t": "puces",
+      "x": [
+        "Bornes Wi-Fi 7 (802.11be) : FortiAP 231K et 244K, pour les débits et la densité les plus élevés.",
+        "Bornes Wi-Fi 6E (802.11ax) : FortiAP 231G (intérieur) et 234G (intérieur/extérieur durci).",
+        "Gestion centralisée par le FortiGate : SSID, sécurité sans fil (WIDS/WIPS) et supervision au même endroit."
+      ]
+    },
+    {
+      "t": "h",
+      "x": "Ce qui reste à cadrer avec {client}"
+    },
+    {
+      "t": "puces",
+      "x": [
+        "Dimensionnement du débit pour choisir le bon modèle (30G / 50G / 70G / 90G / 120G / 200F).",
+        "Besoin ou non d'un Wi-Fi intégré au pare-feu (FortiWiFi) plutôt que des bornes séparées.",
+        "Nombre et emplacement des bornes Wi-Fi si l'option réseau est retenue.",
+        "À noter : l'installation physique des bornes, le câblage / courant fort et les injecteurs PoE ou alimentations ne sont pas inclus dans le service."
+      ]
+    },
+    {
+      "t": "p",
+      "x": "En synthèse, la Location Fortinet permet à {client} de déployer un pare-feu FortiGate de dernière génération, protégé par la licence UTP et exploité par ONE ID, avec un réseau Wi-Fi Fortinet managé en option sous la même console."
+    }
+  ],
+  "images_defaut": [
+    "fortinet.png"
+  ],
+  "sources": [
+    "ONE ID — Catalogue tarifs, périmètre de l'offre « Location Fortinet » (dossier 00-LOCATION FORTINET) : modèles FortiGate/FortiWiFi et bornes FortiAP proposés, éléments inclus / non inclus.",
+    "Fortinet — FortiGuard AI-powered Security Bundles for FortiGate : contenu du bundle UTP (IPS, Advanced Malware Protection, Application Control, filtrage URL/DNS/Vidéo, Antispam, FortiCare Premium). https://www.fortinet.com/support/support-services/fortiguard-security-subscriptions/fortigate-security-bundles",
+    "Fortinet — Secure Processors / FortiSP5 : accélération matérielle par ASIC (SoC sur les FortiGate d'entrée de gamme, ex. 90G) et SD-WAN intégré. https://www.fortinet.com/products/fortigate/fortiasic",
+    "Fortinet — FortiAP Series (data sheet) : FortiAP 231K et 244K en Wi-Fi 7 (802.11be), FortiAP 231G et 234G en Wi-Fi 6E (802.11ax). https://www.fortinet.com/resources/data-sheets/fortiap-series"
+  ],
+  "avertissement": "Contenu de présentation technico-commerciale. Le modèle de pare-feu, la durée d'engagement et le périmètre exact (nombre de bornes, Wi-Fi intégré ou non) sont à confirmer selon le dimensionnement du dossier. La génération Wi-Fi (6E ou 7) dépend du modèle de borne choisi. L'installation, le câblage et les accessoires PoE ne sont pas inclus dans le service. Aucun tarif n'est mentionné : le chiffrage est traité dans le devis."
+}

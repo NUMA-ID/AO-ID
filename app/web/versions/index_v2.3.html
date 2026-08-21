@@ -100,8 +100,8 @@
 </head>
 <body>
 <header>
-  <h1>ONE ID — Générateur d'appel d'offre <span style="font-size:13px;font-weight:600;opacity:.75">v2.1</span></h1>
-  <p>Analyse CCTP (Claude/Mammouth) · Import Excel Dell · Équipements · PRA/PCA · Sauvegarde · Kanban · Génération du Word ONE ID <span style="opacity:.6">— version 2.1 · build __BUILD__</span></p>
+  <h1>ONE ID — Générateur d'appel d'offre <span style="font-size:13px;font-weight:600;opacity:.75">v2.2</span></h1>
+  <p>Analyse CCTP (Claude/Mammouth) · Import Excel Dell · Équipements · PRA/PCA · Sauvegarde · Kanban · draw.io · Génération du Word ONE ID <span style="opacity:.6">— version 2.2 · build __BUILD__</span></p>
 </header>
 <div class="layout">
 <aside class="sidebar">
@@ -134,7 +134,7 @@
       <div class="dz" id="cctpdz">📎 Déposez le CCTP (PDF / Word / TXT) ou cliquez<input type="file" id="cctpfile" accept=".pdf,.doc,.docx,.txt" style="display:none"></div>
       <div id="cctpname" class="small" style="margin-top:6px"></div>
       <textarea id="cctp_text" rows="6" style="margin-top:10px" placeholder="…ou collez ici le texte du CCTP"></textarea>
-      <div style="margin-top:10px"><button class="btn btn-ghost" onclick="dicter('cctp_text',this)" title="Dictée vocale (fr-FR) — cliquez pour parler, recliquez pour arrêter">🎤 Dicter</button> <button class="btn btn-primary" id="goAnalyse">⚙️ Analyser le CCTP avec Claude</button><span class="msg" id="cstatus" style="margin-left:8px"></span></div>
+      <div style="margin-top:10px"><button class="btn btn-ghost" onclick="dicter('cctp_text',this)" title="Dictée vocale (fr-FR) — cliquez pour parler, recliquez pour arrêter">🎤 Dicter</button> <button class="btn btn-primary" id="goAnalyse">⚙️ Analyser le CCTP avec l'IA</button><span class="msg" id="cstatus" style="margin-left:8px"></span></div>
     </div>
     <div class="card" id="resCard" style="display:none">
       <h2>Contexte du projet <span class="small">(intégré au Word)</span> <button class="btn btn-ghost" style="font-size:13px;padding:2px 8px" onclick="dicter('aff_contexte',this)" title="Dictée vocale (fr-FR) — cliquez pour parler, recliquez pour arrêter">🎤</button></h2>
@@ -175,7 +175,7 @@
         <button class="btn btn-ghost" style="margin-top:6px" onclick="addContact()">+ Ajouter un contact</button>
       </div>
       <div style="margin-top:12px"><label>Solution proposée (texte personnalisé — « - » = puce, {client} substitué)</label><textarea id="aff_solution" rows="5" placeholder="Décrivez ici la solution de manière brute (notes, points clés). Cliquez ensuite sur « Reformuler » pour obtenir un texte avant-vente prêt à relire."></textarea>
-        <div style="margin-top:6px"><button class="btn btn-ghost" onclick="dicter('aff_solution',this)" title="Dictée vocale (fr-FR) — cliquez pour parler, recliquez pour arrêter">🎤 Dicter</button> <button class="btn btn-primary" id="goSolution" onclick="ameliorerSolution()" title="Réécrit votre texte brut dans un style d'ingénieur avant-vente ONE ID (arguments commerciaux), sans inventer de fait technique.">✨ Reformuler (style avant-vente Claude)</button><span class="msg" id="solstatus" style="margin-left:8px"></span></div></div>
+        <div style="margin-top:6px"><button class="btn btn-ghost" onclick="dicter('aff_solution',this)" title="Dictée vocale (fr-FR) — cliquez pour parler, recliquez pour arrêter">🎤 Dicter</button> <button class="btn btn-primary" id="goSolution" onclick="ameliorerSolution()" title="Réécrit votre texte brut dans un style d'ingénieur avant-vente ONE ID (arguments commerciaux), sans inventer de fait technique.">✨ Reformuler (style avant-vente IA)</button><span class="msg" id="solstatus" style="margin-left:8px"></span></div></div>
       <div style="margin-top:10px"><label>Schéma d'architecture</label>
         <div style="margin:2px 0 6px"><button class="btn btn-primary" onclick="openDrawio()" title="Dessiner le schéma d'architecture dans draw.io (local). À l'enregistrement, il est ajouté ci-dessous et inséré dans le Word.">✏️ Dessiner (draw.io)</button></div>
         <div class="dz" data-imgzone="arch">📎 Déposez le schéma ou cliquez<input type="file" accept="image/*" multiple style="display:none"></div>
@@ -232,7 +232,7 @@
         <div style="margin-top:12px">
           <button class="btn btn-accent" onclick="genPra()">⚙️ Générer l'argumentaire</button>
           <button class="btn btn-ghost" onclick="dicter('pra_text',this)" title="Dictée vocale (fr-FR)">🎤 Dicter</button>
-          <button class="btn btn-primary" id="goPra" onclick="reformulerPra()" title="Réécrit l'argumentaire dans un style avant-vente ONE ID, sans inventer de fait.">✨ Reformuler (Claude)</button>
+          <button class="btn btn-primary" id="goPra" onclick="reformulerPra()" title="Réécrit l'argumentaire dans un style avant-vente ONE ID, sans inventer de fait.">✨ Reformuler (IA)</button>
           <span class="msg" id="prastatus" style="margin-left:8px"></span>
         </div>
         <div style="margin-top:10px"><label>Argumentaire PRA/PCA (intégré au Word — « - » = puce, {client} substitué)</label>
@@ -281,7 +281,7 @@
     <div class="card">
       <h2>Structure du dossier &amp; prestations <span class="small">(Kanban)</span></h2>
       <p class="hint">Chaque chapitre = une partie du Word. Glissez-y les points d'attention (rouge = à traiter). Bouton « Décrire l'offre » : choisissez un <b>argumentaire</b>, un <b>complément / options / prérequis</b> et le <b>nombre de jours d'installation</b>. Le Word rend chaque chapitre : titre → argumentaire → complément → durée. L'ordre des chapitres (◀ ▶) = ordre dans le Word.</p>
-      <button class="btn btn-primary" id="goChap" onclick="proposerChapitres()" title="Regroupe automatiquement les points d'attention en chapitres thématiques via Claude (sans rien inventer).">✨ Proposer des chapitres (Claude)</button>
+      <button class="btn btn-primary" id="goChap" onclick="proposerChapitres()" title="Regroupe automatiquement les points d'attention en chapitres thématiques via l'IA (sans rien inventer).">✨ Proposer des chapitres (IA)</button>
       <button class="btn btn-accent" onclick="addChap()">+ Ajouter un chapitre</button>
       <button class="btn btn-ghost" onclick="renderKanban()">↻ Rafraîchir</button>
       <span class="msg" id="chapstatus" style="margin-left:8px"></span>
@@ -353,7 +353,7 @@
   <button class="btn btn-ghost" onclick="stepNav(-1)" title="Étape précédente">◀ Précédent</button>
   <button class="btn btn-ghost" onclick="stepNav(1)" title="Étape suivante">Suivant ▶</button>
   <button class="btn btn-primary" onclick="generer('standard')">📄 Générer le Word (modèle existant)</button>
-  <button class="btn btn-primary" onclick="generer('design')" title="Réécrit l'intro / le contexte / la solution proposée et applique un thème, via l'API Claude. Les caractéristiques techniques, tableaux et argumentaires restent inchangés.">✨ Générer (Design Claude)</button>
+  <button class="btn btn-primary" onclick="generer('design')" title="Réécrit l'intro / le contexte / la solution proposée et applique un thème, via le moteur IA. Les caractéristiques techniques, tableaux et argumentaires restent inchangés.">✨ Générer (Design IA)</button>
   <button class="btn btn-accent" id="goVerif" onclick="verifierConformite()" title="À lancer après la génération : compare la demande du CCTP au contenu généré et liste, dans une fenêtre, ce qui manque et les points à résoudre.">🔍 Vérifier la conformité</button>
   <button class="btn btn-ghost" onclick="expFiche()">⬇ Exporter la fiche (JSON)</button>
   <button class="btn btn-ghost" onclick="document.getElementById('loadf').click()">📂 Charger une fiche</button>
@@ -361,7 +361,7 @@
   <span class="msg" style="align-self:center">Moteur IA :</span>
   <select id="aiEngine" onchange="aiToggle();save()" style="width:auto;padding:6px 8px" title="Moteur utilisé par les boutons IA (Reformuler, Analyser, etc.)">
     <option value="claude">Claude (Anthropic)</option>
-    <option value="mammouth">Mammouth</option>
+    <option value="mammouth" selected>Mammouth</option>
   </select>
   <select id="aiModel" onchange="save()" style="width:auto;padding:6px 8px;display:none" title="Modèle Mammouth">
     <optgroup label="Mistral">
@@ -397,7 +397,7 @@
     <label>Complément d'info, options ou prérequis</label>
     <div style="margin:4px 0 6px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
       <button class="btn btn-ghost" onclick="dicter('chapModalText',this)" title="Dictée vocale (fr-FR) — cliquez pour parler, recliquez pour arrêter">🎤 Dicter</button>
-      <button class="btn btn-primary" id="goChapRef" onclick="reformulerChapModal()" title="Améliore le texte via Claude (style avant-vente), sans inventer de fait.">✨ Reformuler (Claude)</button>
+      <button class="btn btn-primary" id="goChapRef" onclick="reformulerChapModal()" title="Améliore le texte via l'IA (style avant-vente), sans inventer de fait.">✨ Reformuler (IA)</button>
       <span class="msg" id="chapModalStatus"></span>
     </div>
     <textarea id="chapModalText" rows="8" style="width:100%" placeholder="Complément d'info, options, prérequis…"></textarea>
@@ -453,7 +453,7 @@
 <script>
 const $=id=>document.getElementById(id);
 function aiToggle(){const e=$('aiEngine');if(!e)return;$('aiModel').style.display=(e.value==='mammouth')?'inline-block':'none';}
-function aiSel(){const p=($('aiEngine')||{}).value||'claude';return {provider:p,model:(p==='mammouth')?(($('aiModel')||{}).value||'').trim()||'mistral':''};}
+function aiSel(){const p=($('aiEngine')||{}).value||'mammouth';return {provider:p,model:(p==='mammouth')?(($('aiModel')||{}).value||'').trim()||'mistral':''};}
 // Empêche le navigateur d'ouvrir le fichier quand on dépose à côté d'une zone
 ['dragenter','dragover','drop'].forEach(ev=>window.addEventListener(ev,e=>{e.preventDefault();},false));
 const STEP_ORDER=['cctp','equip','fonc','kanban','plan','gen'];
@@ -644,7 +644,7 @@ async function ameliorerSolution(){
   const ta=$('aff_solution');const txt=ta.value.trim();
   if(!txt){alert('Saisissez d\'abord une description (même brute) de la solution.');return;}
   const btn=$('goSolution');btn.disabled=true;
-  $('solstatus').innerHTML='<span class="spin"></span> Reformulation par Claude…';
+  $('solstatus').innerHTML='<span class="spin"></span> Reformulation par l\'IA…';
   try{
     const r=await fetch('/api/ameliorer-solution',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(Object.assign({text:txt,client:val('aff_client'),projet:val('aff_projet')},aiSel()))});
     if(!r.ok)throw new Error((await r.json()).detail||r.statusText);
@@ -695,7 +695,7 @@ function buildData(){return{_type:'fiche_specs_oneid',_version:3,genere_le:new D
   planning:planTasks.map(t=>({nom:t.nom,debut:t.debut,fin:t.fin,duree:t.duree,linkPrev:!!t.linkPrev,equipes:t.equipes,teletravail:t.teletravail,conge:!!t.conge})),
   chapitres:chapitres.map(c=>({titre:c.titre||'',argumentaire:c.argumentaire||'',complement:c.complement||c.texte||'',duree:c.duree||'',images:c.images||[],cartes:(c.cartes||[]).map(x=>({l:x.l,ok:!!x.ok}))})),
   sauvegarde:{logiciel:$('sauv_logiciel').value,licence:$('sauv_licence').value,cible:$('sauv_cible').value,cloud:$('sauv_cloud').checked,sites:sauvSites.map(s=>({nom:s.nom||'',cells:s.cells||{}}))},
-  ai:{engine:($('aiEngine')||{}).value||'claude',model:($('aiModel')||{}).value||''},
+  ai:{engine:($('aiEngine')||{}).value||'mammouth',model:($('aiModel')||{}).value||''},
   prestations:prestations.map(p=>({intitule:p.intitule||'',duree:p.duree||'',argumentaire:p.argumentaire||'',complement:p.complement||p.methodo||''}))};}
 function items(key){return [...document.querySelectorAll('#list-'+key+' .item')].map(readItem);}
 function clearAll(){CATS.forEach(c=>{$('list-'+c.key).innerHTML='';idx[c.key]=0;});}
@@ -720,7 +720,7 @@ function loadData(d){const a=d.affaire||{};
 $('loadf').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{loadData(JSON.parse(r.result));$('msg').textContent='✔ Fiche chargée.';save();}catch(err){alert('JSON invalide : '+err.message);}};r.readAsText(f);e.target.value='';};
 function expFiche(){const d=buildData();const name='fiche_specs_'+((d.affaire.client||d.affaire.projet||'client').replace(/[^a-z0-9]/gi,'_').slice(0,40))+'.json';const b=new Blob([JSON.stringify(d,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=name;a.click();}
 async function generer(mode){mode=mode||'standard';
-  $('msg').innerHTML='<span class="spin"></span> '+(mode==='design'?'Génération Design (réécriture par Claude)…':'Génération du Word…');
+  $('msg').innerHTML='<span class="spin"></span> '+(mode==='design'?'Génération Design (réécriture par l\'IA)…':'Génération du Word…');
   try{const r=await fetch('/api/generer',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(Object.assign({mode:mode,ai_provider:aiSel().provider,ai_model:aiSel().model},buildData()))});
     if(!r.ok)throw new Error((await r.json()).detail||r.statusText);
     const blob=await r.blob();const cd=r.headers.get('Content-Disposition')||'';const m=cd.match(/filename="?([^"]+)"?/);const name=m?m[1]:'AO_ONEID.docx';
@@ -851,7 +851,7 @@ async function reformulerChapModal(){
 async function proposerChapitres(){
   const labels=points.map(p=>p.label).filter(Boolean);
   if(!labels.length){alert("Aucun point d'attention. Analysez d'abord le CCTP.");return;}
-  if(chapitres.length && !confirm('Remplacer les chapitres actuels par la proposition de Claude ?'))return;
+  if(chapitres.length && !confirm('Remplacer les chapitres actuels par la proposition de l\'IA ?'))return;
   const btn=$('goChap');if(btn)btn.disabled=true;$('chapstatus').innerHTML='<span class="spin"></span> Regroupement…';
   try{
     const r=await fetch('/api/proposer-chapitres',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(Object.assign({points:labels},aiSel()))});

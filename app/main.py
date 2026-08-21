@@ -58,7 +58,7 @@ def llm_complete(system, user, max_tokens=4000, provider="", model=""):
             raise HTTPException(400, "MAMMOUTH_API_KEY non configurée (voir fichier .env).")
         import urllib.request, urllib.error
         body = json.dumps({
-            "model": model or "mistral", "max_tokens": max_tokens,
+            "model": model or "mammouth/mistral-medium-3.1", "max_tokens": max_tokens,
             "messages": [{"role": "system", "content": system}, {"role": "user", "content": user}],
         }).encode("utf-8")
         req = urllib.request.Request(

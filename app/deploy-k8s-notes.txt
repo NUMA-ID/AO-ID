@@ -1,0 +1,9 @@
+kubectl -n numa create secret generic ao-id-secrets `
+  --from-literal=ANTHROPIC_API_KEY='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' `
+  --from-literal=MAMMOUTH_API_KEY='sk-w1R7Y1LL3LgKXKvT7qg6GQ'
+  
+  
+  kubectl -n numa delete secret ao-id-secrets
+kubectl -n numa create secret generic ao-id-secrets `
+  --from-literal=ANTHROPIC_API_KEY='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' `
+  --from-literal=MAMMOUTH_API_KEY='sk-w1R7Y1LL3LgKXKvT7qg6GQ'

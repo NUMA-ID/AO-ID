@@ -365,22 +365,22 @@
   </select>
   <select id="aiModel" onchange="save()" style="width:auto;padding:6px 8px;display:none" title="Modèle Mammouth">
     <optgroup label="Mistral">
-      <option value="mistral">Mistral Medium</option>
-      <option value="mistral-small-2603">Mistral Small</option>
+      <option value="mammouth/mistral-medium-3.1">Mistral Medium</option>
+      <option value="mammouth/mistral-small-2603">Mistral Small</option>
     </optgroup>
     <optgroup label="Reasoning / avancés">
-      <option value="deepseek-v4-pro">DeepSeek V4 Pro</option>
-      <option value="grok-4.3">Grok 4.3</option>
-      <option value="glm-5.1">GLM 5.1</option>
-      <option value="kimi-k2.6">Kimi K2.6</option>
+      <option value="mammouth/deepseek-v4-pro">DeepSeek V4 Pro</option>
+      <option value="mammouth/grok-4.3">Grok 4.3</option>
+      <option value="mammouth/glm-5.1">GLM 5.1</option>
+      <option value="mammouth/kimi-k2.6">Kimi K2.6</option>
     </optgroup>
     <optgroup label="Autres">
-      <option value="gpt-5.1">GPT-5.1</option>
-      <option value="gemini-3.1-pro-preview">Gemini 3.1 Pro</option>
-      <option value="llama-4-maverick">Llama 4 Maverick</option>
-      <option value="sonar-pro">Perplexity Sonar Pro</option>
-      <option value="sonar-deep-research">Perplexity Sonar Deep Research</option>
-      <option value="claude-sonnet-4-6">Claude Sonnet 4.6</option>
+      <option value="mammouth/gpt-5.1">GPT-5.1</option>
+      <option value="mammouth/gemini-3.1-pro-preview">Gemini 3.1 Pro</option>
+      <option value="mammouth/llama-4-maverick">Llama 4 Maverick</option>
+      <option value="mammouth/sonar-pro">Perplexity Sonar Pro</option>
+      <option value="mammouth/sonar-deep-research">Perplexity Sonar Deep Research</option>
+      <option value="mammouth/claude-sonnet-4-6">Claude Sonnet 4.6</option>
     </optgroup>
   </select>
   <span class="msg" id="msg">Prêt.</span>
@@ -453,7 +453,7 @@
 <script>
 const $=id=>document.getElementById(id);
 function aiToggle(){const e=$('aiEngine');if(!e)return;$('aiModel').style.display=(e.value==='mammouth')?'inline-block':'none';}
-function aiSel(){const p=($('aiEngine')||{}).value||'mammouth';return {provider:p,model:(p==='mammouth')?(($('aiModel')||{}).value||'').trim()||'mistral':''};}
+function aiSel(){const p=($('aiEngine')||{}).value||'mammouth';return {provider:p,model:(p==='mammouth')?(($('aiModel')||{}).value||'').trim()||'mammouth/mistral-medium-3.1':''};}
 // Empêche le navigateur d'ouvrir le fichier quand on dépose à côté d'une zone
 ['dragenter','dragover','drop'].forEach(ev=>window.addEventListener(ev,e=>{e.preventDefault();},false));
 const STEP_ORDER=['cctp','equip','fonc','kanban','plan','gen'];
