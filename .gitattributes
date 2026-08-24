@@ -1,0 +1,33 @@
+# Normalisation des fins de ligne — évite les diffs bruyants CRLF/LF
+# lors des synchronisations entre le poste Windows et les environnements Linux.
+# Tout fichier texte est stocké en LF dans le dépôt (checkin) ; Git décide de
+# l'affichage local via core.autocrlf côté client si besoin.
+
+* text=auto eol=lf
+
+# --- Code applicatif ---
+*.py     text eol=lf
+*.html   text eol=lf
+*.js     text eol=lf
+*.css    text eol=lf
+*.json   text eol=lf
+*.md     text eol=lf
+*.yml    text eol=lf
+*.yaml   text eol=lf
+*.txt    text eol=lf
+.gitignore   text eol=lf
+.gitattributes text eol=lf
+Dockerfile   text eol=lf
+
+# --- Binaires : jamais normalisés (corruption sinon) ---
+*.docx   binary
+*.dotx   binary
+*.xlsx   binary
+*.png    binary
+*.jpg    binary
+*.jpeg   binary
+*.gif    binary
+*.webp   binary
+*.pdf    binary
+*.pptx   binary
+*.zip    binary

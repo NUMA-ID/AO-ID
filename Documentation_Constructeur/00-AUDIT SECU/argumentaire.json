@@ -1,0 +1,112 @@
+{
+  "_description": "Argumentaire Audit de sécurité ONE ID (prestation). Outils principaux : WithSecure Elements Exposure Management (simulation de chemins d'attaque, actions priorisées) et PingCastle (audit Active Directory, score de risque et maturité). Sans prix — descriptif technique, ce que mesure l'audit, avantages concurrentiels et bénéfices client. Sources : périmètre catalogue ONE ID (00-AUDIT SECU) + fiches produit WithSecure et PingCastle/Netwrix. Marqueur {client}. Éditable.",
+  "modele_match": [
+    "audit securite",
+    "audit sécurité",
+    "audit secu",
+    "auditsecu",
+    "audit de securite",
+    "audit de sécurité",
+    "00-audit secu",
+    "exposure management",
+    "pingcastle",
+    "ping castle"
+  ],
+  "titre": "Audit de sécurité — état des lieux et plan d'actions priorisé",
+  "blocs": [
+    {
+      "t": "p",
+      "x": "L'**audit de sécurité** ONE ID dresse un état des lieux complet du système d'information de {client} et en ressort une **liste d'actions priorisée**, classée par impact. L'objectif n'est pas de produire une longue liste de vulnérabilités, mais de dire à {client} par où commencer pour réduire son risque le plus vite possible. La démarche s'appuie sur deux outils reconnus : **WithSecure Elements Exposure Management** pour la surface d'attaque et les chemins d'attaque, et **PingCastle** pour l'audit de l'Active Directory."
+    },
+    {
+      "t": "img",
+      "x": "[ Visuel : Audit de sécurité — chemins d'attaque et actions priorisées ]"
+    },
+    {
+      "t": "h",
+      "x": "Descriptif technique"
+    },
+    {
+      "t": "puces",
+      "x": [
+        "Deux niveaux d'audit : Basique (scan de vulnérabilités IT, audit Active Directory, audit Cloud Azure, analyse de configuration, rapport) ; Avancé (audit complet de l'infra interne — firewalls, switches, serveurs, postes, Wi-Fi, NAS, sauvegarde, antivirus, accès physique — et du périmètre externe : SaaS, Azure, VPN, DMZ, postes nomades).",
+        "Surface d'attaque analysée avec WithSecure Elements Exposure Management : équipements, identités, cloud et actifs exposés sur Internet.",
+        "Active Directory audité avec PingCastle : comptes à privilèges, relations d'approbation (trusts), objets obsolètes et anomalies de sécurité.",
+        "Cloud Azure / Entra ID audité avec PingCastle Cloud : même logique de score de risque et de maturité appliquée à l'identité dans le cloud (environnements hybrides AD + Entra ID).",
+        "Livrable : rapport détaillé avec score, inventaire des vulnérabilités noté CVSS, recommandations priorisées, feuille de route et matrice des risques."
+      ]
+    },
+    {
+      "t": "h",
+      "x": "Ce que l'audit mesure concrètement"
+    },
+    {
+      "t": "puces",
+      "x": [
+        "Chemins d'attaque (WithSecure XM) : simulation, basée sur l'IA, des trajectoires qu'un attaquant pourrait emprunter, et identification des points de passage critiques (choke points) où une seule correction casse le plus de chemins.",
+        "Actions priorisées : recommandations classées en croisant renseignement sur les menaces, chemins d'attaque et contexte métier — le minimum de correctifs pour le maximum d'effet.",
+        "Niveau de risque de l'AD (PingCastle) : un score de risque du domaine (de 0 = aucun risque identifié à plus de 30 = risques majeurs), établi sur quatre axes — comptes à privilèges, trusts, objets obsolètes, anomalies de sécurité.",
+        "Identité dans le cloud (PingCastle Cloud) : le niveau de sécurité d'Azure AD / Entra ID est évalué avec la même méthode, pour couvrir les environnements hybrides.",
+        "Risques mappés sur des référentiels reconnus : les constats PingCastle sont rattachés aux cadres MITRE ATT&CK et ANSSI.",
+        "Maturité de l'AD : évaluation calquée sur le modèle CMMI (note de 1 à 5), pour situer {client} et mesurer les progrès d'un audit à l'autre.",
+        "Vue interne et externe : les vulnérabilités sont inventoriées et notées (CVSS) pour objectiver la gravité."
+      ]
+    },
+    {
+      "t": "h",
+      "x": "Avantages concurrentiels"
+    },
+    {
+      "t": "puces",
+      "x": [
+        "Priorisation par chemin d'attaque, pas par volume : on corrige d'abord le maillon qui neutralise plusieurs scénarios d'attaque à la fois, au lieu de traiter des centaines de vulnérabilités sans hiérarchie.",
+        "Outils reconnus du marché : WithSecure Elements XM (plateforme d'exposure management) et PingCastle (référence de l'audit Active Directory), plutôt qu'un scan générique.",
+        "Vision à 360° : équipements, identités, cloud et exposition externe couverts dans une même démarche.",
+        "Restitution actionnable : un rapport qui se termine par une feuille de route et une matrice des risques, directement exploitable par les équipes.",
+        "Audit reproductible : le score et la maturité permettent de mesurer les progrès dans le temps."
+      ]
+    },
+    {
+      "t": "h",
+      "x": "Bénéfices pour {client}"
+    },
+    {
+      "t": "puces",
+      "x": [
+        "Savoir par où commencer : une liste d'actions courte et priorisée, pas un catalogue de failles.",
+        "Réduire le risque avec un effort maîtrisé : corriger les points de passage critiques a un effet immédiat sur l'exposition globale.",
+        "Un état des lieux chiffré de l'Active Directory, souvent le cœur de cible des attaques, avec un score et un niveau de maturité clairs.",
+        "Une base de décision et de budget : la feuille de route et la matrice des risques aident à arbitrer les priorités.",
+        "Un accompagnement ONE ID pour interpréter les résultats et enchaîner sur la remédiation si {client} le souhaite."
+      ]
+    },
+    {
+      "t": "h",
+      "x": "Ce qui reste à cadrer avec {client}"
+    },
+    {
+      "t": "puces",
+      "x": [
+        "Périmètre : nombre de sites et d'utilisateurs à auditer (dimensionne la prestation).",
+        "Accès en lecture aux systèmes à auditer.",
+        "Compte administrateur AD / Azure en délégation pour les audits d'annuaire et de cloud.",
+        "À noter : la remédiation, les tests d'intrusion (pentest) et la formation des utilisateurs ne sont pas inclus dans l'audit (prestations séparées)."
+      ]
+    },
+    {
+      "t": "p",
+      "x": "En synthèse, l'audit de sécurité ONE ID donne à {client} une photographie claire de son exposition et de son Active Directory, et surtout un plan d'actions priorisé qui indique quoi corriger en premier pour faire baisser le risque rapidement."
+    }
+  ],
+  "images_defaut": [
+    "audit_secu.png"
+  ],
+  "sources": [
+    "ONE ID — Catalogue tarifs, périmètre de l'offre « Audit de sécurité » (dossier 00-AUDIT SECU) : niveaux Basique / Avancé, contenu du livrable, éléments non inclus et prérequis.",
+    "WithSecure — Elements Exposure Management : cartographie et simulation des chemins d'attaque par IA, identification des points de passage critiques et recommandations priorisées. https://www.withsecure.com/en/for-business/platform/xm/",
+    "WithSecure — The Critical Role of Attack Path Mapping in Exposure Management. https://www2.withsecure.com/en/expertise/resources/critical-role-of-attack-path-mapping-in-xm",
+    "PingCastle (Netwrix) — Méthodologie d'audit Active Directory : score de risque du domaine sur 4 axes (comptes à privilèges, trusts, objets obsolètes, anomalies) et maturité basée sur le modèle CMMI (1 à 5). https://www.pingcastle.com/methodology/",
+    "PingCastle / Netwrix — Audit Active Directory et Entra ID (Azure AD) : couverture des environnements hybrides, 170+ risques d'identité, constats mappés MITRE ATT&CK et ANSSI ; PingCastle Cloud pour l'évaluation Azure AD. https://netwrix.com/en/products/pingcastle/"
+  ],
+  "avertissement": "Contenu de présentation technico-commerciale. Le périmètre exact (nombre de sites, d'utilisateurs, niveau Basique ou Avancé) et les accès nécessaires sont à confirmer selon le dossier. La remédiation, le pentest et la formation ne sont pas compris dans l'audit. Aucun tarif n'est mentionné : le chiffrage (dimensionnement en jours + déplacements) est traité dans le devis."
+}

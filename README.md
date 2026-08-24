@@ -105,3 +105,22 @@ Le dossier `Documentation_Constructeur/<PRODUIT>/argumentaire.json` pilote les t
 - **Cadre de mémoire technique** : il est régénéré selon la structure de la trame client (la mise en forme exacte du fichier d'origine n'est pas conservée). Format **`.doc` non pris en charge** → enregistrer en `.docx`.
 - **Police** : le Word utilise la police **Assistant** ; l'installer sur le poste qui ouvre le document pour un rendu fidèle.
 - Les documents générés et les fiches contiennent des données client : ils sont **exclus du dépôt Git** par défaut.
+
+---
+
+## Documentation complémentaire
+
+- `docs/ARCHITECTURE.md` — composants, flux de données, dépendances externes.
+- `docs/FONCTIONS.md` — inventaire exhaustif des endpoints (entrées/sorties/erreurs/effets de bord).
+- `docs/DECISIONS.md` — choix techniques structurants et leur justification.
+- `docs/BLOCAGES.md` — journal des points bloquants (ouvert/contourné/résolu).
+- `docs/EXPLOITATION.md` — variables d'environnement, secrets, procédure de déploiement/retour arrière.
+
+## Pilotage du projet (Hermes)
+
+Depuis le 2026-08-21, ce projet est piloté via Hermes selon un modèle **PREPROD /
+PROD** : tout le travail se fait en PREPROD (`/home/numa/projets/appel-offre`, branche
+`preprod`) et rien n'est déployé en PROD sans validation explicite. L'environnement
+PROD n'est pas encore défini (voir `docs/BLOCAGES.md`). Avant cette date, le projet
+était développé en itératif directement sur le poste Windows de l'utilisateur, avec des
+commits poussés manuellement vers `github.com/NUMA-ID/AO-ID` (branche `main`).
