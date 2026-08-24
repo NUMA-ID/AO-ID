@@ -36,12 +36,15 @@ propagés par `llm_complete` si clé API manquante ou erreur amont.
 **Effets de bord** : appel réseau sortant vers l'API Anthropic ou Mammouth.
 
 ## `POST /api/import-excel`
-**Rôle** : convertit un export Dell Solutions Configurator (.xlsx) en fiche JSON classée
-par catégorie d'équipement.
+**Rôle** : convertit un export Dell Solutions Configurator OU un devis distributeur
+TD SYNNEX (.xlsx) en fiche JSON classée par catégorie d'équipement (auto-détection du
+format par les colonnes d'en-tête présentes).
 **Entrées** : `file: UploadFile` (obligatoire, .xlsx).
 **Sortie** : JSON de la fiche classée (serveurs/stockages/switches/sauvegardes/logiciels).
 **Erreurs possibles** : `500` si le sous-processus `parser_dell_excel.py` échoue (retour
-non nul ou fichier de sortie absent) — message tronqué à 500 caractères.
+non nul ou fichier de sortie absent, y compris si aucun des deux formats reconnus n'est
+détecté) — message tronqué à 500 caractères côté réponse HTTP ; le traceback complet est
+loggé côté serveur (stdout du conteneur) depuis le 2026-08-24.
 **Effets de bord** : écriture disque temporaire (répertoire `tempfile.TemporaryDirectory`,
 auto-nettoyé), exécution d'un sous-processus Python.
 

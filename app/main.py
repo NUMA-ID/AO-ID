@@ -381,6 +381,9 @@ async def import_excel(file: UploadFile = File(...)):
         r = subprocess.run([sys.executable, str(ENGINE / "parser_dell_excel.py"), str(xlsx), str(out)],
                            capture_output=True, text=True)
         if r.returncode != 0 or not out.exists():
+            # Log le traceback complet côté serveur (non tronqué) pour le diagnostic ;
+            # la réponse HTTP reste tronquée à 500 caractères pour ne pas surcharger l'UI.
+            print("ERREUR /api/import-excel — sortie complète du parseur :\n" + (r.stderr or r.stdout), flush=True)
             raise HTTPException(500, "Échec du parseur Excel : " + (r.stderr or r.stdout)[:500])
         return JSONResponse(json.loads(out.read_text(encoding="utf-8")))
 

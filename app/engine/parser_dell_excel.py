@@ -1,14 +1,25 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Parseur d'export Dell Solutions Configurator (.xlsx) -> fiche de specs JSON ONE ID.
+Parseur d'export Dell Solutions Configurator (.xlsx) ou de devis distributeur
+(ex. TD SYNNEX) -> fiche de specs JSON ONE ID.
 
-Le fichier Dell est un tableau hierarchique unique :
-  - lignes d'en-tete solution (ID, Nom, Categorie, Prix...)
-  - ligne de colonnes : Nom du groupe | ID groupe | Nom du produit | Quantite |
-    Prix unitaire | Prix etendu | Nom du module | ID option | Nom option | Prix | SKU | Qte
-  - produits (colonne "Nom du produit" renseignee)
-  - composants/options de chaque produit (colonne "Nom du module" renseignee)
+Deux formats reconnus (auto-détection par en-tête) :
+
+1. Dell Solutions Configurator : tableau hierarchique unique :
+   - lignes d'en-tete solution (ID, Nom, Categorie, Prix...)
+   - ligne de colonnes : Nom du groupe | ID groupe | Nom du produit | Quantite |
+     Prix unitaire | Prix etendu | Nom du module | ID option | Nom option | Prix | SKU | Qte
+   - produits (colonne "Nom du produit" renseignee)
+   - composants/options de chaque produit (colonne "Nom du module" renseignee)
+
+2. Devis distributeur (TD SYNNEX) : tableau plus simple :
+   - ligne de colonnes : Référence Constructeur | Réf. TD SYNNEX | Description |
+     Prix public unit. HT EUR | Total List Price EUR | Remise | Prix d'achat
+     unit. HT EUR | Qté | Prix Total HT EUR | ...
+   - lignes produit : "Référence Constructeur" + "Description" renseignés
+   - lignes composant/option : une seule cellule "Référence Constructeur"
+     au format "<N>X <libellé>" (ex. "2X 480GB SSD SATA...")
 
 Sortie : JSON compatible avec generer_doc.py, categories :
   serveurs / stockages / switches / sauvegardes / logiciels_services
@@ -17,6 +28,23 @@ Usage : python3 parser_dell_excel.py entree.xlsx sortie.json
 """
 import sys, json, re, datetime, unicodedata
 import openpyxl
+
+# --- Correctif lecture : certains exports (dont les devis TD SYNNEX observés en
+# production) contiennent un attribut de style <font family="…"> supérieur à 14.
+# openpyxl (3.1.5) applique une validation trop stricte (max=14, voir
+# openpyxl/styles/fonts.py, descripteur Font.family) alors que la norme OOXML
+# n'impose pas cette limite en pratique. Sans ce correctif, l'ouverture du
+# classeur échoue avec "ValueError: Max value is 14" dès load_workbook().
+# Voir docs/BLOCAGES.md, incident du 2026-08-24 (PROD, import Excel HTTP 500).
+try:
+    import openpyxl.styles.fonts as _openpyxl_fonts
+    _openpyxl_fonts.Font.family.max = 999
+except Exception:
+    pass
+
+
+class HeaderNotFoundError(ValueError):
+    """Levée quand aucun format d'en-tête connu (Dell ou TD SYNNEX) n'est trouvé."""
 
 
 def deacc(s):
@@ -56,6 +84,9 @@ SPEC_HINTS = [
     ("support", ["prosupport", "support", "garantie", "service", "warranty"]),
 ]
 
+# Ligne composant TD SYNNEX : "<N>X <libellé>" (ex. "24X Informational Purposes Only").
+COMP_QTE_RE = re.compile(r"^(\d+)\s*[xX]\s+(.+)$")
+
 
 def norm(v):
     if v is None:
@@ -83,6 +114,7 @@ def ptext(p):
 
 
 def find_header(ws):
+    """Détecte l'en-tête format Dell Solutions Configurator."""
     for r in range(1, min(ws.max_row, 30) + 1):
         rowvals = [deacc(norm(ws.cell(r, c).value).lower()) for c in range(1, ws.max_column + 1)]
         if "nom du produit" in rowvals and "nom du module" in rowvals:
@@ -110,7 +142,32 @@ def find_header(ws):
                 elif "prix catalogue" in v and "option" in v:
                     idx["prix_mod"] = c
             return r, idx
-    raise SystemExit("En-tete Dell introuvable (colonnes 'Nom du produit'/'Nom du module').")
+    raise HeaderNotFoundError("En-tete Dell introuvable (colonnes 'Nom du produit'/'Nom du module').")
+
+
+def find_header_tdsynnex(ws):
+    """Détecte l'en-tête format devis distributeur (TD SYNNEX)."""
+    for r in range(1, min(ws.max_row, 40) + 1):
+        rowvals = [deacc(norm(ws.cell(r, c).value).lower()) for c in range(1, ws.max_column + 1)]
+        if "reference constructeur" in rowvals and "description" in rowvals and "qte" in rowvals:
+            idx = {}
+            for c in range(1, ws.max_column + 1):
+                v = deacc(norm(ws.cell(r, c).value).lower())
+                if v == "reference constructeur":
+                    idx["ref"] = c
+                elif v == "description":
+                    idx["description"] = c
+                elif "prix public" in v:
+                    idx["prix_public"] = c
+                elif "achat" in v:
+                    idx["prix_achat"] = c
+                elif v == "qte":
+                    idx["qte"] = c
+                elif "prix total" in v and "ht" in v:
+                    idx["prix_total"] = c
+            return r, idx
+    raise HeaderNotFoundError(
+        "En-tete TD SYNNEX introuvable (colonnes 'Reference Constructeur'/'Description'/'Qte').")
 
 
 def fmt_qte(val, qte):
@@ -144,11 +201,7 @@ def build_item(p, cat, qte):
     }
 
 
-def parse(path):
-    wb = openpyxl.load_workbook(path, data_only=True)
-    ws = wb.active
-    hdr, idx = find_header(ws)
-
+def parse_dell(path, ws, hdr, idx):
     sol = {}
     for r in range(1, hdr):
         a = norm(ws.cell(r, 1).value)
@@ -215,6 +268,91 @@ def parse(path):
         "sauvegardes": buckets["sauvegardes"],
         "logiciels_services": buckets["logiciels_services"],
     }
+
+
+def parse_tdsynnex(path, ws, hdr, idx):
+    def cell(r, key):
+        return norm(ws.cell(r, idx[key]).value) if key in idx else ""
+
+    def find_meta(label_norm):
+        """Cherche un libellé (ex. 'client final') avant l'en-tête et renvoie la
+        première cellule non vide qui le suit sur la même ligne."""
+        for r in range(1, hdr):
+            for c in range(1, ws.max_column + 1):
+                v = deacc(norm(ws.cell(r, c).value).lower()).rstrip(":").strip()
+                if v == label_norm:
+                    for c2 in range(c + 1, ws.max_column + 1):
+                        vv = norm(ws.cell(r, c2).value)
+                        if vv:
+                            return vv
+        return ""
+
+    client = find_meta("client final")
+    devis = find_meta("numero de devis")
+
+    produits = []
+    current = None
+    for r in range(hdr + 1, ws.max_row + 1):
+        desc = cell(r, "description")
+        ref1 = norm(ws.cell(r, 1).value)  # colonne A : réf. produit OU ligne composant "NX ..."
+        if desc:
+            current = {
+                "produit": desc, "groupe": "",
+                "qte": cell(r, "qte") or "1",
+                "prix_unitaire": cell(r, "prix_achat") or cell(r, "prix_public"),
+                "prix_etendu": cell(r, "prix_total"),
+                "composants": [],
+            }
+            produits.append(current)
+        elif ref1 and current is not None:
+            m = COMP_QTE_RE.match(ref1)
+            if m:
+                current["composants"].append({
+                    "module": "", "description": m.group(2),
+                    "sku": "", "qte": m.group(1), "prix": "",
+                })
+
+    buckets = dict((k, []) for k in CAT_LABEL)
+    for p in produits:
+        if not p["composants"]:
+            continue
+        cat = classify(p)
+        buckets[cat].append(build_item(p, cat, p["qte"]))
+
+    return {
+        "_type": "fiche_specs_oneid", "_version": 2,
+        "_import": {"source": "Devis TD SYNNEX", "fichier": path,
+                    "le": datetime.date.today().isoformat()},
+        "affaire": {
+            "client": client, "projet": devis,
+            "reference": devis, "version": "1.0", "auteur": "",
+            "date": datetime.date.today().isoformat(),
+            "notes": "", "prix_solution": "",
+        },
+        "serveurs": buckets["serveurs"],
+        "stockages": buckets["stockages"],
+        "switches": buckets["switches"],
+        "sauvegardes": buckets["sauvegardes"],
+        "logiciels_services": buckets["logiciels_services"],
+    }
+
+
+def parse(path):
+    wb = openpyxl.load_workbook(path, data_only=True)
+    ws = wb.active
+    try:
+        hdr, idx = find_header(ws)
+        return parse_dell(path, ws, hdr, idx)
+    except HeaderNotFoundError:
+        pass
+    try:
+        hdr, idx = find_header_tdsynnex(ws)
+        return parse_tdsynnex(path, ws, hdr, idx)
+    except HeaderNotFoundError:
+        raise HeaderNotFoundError(
+            "Format de fichier non reconnu : ni export Dell Solutions Configurator "
+            "(colonnes 'Nom du produit'/'Nom du module'), ni devis TD SYNNEX "
+            "(colonnes 'Référence Constructeur'/'Description'/'Qté').")
 
 
 def main():
