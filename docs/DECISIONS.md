@@ -94,3 +94,21 @@ facturation, autre disponibilité). Implémentation symétrique à Mammouth
 `POST /api/ameliorer-solution` avec `provider=mistral` : réponse cohérente obtenue.
 Écarté : fusionner cette entrée avec le moteur Mammouth existant (les deux comptes/clés
 sont distincts et doivent pouvoir être activés indépendamment).
+
+## 2026-08-24 — Appels IA délégués au threadpool (run_in_threadpool)
+Cause racine identifiée d'un redémarrage de pod signalé en PROD (v2.4.1, voir
+`appel-offre-k8s/docs/BLOCAGES.md`) : `llm_complete()` et `design_enhance()` sont des
+fonctions synchrones (`urllib.request.urlopen`, timeout 180s) appelées directement
+depuis des routes `async def` de FastAPI. Avec Uvicorn en un seul worker, un appel IA
+en cours bloquait entièrement la boucle d'événements asyncio, y compris les requêtes
+`GET /` utilisées par les probes Kubernetes — d'où un faux-positif de la liveness probe
+et un redémarrage du pod en pleine réponse à un utilisateur. Correctif : les 6 points
+d'appel (`analyse-cctp`, `proposer-chapitres`, `verifier`, `ameliorer-solution`,
+`memoire`, `generer` en mode design) passent par `starlette.concurrency.run_in_threadpool`
+plutôt que d'appeler la fonction bloquante directement. Aucune nouvelle dépendance
+(`starlette` fourni par `fastapi==0.115.6`). Testé en conditions réelles (PREPROD) :
+`GET /` répond en 5ms pendant qu'un appel IA est en cours de traitement, alors qu'avant
+ce correctif la requête aurait été bloquée jusqu'à la fin de l'appel. Écarté : réécrire
+`llm_complete()` en natif asynchrone (`httpx.AsyncClient`) — plus invasif pour un gain
+équivalent dans le contexte actuel (un seul worker, faible concurrence attendue) ;
+pourra être reconsidéré si le nombre d'utilisateurs simultanés augmente.
