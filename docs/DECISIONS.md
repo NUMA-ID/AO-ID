@@ -80,3 +80,17 @@ garder un développement mixte Windows/Linux (aurait reproduit le problème que 
 changement vise justement à éliminer). Le poste Windows n'est plus qu'un point
 d'origine historique ; il n'est plus une cible de déploiement ni un environnement de
 travail.
+
+## 2026-08-23 — Ajout d'un troisième moteur IA : Mistral AI direct
+Ajout de Mistral AI en accès direct (API officielle `api.mistral.ai`), en plus de
+Claude (Anthropic) et Mammouth.ai (qui proxifie déjà Mistral parmi d'autres modèles).
+Justification : demande explicite de l'utilisateur d'avoir un accès direct au fournisseur
+Mistral avec sa propre clé, indépendamment du proxy Mammouth (autre compte, autre
+facturation, autre disponibilité). Implémentation symétrique à Mammouth
+(`llm_complete()`, branche `provider == "mistral"`, appel `urllib` OpenAI-compatible vers
+`/chat/completions`, modèle par défaut `mistral-medium-latest`). Sélecteur d'interface
+étendu avec un troisième choix "Mistral (direct)" et sa propre liste de modèles
+(Medium/Large/Small). Testé en conditions réelles le jour même via
+`POST /api/ameliorer-solution` avec `provider=mistral` : réponse cohérente obtenue.
+Écarté : fusionner cette entrée avec le moteur Mammouth existant (les deux comptes/clés
+sont distincts et doivent pouvoir être activés indépendamment).

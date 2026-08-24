@@ -45,13 +45,15 @@ def sysp(specific: str) -> str:
 
 MAMMOUTH_API_KEY = os.environ.get("MAMMOUTH_API_KEY", "")
 MAMMOUTH_BASE = os.environ.get("MAMMOUTH_BASE", "https://api.mammouth.ai/v1")
-# Moteur IA par défaut quand la requête n'en précise pas : "mammouth" ou "claude".
+MISTRAL_API_KEY = os.environ.get("MISTRAL_API_KEY", "")
+MISTRAL_BASE = os.environ.get("MISTRAL_BASE", "https://api.mistral.ai/v1")
+# Moteur IA par défaut quand la requête n'en précise pas : "mammouth", "claude" ou "mistral".
 # Repasser à "claude" dans l'environnement dès que le solde Anthropic est rechargé.
 DEFAULT_PROVIDER = os.environ.get("DEFAULT_PROVIDER", "mammouth").lower()
 
 
 def llm_complete(system, user, max_tokens=4000, provider="", model=""):
-    """Appelle le moteur IA choisi : 'claude' (Anthropic) ou 'mammouth' (OpenAI-compatible)."""
+    """Appelle le moteur IA choisi : 'claude' (Anthropic), 'mammouth' ou 'mistral' (OpenAI-compatibles)."""
     provider = (provider or DEFAULT_PROVIDER).lower()
     if provider == "mammouth":
         if not MAMMOUTH_API_KEY:
@@ -86,6 +88,33 @@ def llm_complete(system, user, max_tokens=4000, provider="", model=""):
             raise
         except Exception as e:
             raise HTTPException(502, "Erreur API Mammouth : " + str(e))
+    if provider == "mistral":
+        if not MISTRAL_API_KEY:
+            raise HTTPException(400, "MISTRAL_API_KEY non configurée (voir fichier .env).")
+        import urllib.request, urllib.error
+        body = json.dumps({
+            "model": model or "mistral-medium-latest", "max_tokens": max_tokens,
+            "messages": [{"role": "system", "content": system}, {"role": "user", "content": user}],
+        }).encode("utf-8")
+        req = urllib.request.Request(
+            MISTRAL_BASE.rstrip("/") + "/chat/completions", data=body,
+            headers={"Authorization": "Bearer " + MISTRAL_API_KEY,
+                     "Content-Type": "application/json",
+                     "Accept": "application/json"})
+        try:
+            with urllib.request.urlopen(req, timeout=180) as resp:
+                d = json.loads(resp.read().decode("utf-8"))
+            return d["choices"][0]["message"]["content"] or ""
+        except urllib.error.HTTPError as e:
+            try:
+                detail = e.read().decode("utf-8", "replace")[:500]
+            except Exception:
+                detail = ""
+            raise HTTPException(502, "Erreur API Mistral (HTTP %s) : %s" % (e.code, detail or e.reason))
+        except HTTPException:
+            raise
+        except Exception as e:
+            raise HTTPException(502, "Erreur API Mistral : " + str(e))
     # défaut : Claude (Anthropic)
     if not API_KEY:
         raise HTTPException(400, "ANTHROPIC_API_KEY non configurée (voir fichier .env).")

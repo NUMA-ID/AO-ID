@@ -362,6 +362,7 @@
   <select id="aiEngine" onchange="aiToggle();save()" style="width:auto;padding:6px 8px" title="Moteur utilisé par les boutons IA (Reformuler, Analyser, etc.)">
     <option value="claude">Claude (Anthropic)</option>
     <option value="mammouth" selected>Mammouth</option>
+    <option value="mistral">Mistral (direct)</option>
   </select>
   <select id="aiModel" onchange="save()" style="width:auto;padding:6px 8px;display:none" title="Modèle Mammouth">
     <optgroup label="Mistral">
@@ -382,6 +383,11 @@
       <option value="mammouth/sonar-deep-research">Perplexity Sonar Deep Research</option>
       <option value="mammouth/claude-sonnet-4-6">Claude Sonnet 4.6</option>
     </optgroup>
+  </select>
+  <select id="aiModelMistral" onchange="save()" style="width:auto;padding:6px 8px;display:none" title="Modèle Mistral (API directe)">
+    <option value="mistral-medium-latest">Mistral Medium</option>
+    <option value="mistral-large-latest">Mistral Large</option>
+    <option value="mistral-small-latest">Mistral Small</option>
   </select>
   <span class="msg" id="msg">Prêt.</span>
 </div>
@@ -452,8 +458,8 @@
 
 <script>
 const $=id=>document.getElementById(id);
-function aiToggle(){const e=$('aiEngine');if(!e)return;$('aiModel').style.display=(e.value==='mammouth')?'inline-block':'none';}
-function aiSel(){const p=($('aiEngine')||{}).value||'mammouth';return {provider:p,model:(p==='mammouth')?(($('aiModel')||{}).value||'').trim()||'mammouth/mistral-medium-3.1':''};}
+function aiToggle(){const e=$('aiEngine');if(!e)return;$('aiModel').style.display=(e.value==='mammouth')?'inline-block':'none';$('aiModelMistral').style.display=(e.value==='mistral')?'inline-block':'none';}
+function aiSel(){const p=($('aiEngine')||{}).value||'mammouth';if(p==='mammouth')return {provider:p,model:(($('aiModel')||{}).value||'').trim()||'mammouth/mistral-medium-3.1'};if(p==='mistral')return {provider:p,model:(($('aiModelMistral')||{}).value||'').trim()||'mistral-medium-latest'};return {provider:p,model:''};}
 // Empêche le navigateur d'ouvrir le fichier quand on dépose à côté d'une zone
 ['dragenter','dragover','drop'].forEach(ev=>window.addEventListener(ev,e=>{e.preventDefault();},false));
 const STEP_ORDER=['cctp','equip','fonc','kanban','plan','gen'];
@@ -695,7 +701,7 @@ function buildData(){return{_type:'fiche_specs_oneid',_version:3,genere_le:new D
   planning:planTasks.map(t=>({nom:t.nom,debut:t.debut,fin:t.fin,duree:t.duree,linkPrev:!!t.linkPrev,equipes:t.equipes,teletravail:t.teletravail,conge:!!t.conge})),
   chapitres:chapitres.map(c=>({titre:c.titre||'',argumentaire:c.argumentaire||'',complement:c.complement||c.texte||'',duree:c.duree||'',images:c.images||[],cartes:(c.cartes||[]).map(x=>({l:x.l,ok:!!x.ok}))})),
   sauvegarde:{logiciel:$('sauv_logiciel').value,licence:$('sauv_licence').value,cible:$('sauv_cible').value,cloud:$('sauv_cloud').checked,sites:sauvSites.map(s=>({nom:s.nom||'',cells:s.cells||{}}))},
-  ai:{engine:($('aiEngine')||{}).value||'mammouth',model:($('aiModel')||{}).value||''},
+  ai:{engine:($('aiEngine')||{}).value||'mammouth',model:($('aiModel')||{}).value||'',modelMistral:($('aiModelMistral')||{}).value||''},
   prestations:prestations.map(p=>({intitule:p.intitule||'',duree:p.duree||'',argumentaire:p.argumentaire||'',complement:p.complement||p.methodo||''}))};}
 function items(key){return [...document.querySelectorAll('#list-'+key+' .item')].map(readItem);}
 function clearAll(){CATS.forEach(c=>{$('list-'+c.key).innerHTML='';idx[c.key]=0;});}
@@ -710,7 +716,7 @@ function loadData(d){const a=d.affaire||{};
   verif=a.verification||[];renderVerif();
   $('sauv_veeam').checked=!!a.sauv_veeam;$('sauv_datadomain').checked=!!a.sauv_datadomain;
   const sv=d.sauvegarde||{};$('sauv_logiciel').value=sv.logiciel||'';$('sauv_licence').value=sv.licence||'acheter';$('sauv_cible').value=sv.cible||'';$('sauv_cloud').checked=!!sv.cloud;sauvSites=(sv.sites||[]).map(s=>({nom:s.nom||'',cells:s.cells||{}}));renderSauv();
-  const ai=d.ai||{};if(ai.engine)$('aiEngine').value=ai.engine;if(ai.model!==undefined)$('aiModel').value=ai.model;aiToggle();
+  const ai=d.ai||{};if(ai.engine)$('aiEngine').value=ai.engine;if(ai.model!==undefined)$('aiModel').value=ai.model;if(ai.modelMistral!==undefined)$('aiModelMistral').value=ai.modelMistral;aiToggle();
   prestations=(d.prestations||[]).map(p=>({intitule:p.intitule||'',duree:p.duree||'',argumentaire:p.argumentaire||'',complement:p.complement||p.methodo||''}));renderPrest();
   const pp=a.pra_pca||{};if(pp.mode)$('pra_mode').value=pp.mode;$('pra_rto').value=pp.rto||'';$('pra_rpo').value=pp.rpo||'';if(pp.cible)$('pra_cible').value=pp.cible;if(pp.methode)$('pra_methode').value=pp.methode;$('pra_text').value=pp.texte||'';praToggle();
   if(points.length||a.contexte||clars.length||verif.length)$('resCard').style.display='block';
