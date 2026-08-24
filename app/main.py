@@ -8,6 +8,7 @@ import os, json, tempfile, subprocess, sys, datetime, re
 from pathlib import Path
 from fastapi import FastAPI, UploadFile, File, Form, HTTPException
 from fastapi.responses import HTMLResponse, JSONResponse, FileResponse
+from starlette.concurrency import run_in_threadpool
 
 HERE = Path(__file__).resolve().parent
 ENGINE = HERE / "engine"
@@ -357,7 +358,7 @@ async def analyse_cctp(file: UploadFile = File(None), text: str = Form(None), so
         user += "\n\nSOLUTION ACTUELLEMENT CONFIGURÉE :\n" + sol_summary[:20000]
     else:
         user += "\n\n(Aucune solution configurée pour le moment : marque les exigences en 'a_preciser'.)"
-    raw = llm_complete(sysp(CCTP_PROMPT), user, 8000, provider, model)
+    raw = await run_in_threadpool(llm_complete, sysp(CCTP_PROMPT), user, 8000, provider, model)
     p = parse_cctp(raw)
     contexte, points = p["contexte"], p["points"]
     clarifications, verification = p["clarifications"], p["verification"]
@@ -403,7 +404,7 @@ async def proposer_chapitres(payload: dict):
     if not pts:
         raise HTTPException(400, "Aucun point d'attention à regrouper (analysez d'abord le CCTP).")
     user = "POINTS D'ATTENTION :\n" + "\n".join("- " + p for p in pts)
-    raw = llm_complete(sysp(CHAP_PROMPT), user, 4000, payload.get("provider"), payload.get("model"))
+    raw = await run_in_threadpool(llm_complete, sysp(CHAP_PROMPT), user, 4000, payload.get("provider"), payload.get("model"))
     cleaned = raw.strip()
     m = re.search(r"```(?:json)?\s*(.*?)```", cleaned, re.S)
     if m:
@@ -447,7 +448,7 @@ async def verifier(payload: dict):
     user = "TEXTE DU CCTP :\n\n" + cctp[:120000]
     user += ("\n\nCONTENU DE L'AO (%s) :\n%s" % (source, doc_text[:80000])) if doc_text else \
             "\n\n(Aucun contenu d'AO fourni : marque les exigences en 'a_preciser'.)"
-    raw = llm_complete(sysp(VERIF_PROMPT), user, 6000, payload.get("provider"), payload.get("model"))
+    raw = await run_in_threadpool(llm_complete, sysp(VERIF_PROMPT), user, 6000, payload.get("provider"), payload.get("model"))
     cleaned = raw.strip()
     m = re.search(r"```(?:json)?\s*(.*?)```", cleaned, re.S)
     if m:
@@ -522,7 +523,7 @@ async def ameliorer_solution(payload: dict):
     if payload.get("projet"):
         ctx.append("Projet : " + str(payload["projet"]))
     user = (("\n".join(ctx) + "\n\n") if ctx else "") + "Description brute à réécrire :\n" + texte
-    out = llm_complete(sysp(SOLUTION_PROMPT), user, 3000, payload.get("provider"), payload.get("model")).strip()
+    out = (await run_in_threadpool(llm_complete, sysp(SOLUTION_PROMPT), user, 3000, payload.get("provider"), payload.get("model"))).strip()
     return {"text": out}
 
 
@@ -710,7 +711,7 @@ async def memoire(file: UploadFile = File(...), cctp: str = Form(""), solution: 
     user += "\n\nDONNÉES DE L'AO (à utiliser pour remplir) :\n" + (ao[:60000] or "(aucune)")
     if cctp.strip():
         user += "\n\nCONTEXTE CCTP :\n" + cctp[:20000]
-    filled = llm_complete(sysp(MEMOIRE_PROMPT), user, 8000, provider, model)
+    filled = await run_in_threadpool(llm_complete, sysp(MEMOIRE_PROMPT), user, 8000, provider, model)
     name = "Memoire_technique_" + slug(client or "client") + "_" + \
            datetime.datetime.now().strftime("%Y%m%d_%H%M%S") + ".docx"
     out_path = OUT_DIR / name
@@ -732,7 +733,7 @@ async def generer(spec: dict):
     if mode == "design":
         affd = spec.setdefault("affaire", {})
         try:
-            d = design_enhance(affd, ai_provider, ai_model)
+            d = await run_in_threadpool(design_enhance, affd, ai_provider, ai_model)
         except Exception as e:
             raise HTTPException(502, "Mode Design (moteur IA) : " + str(e))
         if d.get("intro"):
