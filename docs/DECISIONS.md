@@ -112,3 +112,22 @@ ce correctif la requête aurait été bloquée jusqu'à la fin de l'appel. Écar
 `llm_complete()` en natif asynchrone (`httpx.AsyncClient`) — plus invasif pour un gain
 équivalent dans le contexte actuel (un seul worker, faible concurrence attendue) ;
 pourra être reconsidéré si le nombre d'utilisateurs simultanés augmente.
+
+## 2026-08-24 — Quatrième moteur IA : GB10 (serveur vLLM interne ONE ID)
+Ajout d'un moteur GB10, pointant vers `https://llm.one-id.fr/v1` (serveur vLLM interne
+ONE ID, machine GB10/DGX Spark administrée par l'équipe infra — Thibaud Melano, voir
+tickets CRM `TT038490`). Justification : accès à un modèle auto-hébergé (Qwen3.8 via
+Unsloth, `unsloth/Qwen3.8-Flash-Next-GGUF`), sans dépendance à un fournisseur externe ni
+coût par requête, utile en secours quand Claude/Mammouth/Mistral sont indisponibles ou
+rate-limited (cas vécu le jour même avec Mistral, HTTP 429). Implémentation symétrique
+aux moteurs OpenAI-compatibles existants (`llm_complete()`, branche `provider == "gb10"`,
+`GB10_API_KEY`/`GB10_BASE` en variables d'environnement). Particularité gérée : ce modèle
+est de type "reasoning" et renvoie un champ `reasoning_content` séparé du `content` final
+dans la réponse API — seul `content` est retourné à l'appelant. Sélecteur d'interface
+étendu avec un quatrième choix "GB10 (interne ONE ID)". Testé en conditions réelles :
+appel direct à l'API (34,5s pour un prompt simple) et via `/api/analyse-cctp`
+(138,8s, `HTTP 200`, JSON valide) — le modèle est sensiblement plus lent que Mistral/
+Claude du fait de son raisonnement interne, mais reste sous le timeout de 180s de
+`llm_complete()`. Écarté à ce stade : réduire le timeout spécifiquement pour ce
+provider (aucune limite basse n'a été demandée) ; exposer le `reasoning_content` dans
+l'interface (non demandé, alourdirait l'affichage).

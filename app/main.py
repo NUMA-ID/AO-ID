@@ -48,13 +48,15 @@ MAMMOUTH_API_KEY = os.environ.get("MAMMOUTH_API_KEY", "")
 MAMMOUTH_BASE = os.environ.get("MAMMOUTH_BASE", "https://api.mammouth.ai/v1")
 MISTRAL_API_KEY = os.environ.get("MISTRAL_API_KEY", "")
 MISTRAL_BASE = os.environ.get("MISTRAL_BASE", "https://api.mistral.ai/v1")
-# Moteur IA par défaut quand la requête n'en précise pas : "mammouth", "claude" ou "mistral".
+GB10_API_KEY = os.environ.get("GB10_API_KEY", "")
+GB10_BASE = os.environ.get("GB10_BASE", "https://llm.one-id.fr/v1")
+# Moteur IA par défaut quand la requête n'en précise pas : "mammouth", "claude", "mistral" ou "gb10".
 # Repasser à "claude" dans l'environnement dès que le solde Anthropic est rechargé.
 DEFAULT_PROVIDER = os.environ.get("DEFAULT_PROVIDER", "mammouth").lower()
 
 
 def llm_complete(system, user, max_tokens=4000, provider="", model=""):
-    """Appelle le moteur IA choisi : 'claude' (Anthropic), 'mammouth' ou 'mistral' (OpenAI-compatibles)."""
+    """Appelle le moteur IA choisi : 'claude' (Anthropic), 'mammouth', 'mistral' ou 'gb10' (OpenAI-compatibles)."""
     provider = (provider or DEFAULT_PROVIDER).lower()
     if provider == "mammouth":
         if not MAMMOUTH_API_KEY:
@@ -116,6 +118,35 @@ def llm_complete(system, user, max_tokens=4000, provider="", model=""):
             raise
         except Exception as e:
             raise HTTPException(502, "Erreur API Mistral : " + str(e))
+    if provider == "gb10":
+        if not GB10_API_KEY:
+            raise HTTPException(400, "GB10_API_KEY non configurée (voir fichier .env).")
+        import urllib.request, urllib.error
+        body = json.dumps({
+            "model": model or "unsloth/Qwen3.8-Flash-Next-GGUF", "max_tokens": max_tokens,
+            "messages": [{"role": "system", "content": system}, {"role": "user", "content": user}],
+        }).encode("utf-8")
+        req = urllib.request.Request(
+            GB10_BASE.rstrip("/") + "/chat/completions", data=body,
+            headers={"Authorization": "Bearer " + GB10_API_KEY,
+                     "Content-Type": "application/json",
+                     "Accept": "application/json"})
+        try:
+            with urllib.request.urlopen(req, timeout=180) as resp:
+                d = json.loads(resp.read().decode("utf-8"))
+            # Modèles "reasoning" (Qwen3 etc.) : ne garder que le contenu final,
+            # pas le raisonnement intermédiaire (champ reasoning_content séparé).
+            return d["choices"][0]["message"]["content"] or ""
+        except urllib.error.HTTPError as e:
+            try:
+                detail = e.read().decode("utf-8", "replace")[:500]
+            except Exception:
+                detail = ""
+            raise HTTPException(502, "Erreur API GB10 (HTTP %s) : %s" % (e.code, detail or e.reason))
+        except HTTPException:
+            raise
+        except Exception as e:
+            raise HTTPException(502, "Erreur API GB10 : " + str(e))
     # défaut : Claude (Anthropic)
     if not API_KEY:
         raise HTTPException(400, "ANTHROPIC_API_KEY non configurée (voir fichier .env).")

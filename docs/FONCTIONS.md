@@ -28,7 +28,7 @@ points d'attention, clarifications et grille de vérification préliminaire.
 - `file: UploadFile` (optionnel, PDF/Word/TXT)
 - `text: str` (optionnel, texte brut du CCTP)
 - `solution: str` (optionnel, JSON sérialisé de la solution déjà configurée)
-- `provider: str` (défaut : `DEFAULT_PROVIDER`, "claude", "mammouth" ou "mistral")
+- `provider: str` (défaut : `DEFAULT_PROVIDER`, "claude", "mammouth", "mistral" ou "gb10")
 - `model: str` (optionnel)
 **Sortie** : JSON `{contexte, points, clarifications, verification, cctp_text, raw}`.
 **Erreurs possibles** : `400` si aucun CCTP fourni (fichier et texte vides) ; `400`/`502`
@@ -202,7 +202,7 @@ pour éviter la traversée de répertoire.
 
 | Fonction | Fichier | Rôle | Effets de bord |
 |---|---|---|---|
-| `llm_complete(system, user, max_tokens, provider, model)` | main.py | Point d'entrée unique vers les moteurs IA (Claude, Mammouth ou Mistral) | Appel réseau sortant |
+| `llm_complete(system, user, max_tokens, provider, model)` | main.py | Point d'entrée unique vers les moteurs IA (Claude, Mammouth, Mistral ou GB10) | Appel réseau sortant |
 | `extract_text(filename, data)` | main.py | Extraction de texte depuis .txt/.docx/.pdf | Aucun (traitement en mémoire) |
 | `extract_docx_text(path)` | main.py | Extraction texte + tableaux d'un .docx généré | Lecture disque |
 | `parse_cctp(raw)` | main.py | Parsing tolérant du JSON renvoyé par l'IA (fallback regex si JSON malformé) | Aucun |

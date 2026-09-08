@@ -184,3 +184,22 @@ seul utilisé par `generer_doc.py`) ; encombrement du dépôt uniquement. Le mot
 pour traçabilité seulement).
 **Contournement en place** : exclusion Git déjà active ; suppression du fichier laissée
 au choix de l'utilisateur.
+
+## 2026-08-24 — Moteur GB10 sensiblement plus lent que les autres (latence de raisonnement)
+**Description factuelle** : le modèle GB10 (`unsloth/Qwen3.8-Flash-Next-GGUF`, serveur
+vLLM interne `https://llm.one-id.fr/v1`) est un modèle "reasoning" qui génère un
+raisonnement interne (`reasoning_content`) avant sa réponse finale. Mesuré en conditions
+réelles : 34,5s pour un prompt simple (max_tokens=8000), 138,8s pour un appel
+`/api/analyse-cctp` complet (prompt système long) — largement plus lent que Mistral
+(quelques secondes) ou Claude.
+**Cause** : architecture "reasoning" du modèle (chaîne de pensée générée avant la
+réponse), latence intrinsèque au modèle, pas à l'intégration.
+**Impact** : un appel GB10 sur un CCTP volumineux ou un prompt système très long
+pourrait approcher ou dépasser le timeout de 180s codé dans `llm_complete()`,
+provoquant une erreur 502 côté utilisateur sans lien avec un bug applicatif.
+**État** : ouvert (à surveiller à l'usage, aucun dépassement observé lors des tests du
+24/08).
+**Contournement en place** : aucun pour l'instant ; le timeout de 180s reste commun à
+tous les providers. Si des dépassements sont constatés à l'usage, envisager un timeout
+spécifique plus long pour `provider="gb10"` ou un paramètre serveur limitant la longueur
+du raisonnement.
