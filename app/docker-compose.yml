@@ -34,4 +34,8 @@ services:
       # Fonctionnement autonome / hors-ligne : pas d'intégrations cloud externes
       DRAWIO_GOOGLE_CLIENT_ID: ""
       DRAWIO_MSGRAPH_CLIENT_ID: ""
+    volumes:
+      # Bibliothèques de shapes ONE ID servies par draw.io lui-même (même origine que
+      # l'éditeur → aucun problème CORS). Chargées au démarrage via clibs=U<url>.
+      - ./web/drawio-libs:/usr/local/tomcat/webapps/draw/drawio-libs:ro
     restart: unless-stopped

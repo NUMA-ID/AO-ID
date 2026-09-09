@@ -505,17 +505,18 @@ async function openDrawio(xml,editIdx){
   const frame=$('drawioFrame');
   $('drawioStatus').textContent='Chargement de l’éditeur…';
   // Bibliothèques de shapes ONE ID : passées en clibs=U<url> (mécanisme natif draw.io,
-  // chargées au démarrage dans le panneau latéral). URLs absolues côté app (port 8080),
-  // fetchées par le navigateur. Voir routes /api/drawio-libs et /drawio-libs/<nom>.
+  // chargées au démarrage dans le panneau latéral). Servies par draw.io lui-même
+  // (DRAWIO_BASE, port 8081) → MÊME ORIGINE que l'éditeur, donc aucun CORS/préflight.
+  // draw.io décode clibs deux fois (parsing URL iframe + decodeURIComponent après split(';')),
+  // d'où le double encodeURIComponent ; le paramètre global n'est PAS ré-encodé.
   let clibs='';
   try{
     const list=await fetch('/api/drawio-libs').then(r=>r.json()).catch(()=>({libs:[]}));
     const libs=(list&&list.libs)||[];
-    const base=location.protocol+'//'+location.host;
-    clibs=libs.map(n=>'U'+encodeURIComponent(base+'/drawio-libs/'+encodeURIComponent(n))).join(';');
+    clibs=libs.map(n=>'U'+encodeURIComponent(encodeURIComponent(DRAWIO_BASE+'/drawio-libs/'+n))).join(';');
   }catch(e){/* l'éditeur reste utilisable sans les libs custom */}
   let src=DRAWIO_BASE+'/?embed=1&proto=json&spin=1&ui=atlas&noExitBtn=1&saveAndExit=0&noSaveBtn=0&libraries=1';
-  if(clibs)src+='&clibs='+encodeURIComponent(clibs);
+  if(clibs)src+='&clibs='+clibs;
   frame.src=src;
   $('drawioModal').style.display='flex';
   if(_drawioHandler)window.removeEventListener('message',_drawioHandler);
