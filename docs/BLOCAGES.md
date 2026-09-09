@@ -197,9 +197,13 @@ réponse), latence intrinsèque au modèle, pas à l'intégration.
 **Impact** : un appel GB10 sur un CCTP volumineux ou un prompt système très long
 pourrait approcher ou dépasser le timeout de 180s codé dans `llm_complete()`,
 provoquant une erreur 502 côté utilisateur sans lien avec un bug applicatif.
-**État** : ouvert (à surveiller à l'usage, aucun dépassement observé lors des tests du
-24/08).
-**Contournement en place** : aucun pour l'instant ; le timeout de 180s reste commun à
-tous les providers. Si des dépassements sont constatés à l'usage, envisager un timeout
-spécifique plus long pour `provider="gb10"` ou un paramètre serveur limitant la longueur
-du raisonnement.
+**État** : ouvert — **aggravé le 2026-09-09** : GB10 étant désormais le SEUL moteur (retrait
+de Claude/Mammouth/Mistral), le risque de timeout n'est plus contournable en basculant sur un
+autre moteur. Mesure du 2026-09-09 : un `/api/analyse-cctp` sur un CCTP court a pris **172,9s**
+(`HTTP 200`), soit très proche des 180s — un CCTP réel plus volumineux dépassera probablement le
+timeout et renverra une erreur 502 à l'utilisateur.
+**Contournement en place** : aucun pour l'instant ; le timeout de 180s reste celui de
+`llm_complete()`. Piste recommandée (non appliquée, à valider avant PROD) : augmenter le timeout
+pour GB10 (ex. 300s) ET aligner en conséquence les `timeoutSeconds` / la tolérance des probes
+Kubernetes, sans quoi un appel long pourrait de nouveau déclencher un redémarrage du pod. À
+trancher avec l'utilisateur lors de la prochaine bascule PROD.

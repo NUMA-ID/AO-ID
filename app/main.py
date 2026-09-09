@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 Application Appel d'offre ONE ID — backend FastAPI.
-Tout-en-un : analyse CCTP via l'API Claude, import Excel Dell, génération du Word ONE ID.
+Tout-en-un : analyse CCTP via le LLM GB10 (vLLM ONE ID), import Excel Dell, génération du Word ONE ID.
 """
 import os, json, tempfile, subprocess, sys, datetime, re
 from pathlib import Path
@@ -19,8 +19,6 @@ BASE_DOCX = os.environ.get("BASE_DOCX", str(ASSETS / "TEMPLATE_BASE_ONEID.docx")
 DOC_BASE = os.environ.get("DOC_BASE", str(HERE.parent / "Documentation_Constructeur"))
 OUT_DIR = Path(os.environ.get("OUT_DIR", str(HERE.parent / "Documents_Generes")))
 FICHES_DIR = Path(os.environ.get("FICHES_DIR", str(HERE.parent / "Fiches_Specs")))
-API_KEY = os.environ.get("ANTHROPIC_API_KEY", "")
-MODEL = os.environ.get("ANTHROPIC_MODEL", "claude-sonnet-4-6")
 
 # Préambule système commun, appliqué à TOUS les appels IA (cadre ONE ID + règles de véracité).
 ONEID_PREAMBLE = (
@@ -44,122 +42,59 @@ def sysp(specific: str) -> str:
     return ONEID_PREAMBLE + "\n\n" + specific
 
 
-MAMMOUTH_API_KEY = os.environ.get("MAMMOUTH_API_KEY", "")
-MAMMOUTH_BASE = os.environ.get("MAMMOUTH_BASE", "https://api.mammouth.ai/v1")
-MISTRAL_API_KEY = os.environ.get("MISTRAL_API_KEY", "")
-MISTRAL_BASE = os.environ.get("MISTRAL_BASE", "https://api.mistral.ai/v1")
 GB10_API_KEY = os.environ.get("GB10_API_KEY", "")
 GB10_BASE = os.environ.get("GB10_BASE", "https://llm.one-id.fr/v1")
-# Moteur IA par défaut quand la requête n'en précise pas : "mammouth", "claude", "mistral" ou "gb10".
-# Repasser à "claude" dans l'environnement dès que le solde Anthropic est rechargé.
-DEFAULT_PROVIDER = os.environ.get("DEFAULT_PROVIDER", "mammouth").lower()
+GB10_MODEL = os.environ.get("GB10_MODEL", "unsloth/Qwen3.8-Flash-Next-GGUF")
+# Moteur IA unique : GB10 (serveur vLLM ONE ID, API OpenAI-compatible).
+# Les moteurs Claude / Mammouth / Mistral ont été retirés le 2026-09-09 (décision utilisateur).
+DEFAULT_PROVIDER = os.environ.get("DEFAULT_PROVIDER", "gb10").lower()
 
 
 def llm_complete(system, user, max_tokens=4000, provider="", model=""):
-    """Appelle le moteur IA choisi : 'claude' (Anthropic), 'mammouth', 'mistral' ou 'gb10' (OpenAI-compatibles)."""
-    provider = (provider or DEFAULT_PROVIDER).lower()
-    if provider == "mammouth":
-        if not MAMMOUTH_API_KEY:
-            raise HTTPException(400, "MAMMOUTH_API_KEY non configurée (voir fichier .env).")
-        import urllib.request, urllib.error
-        body = json.dumps({
-            "model": model or "mammouth/mistral-medium-3.1", "max_tokens": max_tokens,
-            "messages": [{"role": "system", "content": system}, {"role": "user", "content": user}],
-        }).encode("utf-8")
-        req = urllib.request.Request(
-            MAMMOUTH_BASE.rstrip("/") + "/chat/completions", data=body,
-            headers={"Authorization": "Bearer " + MAMMOUTH_API_KEY,
-                     "Content-Type": "application/json",
-                     "Accept": "application/json",
-                     # Cloudflare (Browser Integrity Check) renvoie une erreur 1010 sur les
-                     # signatures non-navigateur (ex. Python-urllib ou un UA maison). UA
-                     # navigateur validé en test depuis le pod (voir diagnostic 2026-07-15).
-                     "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) "
-                                   "AppleWebKit/537.36 (KHTML, like Gecko) "
-                                   "Chrome/126.0 Safari/537.36"})
-        try:
-            with urllib.request.urlopen(req, timeout=180) as resp:
-                d = json.loads(resp.read().decode("utf-8"))
-            return d["choices"][0]["message"]["content"] or ""
-        except urllib.error.HTTPError as e:
-            try:
-                detail = e.read().decode("utf-8", "replace")[:500]
-            except Exception:
-                detail = ""
-            raise HTTPException(502, "Erreur API Mammouth (HTTP %s) : %s" % (e.code, detail or e.reason))
-        except HTTPException:
-            raise
-        except Exception as e:
-            raise HTTPException(502, "Erreur API Mammouth : " + str(e))
-    if provider == "mistral":
-        if not MISTRAL_API_KEY:
-            raise HTTPException(400, "MISTRAL_API_KEY non configurée (voir fichier .env).")
-        import urllib.request, urllib.error
-        body = json.dumps({
-            "model": model or "mistral-medium-latest", "max_tokens": max_tokens,
-            "messages": [{"role": "system", "content": system}, {"role": "user", "content": user}],
-        }).encode("utf-8")
-        req = urllib.request.Request(
-            MISTRAL_BASE.rstrip("/") + "/chat/completions", data=body,
-            headers={"Authorization": "Bearer " + MISTRAL_API_KEY,
-                     "Content-Type": "application/json",
-                     "Accept": "application/json"})
-        try:
-            with urllib.request.urlopen(req, timeout=180) as resp:
-                d = json.loads(resp.read().decode("utf-8"))
-            return d["choices"][0]["message"]["content"] or ""
-        except urllib.error.HTTPError as e:
-            try:
-                detail = e.read().decode("utf-8", "replace")[:500]
-            except Exception:
-                detail = ""
-            raise HTTPException(502, "Erreur API Mistral (HTTP %s) : %s" % (e.code, detail or e.reason))
-        except HTTPException:
-            raise
-        except Exception as e:
-            raise HTTPException(502, "Erreur API Mistral : " + str(e))
-    if provider == "gb10":
-        if not GB10_API_KEY:
-            raise HTTPException(400, "GB10_API_KEY non configurée (voir fichier .env).")
-        import urllib.request, urllib.error
-        body = json.dumps({
-            "model": model or "unsloth/Qwen3.8-Flash-Next-GGUF", "max_tokens": max_tokens,
-            "messages": [{"role": "system", "content": system}, {"role": "user", "content": user}],
-        }).encode("utf-8")
-        req = urllib.request.Request(
-            GB10_BASE.rstrip("/") + "/chat/completions", data=body,
-            headers={"Authorization": "Bearer " + GB10_API_KEY,
-                     "Content-Type": "application/json",
-                     "Accept": "application/json"})
-        try:
-            with urllib.request.urlopen(req, timeout=180) as resp:
-                d = json.loads(resp.read().decode("utf-8"))
-            # Modèles "reasoning" (Qwen3 etc.) : ne garder que le contenu final,
-            # pas le raisonnement intermédiaire (champ reasoning_content séparé).
-            return d["choices"][0]["message"]["content"] or ""
-        except urllib.error.HTTPError as e:
-            try:
-                detail = e.read().decode("utf-8", "replace")[:500]
-            except Exception:
-                detail = ""
-            raise HTTPException(502, "Erreur API GB10 (HTTP %s) : %s" % (e.code, detail or e.reason))
-        except HTTPException:
-            raise
-        except Exception as e:
-            raise HTTPException(502, "Erreur API GB10 : " + str(e))
-    # défaut : Claude (Anthropic)
-    if not API_KEY:
-        raise HTTPException(400, "ANTHROPIC_API_KEY non configurée (voir fichier .env).")
+    """Appelle le moteur IA GB10 (serveur vLLM ONE ID, API OpenAI-compatible).
+
+    Args:
+        system: prompt système (cadre ONE ID + consigne spécifique).
+        user: contenu utilisateur.
+        max_tokens: plafond de tokens générés.
+        provider: conservé pour compatibilité d'appel ; seul 'gb10' est desservi.
+        model: identifiant de modèle vLLM ; défaut GB10_MODEL.
+
+    Returns:
+        Le contenu texte final de la réponse (le raisonnement intermédiaire
+        éventuel — champ reasoning_content — est ignoré).
+
+    Raises:
+        HTTPException 400 si GB10_API_KEY absente ; 502 sur erreur de l'API GB10.
+    """
+    if not GB10_API_KEY:
+        raise HTTPException(400, "GB10_API_KEY non configurée (voir fichier .env).")
+    import urllib.request, urllib.error
+    body = json.dumps({
+        "model": model or GB10_MODEL, "max_tokens": max_tokens,
+        "messages": [{"role": "system", "content": system}, {"role": "user", "content": user}],
+    }).encode("utf-8")
+    req = urllib.request.Request(
+        GB10_BASE.rstrip("/") + "/chat/completions", data=body,
+        headers={"Authorization": "Bearer " + GB10_API_KEY,
+                 "Content-Type": "application/json",
+                 "Accept": "application/json"})
     try:
-        from anthropic import Anthropic
-        client = Anthropic(api_key=API_KEY)
-        msg = client.messages.create(model=model or MODEL, max_tokens=max_tokens, system=system,
-                                     messages=[{"role": "user", "content": user}])
-        return "".join(getattr(b, "text", "") for b in msg.content if getattr(b, "type", "") == "text")
+        with urllib.request.urlopen(req, timeout=180) as resp:
+            d = json.loads(resp.read().decode("utf-8"))
+        # Modèles "reasoning" (Qwen3 etc.) : ne garder que le contenu final,
+        # pas le raisonnement intermédiaire (champ reasoning_content séparé).
+        return d["choices"][0]["message"]["content"] or ""
+    except urllib.error.HTTPError as e:
+        try:
+            detail = e.read().decode("utf-8", "replace")[:500]
+        except Exception:
+            detail = ""
+        raise HTTPException(502, "Erreur API GB10 (HTTP %s) : %s" % (e.code, detail or e.reason))
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(502, "Erreur API Claude : " + str(e))
+        raise HTTPException(502, "Erreur API GB10 : " + str(e))
 
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 FICHES_DIR.mkdir(parents=True, exist_ok=True)
@@ -210,7 +145,7 @@ def index():
 
 @app.get("/api/health")
 def health():
-    return {"ok": True, "model": MODEL, "api_key_set": bool(API_KEY),
+    return {"ok": True, "model": GB10_MODEL, "api_key_set": bool(GB10_API_KEY),
             "doc_base": DOC_BASE, "out_dir": str(OUT_DIR)}
 
 
@@ -491,7 +426,7 @@ async def verifier(payload: dict):
     return {"verification": data.get("verification") or []}
 
 
-# ---------------------------------------------------------------- Mode Design (API Claude)
+# ---------------------------------------------------------------- Mode Design (moteur GB10)
 DESIGN_PROMPT = (
     "Tu es rédacteur technique avant-vente ONE ID. On te fournit un JSON contenant des champs "
     "narratifs d'un document d'appel d'offre. Améliore UNIQUEMENT le style, la clarté, la structure "

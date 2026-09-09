@@ -28,12 +28,12 @@ points d'attention, clarifications et grille de vérification préliminaire.
 - `file: UploadFile` (optionnel, PDF/Word/TXT)
 - `text: str` (optionnel, texte brut du CCTP)
 - `solution: str` (optionnel, JSON sérialisé de la solution déjà configurée)
-- `provider: str` (défaut : `DEFAULT_PROVIDER`, "claude", "mammouth", "mistral" ou "gb10")
+- `provider: str` (défaut : `DEFAULT_PROVIDER` = `gb10` ; seul `gb10` desservi depuis le 2026-09-09)
 - `model: str` (optionnel)
 **Sortie** : JSON `{contexte, points, clarifications, verification, cctp_text, raw}`.
 **Erreurs possibles** : `400` si aucun CCTP fourni (fichier et texte vides) ; `400`/`502`
 propagés par `llm_complete` si clé API manquante ou erreur amont.
-**Effets de bord** : appel réseau sortant vers l'API Anthropic ou Mammouth.
+**Effets de bord** : appel réseau sortant vers le serveur vLLM GB10 (`GB10_BASE`).
 
 ## `POST /api/import-excel`
 **Rôle** : convertit un export Dell Solutions Configurator OU un devis distributeur

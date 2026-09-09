@@ -131,3 +131,19 @@ Claude du fait de son raisonnement interne, mais reste sous le timeout de 180s d
 `llm_complete()`. Écarté à ce stade : réduire le timeout spécifiquement pour ce
 provider (aucune limite basse n'a été demandée) ; exposer le `reasoning_content` dans
 l'interface (non demandé, alourdirait l'affichage).
+
+## 2026-09-09 — GB10 devient le seul moteur IA (retrait de Claude, Mammouth, Mistral)
+Décision utilisateur : ne conserver que le moteur GB10 (serveur vLLM interne ONE ID) et
+retirer complètement les trois autres (Claude/Anthropic, Mammouth.ai, Mistral direct).
+Justification : le serveur GB10 est auto-hébergé, sans coût par requête ni dépendance à un
+fournisseur externe, et sans les limites de débit rencontrées (Mistral HTTP 429). Portée du
+retrait (choix « suppression complète et propre ») : branches backend Claude/Mammouth/Mistral
+supprimées de `llm_complete()` (ne reste que GB10) ; variables `ANTHROPIC_API_KEY`/`ANTHROPIC_MODEL`/
+`MAMMOUTH_*`/`MISTRAL_*` retirées du code, de `.env.example`, du `Dockerfile` et des notes K8s ;
+options du sélecteur d'interface retirées. Le **sélecteur « Moteur IA » est conservé** avec GB10
+comme unique option (choix utilisateur : réintroduction facile d'un futur moteur). `DEFAULT_PROVIDER`
+passe de `mammouth` à `gb10`. Testé en conditions réelles (PREPROD) : health OK, `/api/analyse-cctp`
+sans provider explicite → `HTTP 200`, JSON complet et cohérent généré par GB10. Écarté : retirer
+entièrement le sélecteur (rendrait la réintroduction d'un moteur plus lourde) ; conserver les clés
+en réserve (l'utilisateur a explicitement demandé une suppression complète). Réversibilité : le code
+des anciens moteurs reste récupérable via l'historique Git (tags `v2.4.x`).
