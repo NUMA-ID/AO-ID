@@ -516,6 +516,10 @@ async function openDrawio(xml,editIdx){
     clibs=libs.map(n=>'U'+encodeURIComponent(encodeURIComponent(DRAWIO_BASE+'/drawio-libs/'+n))).join(';');
   }catch(e){/* l'éditeur reste utilisable sans les libs custom */}
   let src=DRAWIO_BASE+'/?embed=1&proto=json&spin=1&ui=atlas&noExitBtn=1&saveAndExit=0&noSaveBtn=0&libraries=1';
+  // cors=<regex> : autorise draw.io à charger ces URLs en direct (isCorsEnabledForUrl),
+  // sinon il les route via son endpoint /proxy — absent de cette image → 404 (cause du bug).
+  // La regex matche nos bibliothèques servies par draw.io lui-même (même origine).
+  src+='&cors='+encodeURIComponent(DRAWIO_BASE.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'/drawio-libs/.*');
   if(clibs)src+='&clibs='+clibs;
   frame.src=src;
   $('drawioModal').style.display='flex';
