@@ -1,0 +1,90 @@
+{
+  "_description": "Argumentaire Switch Cisco Nexus 3172TQ (N3K-C3172TQ-10GT) — commutateur Data Center 1RU, 48 ports 10GBASE-T cuivre + 6 ports QSFP+. Sans prix — descriptif technique, performances et bénéfices client. Sources : fiche technique Cisco (data_sheet_c78-729483) et fiche revendeur ITinStock (photo produit). Marqueur {client}. Éditable.",
+  "modele_match": [
+    "nexus 3172t",
+    "nexus 3172tq",
+    "n3k-c3172tq",
+    "cisco nexus 3172",
+    "3172tq"
+  ],
+  "titre": "Cisco Nexus 3172TQ — commutateur Data Center 10 GbE cuivre",
+  "blocs": [
+    {
+      "t": "p",
+      "x": "Le commutateur **Cisco Nexus 3172TQ** (référence N3K-C3172TQ-10GT) est un switch de type ToR (Top-of-Rack) 1U, conçu pour les environnements Data Center exigeants. Il offre 48 ports 10GBASE-T cuivre RJ-45 et 6 ports QSFP+, permettant à {client} de migrer ses serveurs du Gigabit vers le 10 Gigabit Ethernet tout en réutilisant son câblage cuivre existant."
+    },
+    {
+      "t": "img",
+      "x": "[ Visuel : Cisco Nexus 3172TQ — façade avant, 48 ports RJ-45 + 6 ports QSFP+ ]"
+    },
+    {
+      "t": "h",
+      "x": "Descriptif technique"
+    },
+    {
+      "t": "puces",
+      "x": [
+        "Format 1RU (1 unité de rack) compact : 4,4 x 43,9 x 50,5 cm, environ 10 kg.",
+        "48 ports 10GBASE-T RJ-45 fixes, chacun pouvant fonctionner en 100 Mbps, 1 Gbps ou 10 Gbps.",
+        "6 ports QSFP+ fixes, chacun supportant 4 x 10 Gigabit Ethernet ou 1 x 40 Gigabit Ethernet.",
+        "Capacité de commutation de 1,4 Tbps et un débit de traitement pouvant atteindre 1 milliard de paquets par seconde (bpps).",
+        "Système d'exploitation Cisco NX-OS, commun à l'ensemble de la gamme Data Center Cisco Nexus.",
+        "Ventilateurs redondants (3+1) et double alimentation, tous deux à chaud (hot-swappable).",
+        "4 Go de mémoire système (8 Go sur la variante XL).",
+        "Trames jumbo supportées jusqu'à 9216 octets."
+      ]
+    },
+    {
+      "t": "h",
+      "x": "Performances et fonctionnalités réseau"
+    },
+    {
+      "t": "puces",
+      "x": [
+        "Commutation Layer 2 et 3 au débit filaire (\"wire-rate\") sur l'ensemble des 72 ports 10 Gigabit Ethernet équivalents.",
+        "Technologie vPC (virtual Port-Channel) : multipath Layer 2 sans dépendre du Spanning Tree Protocol, pour une haute disponibilité renforcée.",
+        "Suite complète de protocoles de routage Layer 3 : BGP, OSPF, EIGRP, RIPv2, PIM-SM, SSM et MSDP.",
+        "Latence nominale ultra-faible, adaptée aux charges applicatives les plus sensibles à la latence.",
+        "Power-On Auto Provisioning (POAP) : démarrage et configuration automatisés du commutateur, sans intervention manuelle.",
+        "Cisco Embedded Event Manager (EEM) et scripting Python pour l'automatisation des opérations.",
+        "Ethanalyzer intégré (analyseur de paquets basé sur Wireshark) pour le diagnostic du trafic de plan de contrôle.",
+        "Mises à niveau logicielles sans interruption de service via In Service Software Upgrade (ISSU) et redémarrage rapide (Fast Reboot)."
+      ]
+    },
+    {
+      "t": "h",
+      "x": "Bénéfices pour {client}"
+    },
+    {
+      "t": "puces",
+      "x": [
+        "Migration en douceur du Gigabit vers le 10 Gigabit Ethernet, sans recâblage (ports RJ-45 cuivre, compatibles avec l'infrastructure cuivre existante de {client}).",
+        "Haute disponibilité assurée par la redondance matérielle (ventilateurs, alimentations) et les mécanismes de résilience réseau (vPC).",
+        "Administration simplifiée grâce à NX-OS, commun aux plateformes Cisco Nexus, réduisant l'effort de formation des équipes de {client}.",
+        "Automatisation native (POAP, EEM, Python) réduisant les délais de déploiement et le risque d'erreur de configuration.",
+        "Solution éprouvée en environnement Data Center, avec un excellent rapport densité de ports / encombrement (1U pour 48 ports 10 GbE + 6 ports 40 GbE)."
+      ]
+    },
+    {
+      "t": "h",
+      "x": "Point d'attention — fin de commercialisation"
+    },
+    {
+      "t": "p",
+      "x": "Le Cisco Nexus 3172TQ est un produit en **fin de vente** (« End of Sale ») chez Cisco ; le support constructeur reste néanmoins assuré jusqu'en février 2027 (« End of Support »). Ce point doit être clairement communiqué à {client} : ce commutateur convient à un remplacement à l'identique, une extension d'un parc existant ou une solution économique (marché de l'occasion reconditionnée), mais pas à un investissement structurant de long terme sans plan de migration vers une gamme Nexus plus récente."
+    },
+    {
+      "t": "p",
+      "x": "Nous recommandons de confirmer avec {client} la disponibilité (neuf ou reconditionné), l'origine et la garantie applicable avant intégration au chiffrage."
+    }
+  ],
+  "images_defaut": [
+    "nexus3172t.png"
+  ],
+  "sources": [
+    "Cisco — « Cisco Nexus 3172PQ, 3172TQ, 3172TQ-32T, 3172PQ-XL, and 3172TQ-XL Switches Data Sheet » (mise à jour du 17/10/2018, Document ID 2f05c5b3-3fa6-441a-96a0-907cd2c42767) : configuration des ports, capacité de commutation, protocoles de routage, POAP/EEM/Ethanalyzer, dimensions. https://www.cisco.com/c/en/us/products/collateral/switches/nexus-3000-series-switches/data_sheet_c78-729483.html",
+      "Cisco — page produit « Cisco Nexus 3172TQ Switch » : statut End of Sale / End of Support (28-02-2027). https://www.cisco.com/c/en/us/support/switches/nexus-3172tq-switch/model.html",
+    "ITinStock — fiche produit N3K-C3172TQ-10GT (photo produit façade avant, caractéristiques recoupées avec la fiche technique Cisco). https://itinstock.com/products/cisco-nexus-n3k-c3172tq-10gt-48x-10gbe-rj45-6x-40gb-qsfp-port-1u-switch-1"
+  ],
+  "avertissement": "Contenu de présentation technico-commerciale. Caractéristiques (48 ports 10GBASE-T + 6 QSFP+, 1,4 Tbps, NX-OS, dimensions, statut de fin de vente) issues de la fiche technique et de la page produit Cisco officielles. Le prix, la disponibilité (neuf/reconditionné) et la garantie ne sont pas traités ici : à chiffrer et confirmer séparément selon le canal d'approvisionnement retenu pour {client}. Photo produit tirée d'une fiche revendeur tierce (ITinStock), vérifiée visuellement conforme au modèle 3172TQ (étiquette façade)."
+}
