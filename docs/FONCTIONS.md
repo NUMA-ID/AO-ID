@@ -28,20 +28,23 @@ points d'attention, clarifications et grille de vérification préliminaire.
 - `file: UploadFile` (optionnel, PDF/Word/TXT)
 - `text: str` (optionnel, texte brut du CCTP)
 - `solution: str` (optionnel, JSON sérialisé de la solution déjà configurée)
-- `provider: str` (défaut : `DEFAULT_PROVIDER`, "claude", "mammouth" ou "mistral")
+- `provider: str` (défaut : `DEFAULT_PROVIDER` = `gb10` ; seul `gb10` desservi depuis le 2026-09-09)
 - `model: str` (optionnel)
 **Sortie** : JSON `{contexte, points, clarifications, verification, cctp_text, raw}`.
 **Erreurs possibles** : `400` si aucun CCTP fourni (fichier et texte vides) ; `400`/`502`
 propagés par `llm_complete` si clé API manquante ou erreur amont.
-**Effets de bord** : appel réseau sortant vers l'API Anthropic ou Mammouth.
+**Effets de bord** : appel réseau sortant vers le serveur vLLM GB10 (`GB10_BASE`).
 
 ## `POST /api/import-excel`
-**Rôle** : convertit un export Dell Solutions Configurator (.xlsx) en fiche JSON classée
-par catégorie d'équipement.
+**Rôle** : convertit un export Dell Solutions Configurator OU un devis distributeur
+TD SYNNEX (.xlsx) en fiche JSON classée par catégorie d'équipement (auto-détection du
+format par les colonnes d'en-tête présentes).
 **Entrées** : `file: UploadFile` (obligatoire, .xlsx).
 **Sortie** : JSON de la fiche classée (serveurs/stockages/switches/sauvegardes/logiciels).
 **Erreurs possibles** : `500` si le sous-processus `parser_dell_excel.py` échoue (retour
-non nul ou fichier de sortie absent) — message tronqué à 500 caractères.
+non nul ou fichier de sortie absent, y compris si aucun des deux formats reconnus n'est
+détecté) — message tronqué à 500 caractères côté réponse HTTP ; le traceback complet est
+loggé côté serveur (stdout du conteneur) depuis le 2026-08-24.
 **Effets de bord** : écriture disque temporaire (répertoire `tempfile.TemporaryDirectory`,
 auto-nettoyé), exécution d'un sous-processus Python.
 
@@ -193,13 +196,29 @@ une image reconnue.
 **Effets de bord** : lecture disque. Le nom de fichier est réduit à `Path(name).name`
 pour éviter la traversée de répertoire.
 
+## `GET /api/drawio-libs`
+**Rôle** : liste les bibliothèques de shapes draw.io ONE ID disponibles (une par constructeur).
+**Entrées** : aucune.
+**Sortie** : JSON `{libs: [str]}` — noms de fichiers `.xml` (format `mxlibrary`), triés.
+**Erreurs possibles** : aucune (liste vide si le répertoire est absent).
+**Effets de bord** : lecture du répertoire `app/web/drawio-libs/`.
+
+## `GET /drawio-libs/{name}`
+**Rôle** : sert une bibliothèque de shapes draw.io (fichier `.xml` `mxlibrary`), chargée
+automatiquement dans l'éditeur via le paramètre `clibs` de l'URL draw.io.
+**Entrées** : `name: str` (segment de chemin ; réduit à `Path(name).name`).
+**Sortie** : `FileResponse` `application/xml`, avec en-tête `Access-Control-Allow-Origin: *`
+(draw.io sur le port 8081 fetch depuis le port 8080 — requête cross-origin).
+**Erreurs possibles** : `404` si le fichier n'existe pas ou n'est pas un `.xml`.
+**Effets de bord** : lecture disque. Traversée de répertoire neutralisée (`Path(name).name`).
+
 ---
 
 ## Fonctions internes notables (non exposées en HTTP)
 
 | Fonction | Fichier | Rôle | Effets de bord |
 |---|---|---|---|
-| `llm_complete(system, user, max_tokens, provider, model)` | main.py | Point d'entrée unique vers les moteurs IA (Claude, Mammouth ou Mistral) | Appel réseau sortant |
+| `llm_complete(system, user, max_tokens, provider, model)` | main.py | Point d'entrée unique vers les moteurs IA (Claude, Mammouth, Mistral ou GB10) | Appel réseau sortant |
 | `extract_text(filename, data)` | main.py | Extraction de texte depuis .txt/.docx/.pdf | Aucun (traitement en mémoire) |
 | `extract_docx_text(path)` | main.py | Extraction texte + tableaux d'un .docx généré | Lecture disque |
 | `parse_cctp(raw)` | main.py | Parsing tolérant du JSON renvoyé par l'IA (fallback regex si JSON malformé) | Aucun |

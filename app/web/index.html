@@ -101,7 +101,7 @@
 <body>
 <header>
   <h1>ONE ID — Générateur d'appel d'offre <span style="font-size:13px;font-weight:600;opacity:.75">v2.4</span></h1>
-  <p>Analyse CCTP (IA : Mammouth/Claude/Mistral) · Import Excel Dell · Équipements · PRA/PCA · Sauvegarde · Kanban · draw.io · Génération du Word ONE ID <span style="opacity:.6">— version 2.4 · build __BUILD__</span></p>
+  <p>Analyse CCTP (IA : GB10 interne ONE ID) · Import Excel Dell · Équipements · PRA/PCA · Sauvegarde · Kanban · draw.io · Génération du Word ONE ID <span style="opacity:.6">— version 2.4 · build __BUILD__</span></p>
 </header>
 <div class="layout">
 <aside class="sidebar">
@@ -130,7 +130,7 @@
   <div id="p-cctp" class="panel active">
     <div class="card">
       <h2>Import &amp; analyse du CCTP</h2>
-      <p class="hint">Déposez le CCTP (PDF, Word, TXT) ou collez le texte, puis lancez l'analyse : Claude en extrait le contexte et les points d'attention.</p>
+      <p class="hint">Déposez le CCTP (PDF, Word, TXT) ou collez le texte, puis lancez l'analyse : le moteur GB10 en extrait le contexte et les points d'attention.</p>
       <div class="dz" id="cctpdz">📎 Déposez le CCTP (PDF / Word / TXT) ou cliquez<input type="file" id="cctpfile" accept=".pdf,.doc,.docx,.txt" style="display:none"></div>
       <div id="cctpname" class="small" style="margin-top:6px"></div>
       <textarea id="cctp_text" rows="6" style="margin-top:10px" placeholder="…ou collez ici le texte du CCTP"></textarea>
@@ -360,34 +360,10 @@
   <input type="file" id="loadf" accept="application/json" style="display:none">
   <span class="msg" style="align-self:center">Moteur IA :</span>
   <select id="aiEngine" onchange="aiToggle();save()" style="width:auto;padding:6px 8px" title="Moteur utilisé par les boutons IA (Reformuler, Analyser, etc.)">
-    <option value="claude">Claude (Anthropic)</option>
-    <option value="mammouth" selected>Mammouth</option>
-    <option value="mistral">Mistral (direct)</option>
+    <option value="gb10" selected>GB10 (interne ONE ID)</option>
   </select>
-  <select id="aiModel" onchange="save()" style="width:auto;padding:6px 8px;display:none" title="Modèle Mammouth">
-    <optgroup label="Mistral">
-      <option value="mammouth/mistral-medium-3.1">Mistral Medium</option>
-      <option value="mammouth/mistral-small-2603">Mistral Small</option>
-    </optgroup>
-    <optgroup label="Reasoning / avancés">
-      <option value="mammouth/deepseek-v4-pro">DeepSeek V4 Pro</option>
-      <option value="mammouth/grok-4.3">Grok 4.3</option>
-      <option value="mammouth/glm-5.1">GLM 5.1</option>
-      <option value="mammouth/kimi-k2.6">Kimi K2.6</option>
-    </optgroup>
-    <optgroup label="Autres">
-      <option value="mammouth/gpt-5.1">GPT-5.1</option>
-      <option value="mammouth/gemini-3.1-pro-preview">Gemini 3.1 Pro</option>
-      <option value="mammouth/llama-4-maverick">Llama 4 Maverick</option>
-      <option value="mammouth/sonar-pro">Perplexity Sonar Pro</option>
-      <option value="mammouth/sonar-deep-research">Perplexity Sonar Deep Research</option>
-      <option value="mammouth/claude-sonnet-4-6">Claude Sonnet 4.6</option>
-    </optgroup>
-  </select>
-  <select id="aiModelMistral" onchange="save()" style="width:auto;padding:6px 8px;display:none" title="Modèle Mistral (API directe)">
-    <option value="mistral-medium-latest">Mistral Medium</option>
-    <option value="mistral-large-latest">Mistral Large</option>
-    <option value="mistral-small-latest">Mistral Small</option>
+  <select id="aiModelGb10" onchange="save()" style="width:auto;padding:6px 8px" title="Modèle GB10 (serveur interne ONE ID)">
+    <option value="unsloth/Qwen3.8-Flash-Next-GGUF">Qwen3.8 Flash Next</option>
   </select>
   <span class="msg" id="msg">Prêt.</span>
 </div>
@@ -395,7 +371,7 @@
 <div id="chapModal" class="modal-ov" style="display:none">
   <div class="modal-box">
     <h2 id="chapModalTitle" style="color:var(--oneid);margin:0 0 4px">Description de l'offre</h2>
-    <p class="hint">Choisissez un <b>argumentaire</b> (son contenu est inséré automatiquement dans le Word), ajoutez un <b>complément / options / prérequis</b> (saisie, dictée ou reformulation Claude), puis le <b>nombre de jours d'installation estimé</b>.</p>
+    <p class="hint">Choisissez un <b>argumentaire</b> (son contenu est inséré automatiquement dans le Word), ajoutez un <b>complément / options / prérequis</b> (saisie, dictée ou reformulation IA), puis le <b>nombre de jours d'installation estimé</b>.</p>
     <div style="margin-bottom:10px">
       <label>Argumentaire</label>
       <select id="chapModalArg" style="width:100%"></select>
@@ -458,8 +434,8 @@
 
 <script>
 const $=id=>document.getElementById(id);
-function aiToggle(){const e=$('aiEngine');if(!e)return;$('aiModel').style.display=(e.value==='mammouth')?'inline-block':'none';$('aiModelMistral').style.display=(e.value==='mistral')?'inline-block':'none';}
-function aiSel(){const p=($('aiEngine')||{}).value||'mammouth';if(p==='mammouth')return {provider:p,model:(($('aiModel')||{}).value||'').trim()||'mammouth/mistral-medium-3.1'};if(p==='mistral')return {provider:p,model:(($('aiModelMistral')||{}).value||'').trim()||'mistral-medium-latest'};return {provider:p,model:''};}
+function aiToggle(){/* GB10 seul moteur : liste de modèles toujours visible. */const g=$('aiModelGb10');if(g)g.style.display='inline-block';}
+function aiSel(){return {provider:'gb10',model:(($('aiModelGb10')||{}).value||'').trim()||'unsloth/Qwen3.8-Flash-Next-GGUF'};}
 // Empêche le navigateur d'ouvrir le fichier quand on dépose à côté d'une zone
 ['dragenter','dragover','drop'].forEach(ev=>window.addEventListener(ev,e=>{e.preventDefault();},false));
 const STEP_ORDER=['cctp','equip','fonc','kanban','plan','gen'];
@@ -524,11 +500,24 @@ document.addEventListener('paste',e=>{if(!activeZone)return;const files=[];for(c
 /* draw.io : éditeur de schéma d'architecture (embed, 100 % local) */
 const DRAWIO_BASE=(window.DRAWIO_BASE)||(location.protocol+'//'+location.hostname+':8081');
 let _drawioXml='',_drawioEditIdx=null,_drawioHandler=null;
-function openDrawio(xml,editIdx){
+async function openDrawio(xml,editIdx){
   _drawioXml=xml||'';_drawioEditIdx=(editIdx===undefined?null:editIdx);
   const frame=$('drawioFrame');
   $('drawioStatus').textContent='Chargement de l’éditeur…';
-  frame.src=DRAWIO_BASE+'/?embed=1&proto=json&spin=1&ui=atlas&noExitBtn=1&saveAndExit=0&noSaveBtn=0&libraries=1';
+  // Bibliothèques de shapes ONE ID : passées en clibs=U<url> (mécanisme natif draw.io,
+  // chargées au démarrage dans le panneau latéral). Servies par draw.io lui-même
+  // (DRAWIO_BASE, port 8081) → MÊME ORIGINE que l'éditeur, donc aucun CORS/préflight.
+  // draw.io décode clibs deux fois (parsing URL iframe + decodeURIComponent après split(';')),
+  // d'où le double encodeURIComponent ; le paramètre global n'est PAS ré-encodé.
+  let clibs='';
+  try{
+    const list=await fetch('/api/drawio-libs').then(r=>r.json()).catch(()=>({libs:[]}));
+    const libs=(list&&list.libs)||[];
+    clibs=libs.map(n=>'U'+encodeURIComponent(encodeURIComponent(DRAWIO_BASE+'/drawio-libs/'+n))).join(';');
+  }catch(e){/* l'éditeur reste utilisable sans les libs custom */}
+  let src=DRAWIO_BASE+'/?embed=1&proto=json&spin=1&ui=atlas&noExitBtn=1&saveAndExit=0&noSaveBtn=0&libraries=1';
+  if(clibs)src+='&clibs='+clibs;
+  frame.src=src;
   $('drawioModal').style.display='flex';
   if(_drawioHandler)window.removeEventListener('message',_drawioHandler);
   _drawioHandler=function(evt){
@@ -537,7 +526,7 @@ function openDrawio(xml,editIdx){
     let msg;try{msg=JSON.parse(evt.data);}catch(e){return;}
     if(msg.event==='init'){
       frame.contentWindow.postMessage(JSON.stringify({action:'load',autosave:1,xml:_drawioXml}),'*');
-      $('drawioStatus').textContent='Dessinez, puis « Enregistrer » (disquette) pour l’ajouter au dossier.';
+      $('drawioStatus').textContent='Dessinez (shapes ONE ID dans le panneau de gauche), puis « Enregistrer » (disquette).';
     }else if(msg.event==='save'){
       _drawioXml=msg.xml;$('drawioStatus').textContent='Export en cours…';
       frame.contentWindow.postMessage(JSON.stringify({action:'export',format:'xmlpng',spinKey:'saving'}),'*');
@@ -701,7 +690,7 @@ function buildData(){return{_type:'fiche_specs_oneid',_version:3,genere_le:new D
   planning:planTasks.map(t=>({nom:t.nom,debut:t.debut,fin:t.fin,duree:t.duree,linkPrev:!!t.linkPrev,equipes:t.equipes,teletravail:t.teletravail,conge:!!t.conge})),
   chapitres:chapitres.map(c=>({titre:c.titre||'',argumentaire:c.argumentaire||'',complement:c.complement||c.texte||'',duree:c.duree||'',images:c.images||[],cartes:(c.cartes||[]).map(x=>({l:x.l,ok:!!x.ok}))})),
   sauvegarde:{logiciel:$('sauv_logiciel').value,licence:$('sauv_licence').value,cible:$('sauv_cible').value,cloud:$('sauv_cloud').checked,sites:sauvSites.map(s=>({nom:s.nom||'',cells:s.cells||{}}))},
-  ai:{engine:($('aiEngine')||{}).value||'mammouth',model:($('aiModel')||{}).value||'',modelMistral:($('aiModelMistral')||{}).value||''},
+  ai:{engine:'gb10',modelGb10:($('aiModelGb10')||{}).value||''},
   prestations:prestations.map(p=>({intitule:p.intitule||'',duree:p.duree||'',argumentaire:p.argumentaire||'',complement:p.complement||p.methodo||''}))};}
 function items(key){return [...document.querySelectorAll('#list-'+key+' .item')].map(readItem);}
 function clearAll(){CATS.forEach(c=>{$('list-'+c.key).innerHTML='';idx[c.key]=0;});}
@@ -716,7 +705,7 @@ function loadData(d){const a=d.affaire||{};
   verif=a.verification||[];renderVerif();
   $('sauv_veeam').checked=!!a.sauv_veeam;$('sauv_datadomain').checked=!!a.sauv_datadomain;
   const sv=d.sauvegarde||{};$('sauv_logiciel').value=sv.logiciel||'';$('sauv_licence').value=sv.licence||'acheter';$('sauv_cible').value=sv.cible||'';$('sauv_cloud').checked=!!sv.cloud;sauvSites=(sv.sites||[]).map(s=>({nom:s.nom||'',cells:s.cells||{}}));renderSauv();
-  const ai=d.ai||{};if(ai.engine)$('aiEngine').value=ai.engine;if(ai.model!==undefined)$('aiModel').value=ai.model;if(ai.modelMistral!==undefined)$('aiModelMistral').value=ai.modelMistral;aiToggle();
+  const ai=d.ai||{};if(ai.modelGb10!==undefined)$('aiModelGb10').value=ai.modelGb10;aiToggle();
   prestations=(d.prestations||[]).map(p=>({intitule:p.intitule||'',duree:p.duree||'',argumentaire:p.argumentaire||'',complement:p.complement||p.methodo||''}));renderPrest();
   const pp=a.pra_pca||{};if(pp.mode)$('pra_mode').value=pp.mode;$('pra_rto').value=pp.rto||'';$('pra_rpo').value=pp.rpo||'';if(pp.cible)$('pra_cible').value=pp.cible;if(pp.methode)$('pra_methode').value=pp.methode;$('pra_text').value=pp.texte||'';praToggle();
   if(points.length||a.contexte||clars.length||verif.length)$('resCard').style.display='block';

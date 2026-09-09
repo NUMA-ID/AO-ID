@@ -112,3 +112,61 @@ ce correctif la requête aurait été bloquée jusqu'à la fin de l'appel. Écar
 `llm_complete()` en natif asynchrone (`httpx.AsyncClient`) — plus invasif pour un gain
 équivalent dans le contexte actuel (un seul worker, faible concurrence attendue) ;
 pourra être reconsidéré si le nombre d'utilisateurs simultanés augmente.
+
+## 2026-08-24 — Quatrième moteur IA : GB10 (serveur vLLM interne ONE ID)
+Ajout d'un moteur GB10, pointant vers `https://llm.one-id.fr/v1` (serveur vLLM interne
+ONE ID, machine GB10/DGX Spark administrée par l'équipe infra — Thibaud Melano, voir
+tickets CRM `TT038490`). Justification : accès à un modèle auto-hébergé (Qwen3.8 via
+Unsloth, `unsloth/Qwen3.8-Flash-Next-GGUF`), sans dépendance à un fournisseur externe ni
+coût par requête, utile en secours quand Claude/Mammouth/Mistral sont indisponibles ou
+rate-limited (cas vécu le jour même avec Mistral, HTTP 429). Implémentation symétrique
+aux moteurs OpenAI-compatibles existants (`llm_complete()`, branche `provider == "gb10"`,
+`GB10_API_KEY`/`GB10_BASE` en variables d'environnement). Particularité gérée : ce modèle
+est de type "reasoning" et renvoie un champ `reasoning_content` séparé du `content` final
+dans la réponse API — seul `content` est retourné à l'appelant. Sélecteur d'interface
+étendu avec un quatrième choix "GB10 (interne ONE ID)". Testé en conditions réelles :
+appel direct à l'API (34,5s pour un prompt simple) et via `/api/analyse-cctp`
+(138,8s, `HTTP 200`, JSON valide) — le modèle est sensiblement plus lent que Mistral/
+Claude du fait de son raisonnement interne, mais reste sous le timeout de 180s de
+`llm_complete()`. Écarté à ce stade : réduire le timeout spécifiquement pour ce
+provider (aucune limite basse n'a été demandée) ; exposer le `reasoning_content` dans
+l'interface (non demandé, alourdirait l'affichage).
+
+## 2026-09-09 — GB10 devient le seul moteur IA (retrait de Claude, Mammouth, Mistral)
+Décision utilisateur : ne conserver que le moteur GB10 (serveur vLLM interne ONE ID) et
+retirer complètement les trois autres (Claude/Anthropic, Mammouth.ai, Mistral direct).
+Justification : le serveur GB10 est auto-hébergé, sans coût par requête ni dépendance à un
+fournisseur externe, et sans les limites de débit rencontrées (Mistral HTTP 429). Portée du
+retrait (choix « suppression complète et propre ») : branches backend Claude/Mammouth/Mistral
+supprimées de `llm_complete()` (ne reste que GB10) ; variables `ANTHROPIC_API_KEY`/`ANTHROPIC_MODEL`/
+`MAMMOUTH_*`/`MISTRAL_*` retirées du code, de `.env.example`, du `Dockerfile` et des notes K8s ;
+options du sélecteur d'interface retirées. Le **sélecteur « Moteur IA » est conservé** avec GB10
+comme unique option (choix utilisateur : réintroduction facile d'un futur moteur). `DEFAULT_PROVIDER`
+passe de `mammouth` à `gb10`. Testé en conditions réelles (PREPROD) : health OK, `/api/analyse-cctp`
+sans provider explicite → `HTTP 200`, JSON complet et cohérent généré par GB10. Écarté : retirer
+entièrement le sélecteur (rendrait la réintroduction d'un moteur plus lourde) ; conserver les clés
+en réserve (l'utilisateur a explicitement demandé une suppression complète). Réversibilité : le code
+des anciens moteurs reste récupérable via l'historique Git (tags `v2.4.x`).
+
+## 2026-09-09 — Bibliothèques de shapes ONE ID chargées automatiquement dans draw.io
+Les shapes ONE ID (convertis depuis les stencils Visio de `C:\Projets\Formes`, 124 bibliothèques /
+~6 220 shapes, rangés par constructeur : Dell, Fortinet, VMware, HPE, Aruba, Cisco, EMC, NetApp,
+Nutanix, Palo Alto, Sophos, Stormshield, Brocade, Datacore, Microsoft, + Autres/Raritan) sont
+désormais **versionnés dans le dépôt** (`app/web/drawio-libs/*.xml`, format `mxlibrary`, 187 Mo
+au total, fichiers consolidés `_PAR_CONSTRUCTEUR`) et **chargés automatiquement** à l'ouverture de
+l'éditeur. Justification : ces librairies ne vivaient que dans le localStorage du navigateur (par
+origine) — fragiles, perdues au moindre vidage de cache ou changement d'adresse d'accès (cause de
+leur « disparition » signalée le 09/09). Mécanisme retenu : paramètre d'URL natif draw.io
+`&clibs=U<url_encodée>` (une URL par bibliothèque, séparées par `;`), les fichiers étant servis par
+deux nouvelles routes de l'app (`GET /api/drawio-libs` = liste, `GET /drawio-libs/<nom>` = contenu,
+avec en-tête CORS `Access-Control-Allow-Origin: *` car draw.io tourne sur le port 8081 et fetch
+depuis le port 8080). Écarté : (1) l'action embed `load-libraries` par postMessage — **non supportée**
+par draw.io 30.3.6 (vérifié dans le JS du conteneur, l'action n'existe pas) ; (2) laisser les shapes
+en localStorage (fragile, cause du problème) ; (3) n'auto-charger qu'un sous-ensemble de marques —
+l'utilisateur a explicitement choisi de charger les 16 bibliothèques.
+⚠️ **Limite de performance connue et non résolue** : charger 187 Mo de PNG base64 au démarrage
+(dont DELL 47 Mo, VMware 35 Mo, FORTINET 19 Mo) alourdit l'éditeur au premier affichage — le service
+serveur est rapide (0,13 s pour 47 Mo en local) mais le décodage base64→images côté navigateur peut
+ramer, d'autant plus via le tunnel SSH. Non mesuré côté navigateur (le preview Hermes ne rend pas
+l'iframe draw.io). Si l'ouverture est trop lente à l'usage, réduire à un sous-ensemble de marques
+(retirer des fichiers de `app/web/drawio-libs/` — la liste est dynamique, aucune autre modif requise).

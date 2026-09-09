@@ -13,7 +13,7 @@ ENV BASE_DOCX=/app/assets/TEMPLATE_BASE_ONEID.docx \
     DOC_BASE=/data/Documentation_Constructeur \
     OUT_DIR=/data/Documents_Generes \
     FICHES_DIR=/data/Fiches_Specs \
-    ANTHROPIC_MODEL=claude-sonnet-4-6
+    GB10_MODEL=unsloth/Qwen3.8-Flash-Next-GGUF
 
 EXPOSE 8080
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080"]

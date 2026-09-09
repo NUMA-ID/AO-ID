@@ -78,6 +78,77 @@ précaution. Ces clés ne doivent en aucun cas être commitées.
 l'utilisateur de supprimer `app/.env.bak` et `app/.env.bak.bak` (doublons obsolètes)
 et de faire tourner les clés API si le dossier a pu être exposé.
 
+## 2026-08-24 — Dépôt d'infrastructure Kubernetes séparé découvert (`AO-ID-k8s`)
+**Description factuelle** : la vraie PROD (`https://ao-id.one-id.fr`) existe et tourne
+depuis le 15/07/2026 sur un cluster Kubernetes on-prem (`mrs-wkr.kube.internal`,
+namespace `numa`, Envoy Gateway, image `apicall.one-id.fr/numa/ao-id:2.4.2`). Les
+manifestes vivent dans un dépôt local séparé, `C:\Projets\AO-ID-k8s` (poste Windows,
+profil `n.doublet.ONE-ID`), jamais mentionné avant le 24/08 et absent de mon suivi
+PREPROD/PROD jusqu'ici. Ce dépôt contient un `kubeconfig-host.yaml` avec accès admin
+direct au cluster (pas de VPN nécessaire — accès réseau interne direct depuis le poste
+Windows), et une version de l'app (2.4.2, avec Mistral déjà intégré) différente de la
+mienne côté PREPROD (2.3 + mon ajout Mistral).
+**Cause** : information non communiquée au démarrage du pilotage Hermes ; existait déjà
+avant la reprise du projet.
+**Impact** : mon suivi PREPROD/PROD était incomplet — PROD existait déjà et j'ai
+travaillé un temps sans le savoir. Deux implémentations Mistral indépendantes
+(PREPROD/moi vs. PROD/déjà en place) : à réconcilier.
+**État** : ouvert (réconciliation PREPROD/PROD à faire) — mais l'accès et le diagnostic
+initial sont désormais opérationnels.
+**Contournement en place** : accès cluster obtenu via tunnel SSH vers le poste Windows
+(profil `administrateur`), lecture directe du `kubeconfig-host.yaml` du profil
+`n.doublet.ONE-ID` (droits NTFS différents, contournés en lisant/copiant les fichiers
+plutôt qu'en changeant d'utilisateur SSH).
+
+## 2026-08-24 — Erreur "upstream request timeout" sur ao-id.one-id.fr avec le moteur Mistral
+**Description factuelle** : l'utilisateur rapporte une erreur "Erreur : Unexpected
+token 'u', "upstream r"... is not valid JSON" dans l'interface PROD lors de l'usage du
+moteur Mistral. Diagnostic : appel direct au pod (`kubectl exec`) → Mistral répond en
+< 2s ; appel via port-forward (contourne le Gateway) → HTTP 200 ; appel via le vrai
+Gateway `https://ao-id.one-id.fr` → réussi une fois à 10.8s, proche de la limite
+implicite. Aucun `BackendTrafficPolicy` n'existait sur la route `ao-id` : le timeout par
+défaut d'Envoy Gateway (15s) est insuffisant pour des appels IA plus longs (CCTP
+volumineux, latence Mistral variable).
+**Cause** : timeout de route Gateway trop court pour des appels LLM, jamais configuré
+explicitement lors du déploiement initial (15/07/2026).
+**Impact** : échecs intermittents des fonctions IA en PROD (tous moteurs concernés,
+pas seulement Mistral — Claude et Mammouth ont le même risque de dépassement).
+**État** : résolu.
+**Contournement en place** : ajout d'un `BackendTrafficPolicy` (`ao-id-timeout`,
+namespace `numa`, voir dépôt `AO-ID-k8s`) portant `requestTimeout` à 120s et
+`connectionIdleTimeout` à 130s sur la route `ao-id`. Appliqué le 24/08/2026, accepté par
+les deux listeners du Gateway `gw01` (http + https). Vérifié : `/api/health` toujours
+`ok:true` après application, aucune régression observée.
+
+## 2026-08-24 — Import Excel HTTP 500 : bug openpyxl + format devis TD SYNNEX non reconnu (résolu)
+**Description factuelle** : `POST /api/import-excel` échouait en PROD (et reproduit en
+PREPROD) avec `ValueError: Max value is 14` levée depuis
+`openpyxl/styles/fonts.py` (validation du descripteur `Font.family`) au moment de
+`load_workbook()`. Fichier testé : devis TD SYNNEX réel (mairie de Saint Estève,
+`1006056968`). Une fois ce premier problème contourné, un second est apparu : ce
+fichier n'est pas un export "Dell Solutions Configurator" (le seul format reconnu par
+`parser_dell_excel.py`) mais un devis distributeur TD SYNNEX, avec des colonnes et une
+structure différentes.
+**Cause** : (1) openpyxl 3.1.5 applique une limite `max=14` sur l'attribut de style
+`font.family` non conforme à la réalité des fichiers OOXML produits par certains
+outils tiers (ici TD SYNNEX) ; (2) le parseur ne gérait qu'un seul format d'entrée.
+**Impact** : tout import Excel utilisant un devis TD SYNNEX (format visiblement utilisé
+en pratique par l'équipe, au moins pour ce dossier) était bloqué.
+**État** : résolu.
+**Contournement en place** :
+1. `app/engine/parser_dell_excel.py` : `openpyxl.styles.fonts.Font.family.max` relevé à
+   999 avant tout `load_workbook()` (le classeur s'ouvre alors normalement).
+2. Le parseur détecte maintenant automatiquement le format (Dell Solutions Configurator
+   OU devis TD SYNNEX) par les colonnes d'en-tête présentes, et route vers `parse_dell()`
+   ou `parse_tdsynnex()` en conséquence. Le format Dell existant n'a pas été modifié
+   fonctionnellement (juste extrait dans sa propre fonction).
+3. `app/main.py` (`/api/import-excel`) : le traceback complet est désormais loggé côté
+   serveur (`print(..., flush=True)`) même si la réponse HTTP reste tronquée à 500
+   caractères — nécessaire à ce diagnostic, absent avant.
+Testé en conditions réelles (PREPROD) sur le fichier réel fourni : HTTP 200, client
+détecté "MAIRIE DE SAINT ESTEVE", 1 serveur (PowerEdge R260, specs extraites) + 4 lignes
+sauvegarde (Data Domain DD6410) correctement classées.
+
 ## 2026-07-15 — Erreur 1010 Cloudflare sur les appels Mammouth (résolu)
 **Description factuelle** : les requêtes vers l'API Mammouth échouaient avec une erreur
 Cloudflare 1010 (Browser Integrity Check), la signature `Python-urllib` du client HTTP
@@ -113,3 +184,26 @@ seul utilisé par `generer_doc.py`) ; encombrement du dépôt uniquement. Le mot
 pour traçabilité seulement).
 **Contournement en place** : exclusion Git déjà active ; suppression du fichier laissée
 au choix de l'utilisateur.
+
+## 2026-08-24 — Moteur GB10 sensiblement plus lent que les autres (latence de raisonnement)
+**Description factuelle** : le modèle GB10 (`unsloth/Qwen3.8-Flash-Next-GGUF`, serveur
+vLLM interne `https://llm.one-id.fr/v1`) est un modèle "reasoning" qui génère un
+raisonnement interne (`reasoning_content`) avant sa réponse finale. Mesuré en conditions
+réelles : 34,5s pour un prompt simple (max_tokens=8000), 138,8s pour un appel
+`/api/analyse-cctp` complet (prompt système long) — largement plus lent que Mistral
+(quelques secondes) ou Claude.
+**Cause** : architecture "reasoning" du modèle (chaîne de pensée générée avant la
+réponse), latence intrinsèque au modèle, pas à l'intégration.
+**Impact** : un appel GB10 sur un CCTP volumineux ou un prompt système très long
+pourrait approcher ou dépasser le timeout de 180s codé dans `llm_complete()`,
+provoquant une erreur 502 côté utilisateur sans lien avec un bug applicatif.
+**État** : ouvert — **aggravé le 2026-09-09** : GB10 étant désormais le SEUL moteur (retrait
+de Claude/Mammouth/Mistral), le risque de timeout n'est plus contournable en basculant sur un
+autre moteur. Mesure du 2026-09-09 : un `/api/analyse-cctp` sur un CCTP court a pris **172,9s**
+(`HTTP 200`), soit très proche des 180s — un CCTP réel plus volumineux dépassera probablement le
+timeout et renverra une erreur 502 à l'utilisateur.
+**Contournement en place** : aucun pour l'instant ; le timeout de 180s reste celui de
+`llm_complete()`. Piste recommandée (non appliquée, à valider avant PROD) : augmenter le timeout
+pour GB10 (ex. 300s) ET aligner en conséquence les `timeoutSeconds` / la tolérance des probes
+Kubernetes, sans quoi un appel long pourrait de nouveau déclencher un redémarrage du pod. À
+trancher avec l'utilisateur lors de la prochaine bascule PROD.
