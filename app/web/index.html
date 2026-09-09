@@ -500,11 +500,23 @@ document.addEventListener('paste',e=>{if(!activeZone)return;const files=[];for(c
 /* draw.io : éditeur de schéma d'architecture (embed, 100 % local) */
 const DRAWIO_BASE=(window.DRAWIO_BASE)||(location.protocol+'//'+location.hostname+':8081');
 let _drawioXml='',_drawioEditIdx=null,_drawioHandler=null;
-function openDrawio(xml,editIdx){
+async function openDrawio(xml,editIdx){
   _drawioXml=xml||'';_drawioEditIdx=(editIdx===undefined?null:editIdx);
   const frame=$('drawioFrame');
   $('drawioStatus').textContent='Chargement de l’éditeur…';
-  frame.src=DRAWIO_BASE+'/?embed=1&proto=json&spin=1&ui=atlas&noExitBtn=1&saveAndExit=0&noSaveBtn=0&libraries=1';
+  // Bibliothèques de shapes ONE ID : passées en clibs=U<url> (mécanisme natif draw.io,
+  // chargées au démarrage dans le panneau latéral). URLs absolues côté app (port 8080),
+  // fetchées par le navigateur. Voir routes /api/drawio-libs et /drawio-libs/<nom>.
+  let clibs='';
+  try{
+    const list=await fetch('/api/drawio-libs').then(r=>r.json()).catch(()=>({libs:[]}));
+    const libs=(list&&list.libs)||[];
+    const base=location.protocol+'//'+location.host;
+    clibs=libs.map(n=>'U'+encodeURIComponent(base+'/drawio-libs/'+encodeURIComponent(n))).join(';');
+  }catch(e){/* l'éditeur reste utilisable sans les libs custom */}
+  let src=DRAWIO_BASE+'/?embed=1&proto=json&spin=1&ui=atlas&noExitBtn=1&saveAndExit=0&noSaveBtn=0&libraries=1';
+  if(clibs)src+='&clibs='+encodeURIComponent(clibs);
+  frame.src=src;
   $('drawioModal').style.display='flex';
   if(_drawioHandler)window.removeEventListener('message',_drawioHandler);
   _drawioHandler=function(evt){
@@ -513,7 +525,7 @@ function openDrawio(xml,editIdx){
     let msg;try{msg=JSON.parse(evt.data);}catch(e){return;}
     if(msg.event==='init'){
       frame.contentWindow.postMessage(JSON.stringify({action:'load',autosave:1,xml:_drawioXml}),'*');
-      $('drawioStatus').textContent='Dessinez, puis « Enregistrer » (disquette) pour l’ajouter au dossier.';
+      $('drawioStatus').textContent='Dessinez (shapes ONE ID dans le panneau de gauche), puis « Enregistrer » (disquette).';
     }else if(msg.event==='save'){
       _drawioXml=msg.xml;$('drawioStatus').textContent='Export en cours…';
       frame.contentWindow.postMessage(JSON.stringify({action:'export',format:'xmlpng',spinKey:'saving'}),'*');

@@ -147,3 +147,26 @@ sans provider explicite → `HTTP 200`, JSON complet et cohérent généré par 
 entièrement le sélecteur (rendrait la réintroduction d'un moteur plus lourde) ; conserver les clés
 en réserve (l'utilisateur a explicitement demandé une suppression complète). Réversibilité : le code
 des anciens moteurs reste récupérable via l'historique Git (tags `v2.4.x`).
+
+## 2026-09-09 — Bibliothèques de shapes ONE ID chargées automatiquement dans draw.io
+Les shapes ONE ID (convertis depuis les stencils Visio de `C:\Projets\Formes`, 124 bibliothèques /
+~6 220 shapes, rangés par constructeur : Dell, Fortinet, VMware, HPE, Aruba, Cisco, EMC, NetApp,
+Nutanix, Palo Alto, Sophos, Stormshield, Brocade, Datacore, Microsoft, + Autres/Raritan) sont
+désormais **versionnés dans le dépôt** (`app/web/drawio-libs/*.xml`, format `mxlibrary`, 187 Mo
+au total, fichiers consolidés `_PAR_CONSTRUCTEUR`) et **chargés automatiquement** à l'ouverture de
+l'éditeur. Justification : ces librairies ne vivaient que dans le localStorage du navigateur (par
+origine) — fragiles, perdues au moindre vidage de cache ou changement d'adresse d'accès (cause de
+leur « disparition » signalée le 09/09). Mécanisme retenu : paramètre d'URL natif draw.io
+`&clibs=U<url_encodée>` (une URL par bibliothèque, séparées par `;`), les fichiers étant servis par
+deux nouvelles routes de l'app (`GET /api/drawio-libs` = liste, `GET /drawio-libs/<nom>` = contenu,
+avec en-tête CORS `Access-Control-Allow-Origin: *` car draw.io tourne sur le port 8081 et fetch
+depuis le port 8080). Écarté : (1) l'action embed `load-libraries` par postMessage — **non supportée**
+par draw.io 30.3.6 (vérifié dans le JS du conteneur, l'action n'existe pas) ; (2) laisser les shapes
+en localStorage (fragile, cause du problème) ; (3) n'auto-charger qu'un sous-ensemble de marques —
+l'utilisateur a explicitement choisi de charger les 16 bibliothèques.
+⚠️ **Limite de performance connue et non résolue** : charger 187 Mo de PNG base64 au démarrage
+(dont DELL 47 Mo, VMware 35 Mo, FORTINET 19 Mo) alourdit l'éditeur au premier affichage — le service
+serveur est rapide (0,13 s pour 47 Mo en local) mais le décodage base64→images côté navigateur peut
+ramer, d'autant plus via le tunnel SSH. Non mesuré côté navigateur (le preview Hermes ne rend pas
+l'iframe draw.io). Si l'ouverture est trop lente à l'usage, réduire à un sous-ensemble de marques
+(retirer des fichiers de `app/web/drawio-libs/` — la liste est dynamique, aucune autre modif requise).

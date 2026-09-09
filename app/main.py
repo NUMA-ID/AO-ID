@@ -845,3 +845,44 @@ def argumentaire_image(folder: str, name: str):
     if not p.exists() or p.suffix.lower() not in (".png", ".jpg", ".jpeg", ".gif", ".webp"):
         raise HTTPException(404, "Image introuvable")
     return FileResponse(str(p))
+
+
+# ---------------------------------------------------------------- Bibliothèques de shapes draw.io
+DRAWIO_LIBS_DIR = WEB / "drawio-libs"
+
+
+@app.get("/api/drawio-libs")
+def drawio_libs_list():
+    """Liste les bibliothèques de shapes draw.io disponibles (une par constructeur).
+
+    Returns:
+        JSON `{libs: [str]}` — noms de fichiers `.xml` (format mxlibrary), triés.
+
+    Effets de bord : lecture du répertoire `app/web/drawio-libs/`.
+    """
+    libs = []
+    if DRAWIO_LIBS_DIR.is_dir():
+        libs = sorted(p.name for p in DRAWIO_LIBS_DIR.glob("*.xml"))
+    return {"libs": libs}
+
+
+@app.get("/drawio-libs/{name}")
+def drawio_lib(name: str):
+    """Sert une bibliothèque de shapes draw.io (fichier `.xml` mxlibrary).
+
+    Args:
+        name: nom du fichier `.xml` (le chemin est neutralisé, seul le basename compte).
+
+    Returns:
+        Le fichier XML (`application/xml`).
+
+    Raises:
+        HTTPException 404 si le fichier n'existe pas ou n'est pas un `.xml`.
+    """
+    p = DRAWIO_LIBS_DIR / Path(name).name
+    if not p.exists() or p.suffix.lower() != ".xml":
+        raise HTTPException(404, "Bibliothèque introuvable")
+    # CORS : draw.io tourne sur un autre port (8081) et fetch ces libs depuis l'app (8080).
+    # Origine dynamique = pas d'exposition au-delà du contexte local d'utilisation.
+    return FileResponse(str(p), media_type="application/xml",
+                        headers={"Access-Control-Allow-Origin": "*"})

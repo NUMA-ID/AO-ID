@@ -196,6 +196,22 @@ une image reconnue.
 **Effets de bord** : lecture disque. Le nom de fichier est réduit à `Path(name).name`
 pour éviter la traversée de répertoire.
 
+## `GET /api/drawio-libs`
+**Rôle** : liste les bibliothèques de shapes draw.io ONE ID disponibles (une par constructeur).
+**Entrées** : aucune.
+**Sortie** : JSON `{libs: [str]}` — noms de fichiers `.xml` (format `mxlibrary`), triés.
+**Erreurs possibles** : aucune (liste vide si le répertoire est absent).
+**Effets de bord** : lecture du répertoire `app/web/drawio-libs/`.
+
+## `GET /drawio-libs/{name}`
+**Rôle** : sert une bibliothèque de shapes draw.io (fichier `.xml` `mxlibrary`), chargée
+automatiquement dans l'éditeur via le paramètre `clibs` de l'URL draw.io.
+**Entrées** : `name: str` (segment de chemin ; réduit à `Path(name).name`).
+**Sortie** : `FileResponse` `application/xml`, avec en-tête `Access-Control-Allow-Origin: *`
+(draw.io sur le port 8081 fetch depuis le port 8080 — requête cross-origin).
+**Erreurs possibles** : `404` si le fichier n'existe pas ou n'est pas un `.xml`.
+**Effets de bord** : lecture disque. Traversée de répertoire neutralisée (`Path(name).name`).
+
 ---
 
 ## Fonctions internes notables (non exposées en HTTP)
