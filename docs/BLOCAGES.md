@@ -27,6 +27,20 @@ pas libéré ; bloquant pour tout le nouveau workflow "Linux uniquement".
    `docker info | grep "Docker Root Dir"` → `/srv/docker`.
    `/var` est repassé à 12% d'utilisation après le déplacement.
 
+**Mise à jour du 10/09/2026 — le déplacement était incomplet** : ce
+changement ne couvrait que le `data-root` Docker, pas le **snapshotter
+containerd** sous-jacent (`/var/lib/containerd`, distinct de
+`/var/lib/docker`), qui a fini par regrossir à 3,1 Go et resaturer `/var`
+(61% d'utilisation, 2,2 Go libres), provoquant un nouvel échec de build
+(`no space left on device` pendant la bascule PROD v2.5.1 — voir
+`appel-offre-k8s/docs/DECISIONS.md`). Corrigé cette fois de façon complète :
+`root = "/srv/containerd"` ajouté à `/etc/containerd/config.toml`, contenu
+existant copié vers `/srv/containerd` (`cp -a`, conteneurs arrêtés le temps
+du redémarrage `containerd`+`docker`), ancien `/var/lib/containerd` supprimé
+après vérification que les 3 conteneurs actifs (`ao-oneid`, `ao-drawio`,
+`rag-oneid-qdrant`) redémarraient sains. `/var` passé de 61% à 6%
+d'utilisation (5,3 Go libres) après ce second déplacement.
+
 ## 2026-08-21 — PROD non définie
 **Description factuelle** : au moment de la reprise du projet sous pilotage Hermes,
 seul l'environnement PREPROD a été confirmé par l'utilisateur
