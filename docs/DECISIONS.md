@@ -170,3 +170,31 @@ serveur est rapide (0,13 s pour 47 Mo en local) mais le décodage base64→image
 ramer, d'autant plus via le tunnel SSH. Non mesuré côté navigateur (le preview Hermes ne rend pas
 l'iframe draw.io). Si l'ouverture est trop lente à l'usage, réduire à un sous-ensemble de marques
 (retirer des fichiers de `app/web/drawio-libs/` — la liste est dynamique, aucune autre modif requise).
+
+## 2026-09-09 — Watchdog de tunnel SSH pour l'accès distant à PREPROD
+Le tunnel SSH inversé vers le poste Windows (`ssh -R 8080:localhost:8080 -R
+8081:localhost:8081`, utilisé pour exposer AO-ID/draw.io au navigateur de
+l'utilisateur) tombait de façon répétée et nécessitait une relance manuelle à
+chaque fois. Script `tunnel-watchdog.sh` ajouté à la racine du dépôt : boucle
+`while true` relançant le tunnel automatiquement (nouvelle tentative après 5s)
+en cas de coupure, avec keepalive SSH renforcé (`ServerAliveInterval=15`,
+`ServerAliveCountMax=6`, `TCPKeepAlive=yes`) et journal horodaté
+(`tunnel-watchdog.log`, non versionné). Écarté : solution plus lourde (service
+systemd, VPN) — non nécessaire tant que l'usage reste ponctuel côté
+utilisateur ; à reconsidérer si le besoin devient permanent. Limite connue :
+le watchdog tourne tant que la session `djinn-bot` reste active, ne survit pas
+à un redémarrage de la machine.
+
+## 2026-09-09 — Nouvel argumentaire Cisco Nexus 3172TQ
+Ajout d'un argumentaire pour le commutateur Data Center **Cisco Nexus 3172TQ**
+(N3K-C3172TQ-10GT, 48 ports 10GBASE-T + 6 QSFP+), à la demande explicite de
+l'utilisateur. Données techniques sourcées depuis la fiche technique Cisco
+officielle (`data_sheet_c78-729483`) — aucune caractéristique inventée. Image
+produit récupérée depuis une fiche revendeur tierce (ITinStock, photo façade
+avant), **vérifiée visuellement** avant intégration (étiquette "CISCO NEXUS
+3172TQ" lisible sur la photo, configuration de ports conforme). Point
+d'attention explicitement documenté dans l'argumentaire lui-même : ce modèle
+est en fin de commercialisation chez Cisco (End of Sale ; support jusqu'au
+28/02/2027) — signalé à l'utilisateur final du document plutôt que dissimulé.
+Testé en conditions réelles : JSON validé, argumentaire détecté par
+`/api/argumentaires` (33 argumentaires au total après ajout).
