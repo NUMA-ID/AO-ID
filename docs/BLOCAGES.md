@@ -216,8 +216,25 @@ de Claude/Mammouth/Mistral), le risque de timeout n'est plus contournable en bas
 autre moteur. Mesure du 2026-09-09 : un `/api/analyse-cctp` sur un CCTP court a pris **172,9s**
 (`HTTP 200`), soit très proche des 180s — un CCTP réel plus volumineux dépassera probablement le
 timeout et renverra une erreur 502 à l'utilisateur.
-**Contournement en place** : aucun pour l'instant ; le timeout de 180s reste celui de
-`llm_complete()`. Piste recommandée (non appliquée, à valider avant PROD) : augmenter le timeout
-pour GB10 (ex. 300s) ET aligner en conséquence les `timeoutSeconds` / la tolérance des probes
-Kubernetes, sans quoi un appel long pourrait de nouveau déclencher un redémarrage du pod. À
-trancher avec l'utilisateur lors de la prochaine bascule PROD.
+**Contournement en place** : timeout de `llm_complete()` porté à **300s** le 2026-09-22
+(le `BackendTrafficPolicy` Envoy PROD doit être aligné à 300s/310s, sinon le Gateway
+coupe avant le backend). Les probes K8s (liveness 20s) restent un risque si un appel
+bloque le thread principal — les appels IA passent déjà par `run_in_threadpool`.
+
+## 2026-09-22 — Draw.io en PROD : iframe vers :8081 affiche AO-ID (contourné)
+**Description factuelle** : sur `https://ao-id.one-id.fr`, le bouton « Dessiner (draw.io) »
+ouvre un overlay « Chargement de l'éditeur… » puis affiche une seconde instance d'AO-ID
+dans l'iframe. En PREPROD (`localhost:8080` + conteneur `ao-drawio` sur `:8081`) le même
+bouton ouvre bien l'éditeur.
+**Cause** : le JS construisait `DRAWIO_BASE = location.protocol + '//' + hostname + ':8081'`.
+En PROD ça donne `https://ao-id.one-id.fr:8081`. Ce port n'est pas exposé au navigateur
+(timeout depuis djinn-bot ; screenshot utilisateur = spinner infini / AO-ID dans l'iframe
+si un listener 8081 existe et que la HTTPRoute `ao-id` y est attachée, ou si le navigateur
+retombe sur :443). De plus le Deployment `drawio` n'a pas le volume `drawio-libs`.
+**Impact** : éditeur inutilisable en PROD ; PREPROD inchangée.
+**État** : contourné côté code PREPROD (iframe → `/drawio` en HTTPS, libs via AO-ID).
+La HTTPRoute K8s et `DRAWIO_SERVER_URL` sont prêts dans `appel-offre-k8s` mais **non
+appliqués** tant que l'utilisateur n'a pas dit « bascule en prod » (tunnel SSH Windows
+instable).
+**Contournement en place** : `resolve_drawio_base()` + injection `__DRAWIO_BASE__`.
+

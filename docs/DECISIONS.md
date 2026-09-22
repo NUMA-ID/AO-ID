@@ -198,3 +198,18 @@ est en fin de commercialisation chez Cisco (End of Sale ; support jusqu'au
 28/02/2027) — signalé à l'utilisateur final du document plutôt que dissimulé.
 Testé en conditions réelles : JSON validé, argumentaire détecté par
 `/api/argumentaires` (33 argumentaires au total après ajout).
+
+## 2026-09-22 — Draw.io PROD sous le préfixe `/drawio` (même origin HTTPS)
+Le JS ne peut plus viser `hostname:8081` : ce port n'est pas celui de draw.io
+pour un navigateur sur `ao-id.one-id.fr` (PREPROD Compose oui, Gateway K8s non).
+**Décidé** : injecter `__DRAWIO_BASE__` depuis `GET /` via `resolve_drawio_base()`
+(`:8081` si hôte local / port 8080-8081, sinon `<origin>/drawio`). Les shapes
+sont fetchées sur AO-ID (`/drawio-libs/`), pas sur le pod draw.io.
+**Écarté** : (1) patcher le Gateway partagé pour un listener 8081 — ressource
+partagée, déjà documentée comme optionnelle et probablement absente ;
+(2) un hostname `drawio.one-id.fr` — pas d'enregistrement DNS.
+**Conséquence K8s** : HTTPRoute `ao-id` gagne deux matches Exact `/drawio` +
+PathPrefix `/drawio/` vers le Service `drawio`, et le Deployment pose
+`DRAWIO_SERVER_URL=https://ao-id.one-id.fr/drawio/` pour le context Tomcat.
+Timeout GB10 porté à 300s (aligné BackendTrafficPolicy 300/310s).
+

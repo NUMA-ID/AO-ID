@@ -7,10 +7,10 @@ les entrées `payload: dict` sont des corps JSON bruts (pas de modèle Pydantic 
 
 ## `GET /`
 **Rôle** : sert la page HTML unique de l'application (frontend SPA).
-**Entrées** : aucune.
-**Sortie** : `HTMLResponse` — contenu de `app/web/index.html`, avec le marqueur
-`__BUILD__` remplacé par la date de build calculée (mtime la plus récente parmi
-`index.html`, `main.py`, `generer_doc.py`).
+**Entrées** : en-têtes HTTP `Host` et `X-Forwarded-Proto` (pour déduire l'URL publique de draw.io).
+**Sortie** : `HTMLResponse` — contenu de `app/web/index.html`, avec :
+- `__BUILD__` remplacé par la date de build (mtime la plus récente parmi `index.html`, `main.py`, `generer_doc.py`) ;
+- `__DRAWIO_BASE__` remplacé par `resolve_drawio_base()` (`:8081` en PREPROD locale, `/drawio` en PROD HTTPS).
 **Erreurs possibles** : `500` si `app/web/index.html` est absent ("Frontend manquant").
 **Effets de bord** : lecture disque (`web/index.html`).
 
@@ -208,7 +208,8 @@ pour éviter la traversée de répertoire.
 automatiquement dans l'éditeur via le paramètre `clibs` de l'URL draw.io.
 **Entrées** : `name: str` (segment de chemin ; réduit à `Path(name).name`).
 **Sortie** : `FileResponse` `application/xml`, avec en-tête `Access-Control-Allow-Origin: *`
-(draw.io sur le port 8081 fetch depuis le port 8080 — requête cross-origin).
+(draw.io en iframe peut fetch depuis un autre port en PREPROD — `:8081` vs `:8080` — ;
+en PROD les libs restent servies par AO-ID sur le même origin HTTPS).
 **Erreurs possibles** : `404` si le fichier n'existe pas ou n'est pas un `.xml`.
 **Effets de bord** : lecture disque. Traversée de répertoire neutralisée (`Path(name).name`).
 
@@ -218,7 +219,8 @@ automatiquement dans l'éditeur via le paramètre `clibs` de l'URL draw.io.
 
 | Fonction | Fichier | Rôle | Effets de bord |
 |---|---|---|---|
-| `llm_complete(system, user, max_tokens, provider, model)` | main.py | Point d'entrée unique vers les moteurs IA (Claude, Mammouth, Mistral ou GB10) | Appel réseau sortant |
+| `llm_complete(system, user, max_tokens, provider, model)` | main.py | Point d'entrée unique vers GB10 (timeout HTTP 300s) | Appel réseau sortant |
+| `resolve_drawio_base(override, scheme, hostname, port)` | drawio_url.py | URL publique de draw.io (:8081 local, /drawio en prod HTTPS) | Aucun |
 | `extract_text(filename, data)` | main.py | Extraction de texte depuis .txt/.docx/.pdf | Aucun (traitement en mémoire) |
 | `extract_docx_text(path)` | main.py | Extraction texte + tableaux d'un .docx généré | Lecture disque |
 | `parse_cctp(raw)` | main.py | Parsing tolérant du JSON renvoyé par l'IA (fallback regex si JSON malformé) | Aucun |

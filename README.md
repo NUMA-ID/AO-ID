@@ -42,6 +42,13 @@ docker compose up -d --build
 
 Puis ouvrir : **http://localhost:8080**
 
+Tests (stdlib, sans Docker) :
+
+```
+cd /home/numa/projets/appel-offre
+python3 -m unittest discover -s tests -v
+```
+
 - Après une simple modification de code, `docker compose up -d` suffit (rechargement auto activé).
 - Un `--build` n'est nécessaire qu'en cas de changement de dépendances.
 

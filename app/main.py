@@ -6,9 +6,10 @@ Tout-en-un : analyse CCTP via le LLM GB10 (vLLM ONE ID), import Excel Dell, gén
 """
 import os, json, tempfile, subprocess, sys, datetime, re
 from pathlib import Path
-from fastapi import FastAPI, UploadFile, File, Form, HTTPException
+from fastapi import FastAPI, UploadFile, File, Form, HTTPException, Request
 from fastapi.responses import HTMLResponse, JSONResponse, FileResponse
 from starlette.concurrency import run_in_threadpool
+from drawio_url import resolve_drawio_base
 
 HERE = Path(__file__).resolve().parent
 ENGINE = HERE / "engine"
@@ -48,6 +49,8 @@ GB10_MODEL = os.environ.get("GB10_MODEL", "unsloth/Qwen3.8-Flash-Next-GGUF")
 # Moteur IA unique : GB10 (serveur vLLM ONE ID, API OpenAI-compatible).
 # Les moteurs Claude / Mammouth / Mistral ont été retirés le 2026-09-09 (décision utilisateur).
 DEFAULT_PROVIDER = os.environ.get("DEFAULT_PROVIDER", "gb10").lower()
+# URL publique de draw.io (vide = déduite de l'hôte de la requête : :8081 en local, /drawio en prod).
+DRAWIO_BASE_ENV = os.environ.get("DRAWIO_BASE", "")
 
 
 def llm_complete(system, user, max_tokens=4000, provider="", model=""):
@@ -80,7 +83,7 @@ def llm_complete(system, user, max_tokens=4000, provider="", model=""):
                  "Content-Type": "application/json",
                  "Accept": "application/json"})
     try:
-        with urllib.request.urlopen(req, timeout=180) as resp:
+        with urllib.request.urlopen(req, timeout=300) as resp:
             d = json.loads(resp.read().decode("utf-8"))
         # Modèles "reasoning" (Qwen3 etc.) : ne garder que le contenu final,
         # pas le raisonnement intermédiaire (champ reasoning_content séparé).
@@ -135,11 +138,20 @@ def _build_stamp():
 
 
 @app.get("/", response_class=HTMLResponse)
-def index():
+def index(request: Request):
     f = WEB / "index.html"
     if not f.exists():
         return HTMLResponse("<h1>Frontend manquant</h1>", status_code=500)
-    html = f.read_text(encoding="utf-8").replace("__BUILD__", _build_stamp())
+    host = request.headers.get("host") or request.url.hostname or ""
+    hostname = host.split(":")[0]
+    port = host.split(":")[1] if ":" in host else (str(request.url.port or "") if request.url.port else "")
+    scheme = request.headers.get("x-forwarded-proto") or request.url.scheme or "http"
+    drawio_base = resolve_drawio_base(
+        override=DRAWIO_BASE_ENV, scheme=scheme, hostname=hostname, port=port,
+    )
+    html = (f.read_text(encoding="utf-8")
+            .replace("__BUILD__", _build_stamp())
+            .replace("__DRAWIO_BASE__", drawio_base))
     return HTMLResponse(html)
 
 

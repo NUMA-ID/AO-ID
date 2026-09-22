@@ -19,7 +19,7 @@ flowchart TD
         TPL["assets/TEMPLATE_BASE_ONEID.docx\nassets/CHAPITRES_ADMIN.docx"]
     end
 
-    subgraph "Conteneur ao-drawio (port 8081→8080)"
+    subgraph "Conteneur ao-drawio (PREPROD :8081 ; PROD : /drawio)"
         DRAWIO["jgraph/drawio:30.3.6"]
     end
 
@@ -78,6 +78,9 @@ documents). Un instantané horodaté est conservé à chaque changement de versi
 Service Docker séparé, 100 % local (variables `DRAWIO_GOOGLE_CLIENT_ID` et
 `DRAWIO_MSGRAPH_CLIENT_ID` vidées pour désactiver les intégrations cloud). Le schéma est
 exporté en PNG (XML ré-éditable embarqué) et transmis au générateur Word.
+En PREPROD l'iframe vise `http://<hôte>:8081`. En PROD (même hôte HTTPS, pas de
+listener 8081 joignable) l'iframe vise `https://ao-id.one-id.fr/drawio` ; les
+bibliothèques XML restent servies par AO-ID (`GET /drawio-libs/{name}`).
 
 ## Dépendances externes
 
