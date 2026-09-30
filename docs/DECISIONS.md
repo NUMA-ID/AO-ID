@@ -1,5 +1,23 @@
 # Décisions techniques — Générateur d'appel d'offre ONE ID
 
+## 2026-09-30 — Réglages LLM runtime persistés en JSON (pas de chiffrement)
+Introduction d'une modale ⚙ Paramètres LLM (bouton dans le header) permettant de
+changer base URL / modèle / clé API sans redéployer le conteneur. La config est
+persistée dans `$OUT_DIR/llm_settings.json` (mode 0600, volume Docker) et **prime
+sur** les variables d'env `GB10_*`.
+
+Justification : besoin utilisateur de rotation de clé et de changement de modèle
+à chaud (aligné sur les autres projets ONE ID — RAG, offre-produits — qui ont le
+même bouton). Volume monté = survit au redémarrage. Un test de connexion (`/v1/models`)
+est effectué avant persistance : une clé refusée par le serveur LLM (401/403)
+provoque un `400` et n'écrit rien.
+
+Écarté : chiffrement Fernet dérivé d'une clé de session (comme dans le projet
+RAG). Justification : AO-ID est **mono-utilisateur local sans authentification**,
+le fichier vit sur un volume déjà protégé par les permissions Unix, l'ajout de
+`cryptography` alourdit l'image sans gain réel dans ce contexte. Le fichier est
+créé en mode 0600 et exclu de tout partage/backup non contrôlé.
+
 ## 2026-06-01 — Application locale Docker, pas de SaaS
 Choix d'une application 100 % locale (Docker Desktop), sans hébergement distant à ce
 stade. Justification : données client sensibles (CCTP, chiffrage), pas de besoin

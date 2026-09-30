@@ -17,9 +17,37 @@ les entrées `payload: dict` sont des corps JSON bruts (pas de modèle Pydantic 
 ## `GET /api/health`
 **Rôle** : sonde de santé / diagnostic de configuration.
 **Entrées** : aucune.
-**Sortie** : JSON `{ok, model, api_key_set, doc_base, out_dir}`.
+**Sortie** : JSON `{ok, model, api_key_set, base_url, source, doc_base, out_dir}` — `source` vaut `"file"` si la config vient du fichier `llm_settings.json`, `"env"` si elle vient des variables d'environnement.
 **Erreurs possibles** : aucune.
-**Effets de bord** : aucun.
+**Effets de bord** : lecture disque (`OUT_DIR/llm_settings.json`).
+
+## `GET /api/settings/llm`
+**Rôle** : renvoie la configuration LLM active (base URL, modèle, clé **masquée**). Utilisé par la modale ⚙ Paramètres LLM du frontend.
+**Entrées** : aucune.
+**Sortie** : JSON `{base_url: str, model: str, api_key_masked: str, source: 'file'|'env', updated_at: float|null, updated_by: str|null}`. La clé en clair n'est **jamais** renvoyée.
+**Erreurs possibles** : aucune.
+**Effets de bord** : lecture `OUT_DIR/llm_settings.json`.
+
+## `PUT /api/settings/llm`
+**Rôle** : enregistre une nouvelle configuration LLM après sonde. Refuse si la clé est rejetée par le serveur LLM (401/403). Écrit un fichier JSON local mode 0600.
+**Entrées** : body JSON `{base_url: str, model: str, api_key: str, updated_by?: str}`.
+**Sortie** : `200` → `{ok: true, nb_modeles_listes: int, probe: 'ok'}`. `502` (LLM injoignable mais config enregistrée quand même) → `{ok: false, detail: {probe: 'failed_saved_anyway'}}`.
+**Erreurs possibles** : `400` (champs manquants ou clé refusée par le LLM), `502` (LLM injoignable au moment de la sonde).
+**Effets de bord** : appel réseau vers `base_url/models`, écriture `OUT_DIR/llm_settings.json` (0600).
+
+## `POST /api/settings/llm/probe`
+**Rôle** : sonde une base URL + clé API sans rien persister (bouton « Tester la connexion »).
+**Entrées** : body JSON `{base_url: str, api_key: str}`.
+**Sortie** : JSON `{status: 'ok'|'unauthorized'|'unreachable', nb_modeles: int, models: [str]}`.
+**Erreurs possibles** : `422` si `base_url` ou `api_key` manquant.
+**Effets de bord** : appel réseau vers `base_url/models`.
+
+## `GET /api/settings/llm/models`
+**Rôle** : liste les modèles exposés par le LLM avec la clé actuellement enregistrée (bouton « Tester et lister » sans clé saisie).
+**Entrées** : query string `probe_url?: str` (optionnel — si fourni, sonde cette base plutôt que celle enregistrée).
+**Sortie** : JSON `{models: [str]}`.
+**Erreurs possibles** : `400` (aucune clé enregistrée ou clé refusée), `502` (LLM injoignable).
+**Effets de bord** : lecture `OUT_DIR/llm_settings.json`, appel réseau.
 
 ## `POST /api/analyse-cctp`
 **Rôle** : analyse un CCTP (fichier ou texte) via le moteur IA et en extrait contexte,

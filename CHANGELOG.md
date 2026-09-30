@@ -1,5 +1,12 @@
 # Journal des versions — Générateur d'appel d'offre ONE ID
 
+## v2.5
+- **Bouton ⚙ Paramètres LLM dans le header** : modale de configuration runtime du moteur IA (Base URL, Modèle en liste déroulante, Clé API), test de connexion + listing des modèles exposés par le serveur (endpoint `/v1/models` OpenAI-compatible).
+- **Persistance côté serveur** : la config est stockée dans `$OUT_DIR/llm_settings.json` (mode 0600, volume Docker → survit au redémarrage du conteneur et à la mise à jour d'image). Prioritaire sur les variables d'env `GB10_*`.
+- **Nouveaux endpoints** : `GET /api/settings/llm` (config masquée), `PUT /api/settings/llm` (enregistre après sonde, refuse 401), `POST /api/settings/llm/probe` (test sans persistance), `GET /api/settings/llm/models` (liste avec la clé enregistrée). Voir `docs/FONCTIONS.md`.
+- **`/api/health` enrichi** : renvoie désormais `base_url` et `source` (`file` ou `env`).
+- **`docker-compose.yml`** : `drawio_url.py` ajouté aux bind-mounts pour éviter l'erreur `ModuleNotFoundError` après ajout du fichier sans rebuild d'image.
+
 ## v2.3
 - **Mammouth devient le moteur IA par défaut** (API OpenAI-compatible). Nouveau paramètre d'environnement `DEFAULT_PROVIDER` (`mammouth` par défaut, `claude` au choix) : c'est le moteur utilisé quand la requête n'en précise pas. Sélecteur « Moteur IA » de l'interface pré-réglé sur Mammouth.
 - **Correctif appels Mammouth / Cloudflare** : les requêtes envoyaient une signature `Python-urllib`, rejetée par le Browser Integrity Check de Cloudflare (erreur 1010). Ajout d'un User-Agent navigateur validé côté cluster ; les appels passent désormais jusqu'à l'authentification.

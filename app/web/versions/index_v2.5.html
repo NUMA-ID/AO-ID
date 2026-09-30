@@ -177,28 +177,9 @@ async function openSettings(){
     if(d.updated_by) parts.push('par '+d.updated_by);
     if(d.updated_at){ parts.push('le '+new Date(d.updated_at*1000).toLocaleString('fr-FR')); }
     document.getElementById('set-origin').textContent = parts.join(' — ');
-    // Peuple d'abord avec le modèle courant en placeholder, puis tente d'auto-charger la liste
-    // depuis la clé déjà enregistrée côté serveur (pas besoin que l'utilisateur re-saisisse).
     const sel=document.getElementById('set-model'); sel.innerHTML='';
-    const opt=document.createElement('option'); opt.value=d.model||''; opt.textContent=(d.model||'(aucun)')+' — chargement…'; sel.appendChild(opt);
+    const opt=document.createElement('option'); opt.value=d.model||''; opt.textContent=d.model||'(aucun)'; sel.appendChild(opt);
     _setStatus('');
-    try{
-      const rm=await fetch('/api/settings/llm/models');
-      if(rm.ok){
-        const dm=await rm.json();
-        const ids=dm.models||[];
-        sel.innerHTML='';
-        if(!ids.length){ const o=document.createElement('option'); o.textContent='(aucun modèle listé)'; o.disabled=true; sel.appendChild(o); }
-        else{ for(const id of ids){ const o=document.createElement('option'); o.value=id; o.textContent=id+(id===d.model?' ★':''); if(id===d.model)o.selected=true; sel.appendChild(o); } }
-        _setStatus('✅ '+ids.length+' modèle(s) disponibles.','ok');
-      } else if(rm.status===400){
-        // Pas de clé enregistrée : on laisse le placeholder, l'utilisateur devra saisir puis « Tester et lister ».
-        sel.innerHTML=''; const o=document.createElement('option'); o.value=d.model||''; o.textContent=d.model||'(saisir la clé puis Tester et lister)'; sel.appendChild(o);
-        _setStatus('ℹ️ Saisissez la clé API puis « Tester et lister » pour peupler la liste.');
-      } else {
-        _setStatus('⚠️ Impossible de charger la liste (HTTP '+rm.status+') — bouton « Tester et lister » disponible.','error');
-      }
-    }catch(e2){ _setStatus('⚠️ Liste non chargée : '+(e2.message||e2),'error'); }
   }catch(e){ _setStatus('Erreur : '+(e.message||e),'error'); }
 }
 function closeSettings(){ document.getElementById('settings-overlay').style.display='none'; }
@@ -248,14 +229,12 @@ async function saveSettings(){
   const base_url=document.getElementById('set-baseurl').value.trim();
   const model=document.getElementById('set-model').value;
   const api_key=document.getElementById('set-apikey').value;
-  if(!base_url||!model){_setStatus('Base URL et modèle sont requis.','error');return;}
+  if(!base_url||!model||!api_key){_setStatus('Base URL, modèle et clé sont requis.','error');return;}
   _setStatus('Enregistrement et sonde…');
   try{
-    // api_key vide = on garde la clé actuellement enregistrée (le backend gère ce cas).
-    const body={base_url,model}; if(api_key) body.api_key=api_key;
-    const r=await fetch('/api/settings/llm',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    const r=await fetch('/api/settings/llm',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({base_url,model,api_key})});
     const d=await r.json().catch(()=>({}));
-    if(r.ok){ _setStatus('✅ Enregistré — '+(d.nb_modeles_listes||0)+' modèle(s) disponibles.','ok'); document.getElementById('set-apikey').value=''; if(typeof _refreshFooterModels==='function') _refreshFooterModels(); }
+    if(r.ok){ _setStatus('✅ Enregistré — '+(d.nb_modeles_listes||0)+' modèle(s) disponibles.','ok'); document.getElementById('set-apikey').value=''; }
     else if(r.status===400) _setStatus('❌ '+((d.detail)||'Clé refusée ou champs invalides.'),'error');
     else if(r.status===502) _setStatus('⚠️ LLM injoignable — configuration enregistrée quand même.','error');
     else _setStatus('Erreur HTTP '+r.status,'error');
@@ -522,8 +501,8 @@ async function saveSettings(){
   <select id="aiEngine" onchange="aiToggle();save()" style="width:auto;padding:6px 8px" title="Moteur utilisé par les boutons IA (Reformuler, Analyser, etc.)">
     <option value="gb10" selected>GB10 (interne ONE ID)</option>
   </select>
-  <select id="aiModelGb10" onchange="save()" style="width:auto;padding:6px 8px" title="Modèle GB10 (serveur interne ONE ID) — peuplé depuis ⚙ Paramètres LLM">
-    <option value="">(config runtime)</option>
+  <select id="aiModelGb10" onchange="save()" style="width:auto;padding:6px 8px" title="Modèle GB10 (serveur interne ONE ID)">
+    <option value="unsloth/Qwen3.8-Flash-Next-GGUF">Qwen3.8 Flash Next</option>
   </select>
   <span class="msg" id="msg">Prêt.</span>
 </div>
@@ -595,25 +574,7 @@ async function saveSettings(){
 <script>
 const $=id=>document.getElementById(id);
 function aiToggle(){/* GB10 seul moteur : liste de modèles toujours visible. */const g=$('aiModelGb10');if(g)g.style.display='inline-block';}
-// Peuple #aiModelGb10 (footer) depuis /api/settings/llm/models — sélectionne le modèle
-// enregistré dans la config runtime. Silencieux en cas d'erreur (fallback = "(config runtime)").
-async function _refreshFooterModels(){
-  try{
-    const sel=document.getElementById('aiModelGb10'); if(!sel) return;
-    const [rSet, rMod] = await Promise.all([fetch('/api/settings/llm'), fetch('/api/settings/llm/models')]);
-    if(!rSet.ok || !rMod.ok) return;
-    const set=await rSet.json(); const mod=await rMod.json();
-    const cur=set.model||''; const ids=mod.models||[];
-    const previous=sel.value;
-    sel.innerHTML='';
-    const oDef=document.createElement('option'); oDef.value=''; oDef.textContent='(config runtime · '+(cur||'aucun')+')'; sel.appendChild(oDef);
-    for(const id of ids){ const o=document.createElement('option'); o.value=id; o.textContent=id+(id===cur?' ★':''); sel.appendChild(o); }
-    // Restaure la sélection précédente si toujours valide, sinon '' (= config runtime).
-    sel.value = ids.includes(previous) ? previous : '';
-  }catch(e){/* silencieux */}
-}
-document.addEventListener('DOMContentLoaded', _refreshFooterModels);
-function aiSel(){return {provider:'gb10',model:(($('aiModelGb10')||{}).value||'').trim()};}
+function aiSel(){return {provider:'gb10',model:(($('aiModelGb10')||{}).value||'').trim()||'unsloth/Qwen3.8-Flash-Next-GGUF'};}
 // Empêche le navigateur d'ouvrir le fichier quand on dépose à côté d'une zone
 ['dragenter','dragover','drop'].forEach(ev=>window.addEventListener(ev,e=>{e.preventDefault();},false));
 const STEP_ORDER=['cctp','equip','fonc','kanban','plan','gen'];

@@ -52,6 +52,91 @@ DEFAULT_PROVIDER = os.environ.get("DEFAULT_PROVIDER", "gb10").lower()
 # URL publique de draw.io (vide = déduite de l'hôte de la requête : :8081 en local, /drawio en prod).
 DRAWIO_BASE_ENV = os.environ.get("DRAWIO_BASE", "")
 
+# Réglages LLM persistés (fichier JSON dans OUT_DIR → survit au redémarrage du conteneur,
+# monté en volume via docker-compose / PVC Kubernetes). Prend le pas sur les variables d'env.
+SETTINGS_FILE = Path(os.environ.get("LLM_SETTINGS_FILE", str(Path(os.environ.get("OUT_DIR",
+                     str(HERE.parent / "Documents_Generes"))) / "llm_settings.json")))
+
+
+def _normalize_base(u: str) -> str:
+    """Normalise une base URL LLM : strip, retire slash final. Vide → ''."""
+    return (u or "").strip().rstrip("/")
+
+
+def load_llm_settings() -> dict:
+    """Lit le fichier de réglages LLM. Renvoie {} si absent ou illisible.
+
+    Effets de bord : lecture disque (SETTINGS_FILE).
+    """
+    try:
+        if SETTINGS_FILE.exists():
+            return json.loads(SETTINGS_FILE.read_text(encoding="utf-8"))
+    except Exception:
+        pass
+    return {}
+
+
+def save_llm_settings(data: dict) -> None:
+    """Écrit atomiquement le fichier de réglages LLM (0600).
+
+    Effets de bord : écriture disque (SETTINGS_FILE + fichier .tmp temporaire).
+    """
+    SETTINGS_FILE.parent.mkdir(parents=True, exist_ok=True)
+    tmp = SETTINGS_FILE.with_suffix(".tmp")
+    tmp.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
+    try:
+        os.chmod(tmp, 0o600)
+    except Exception:
+        pass
+    tmp.replace(SETTINGS_FILE)
+
+
+def active_llm() -> dict:
+    """Retourne la configuration LLM effective : fichier > variables d'environnement.
+
+    Returns:
+        dict avec base_url, model, api_key, source ('file' ou 'env'),
+        updated_at (float epoch, optionnel), updated_by (str, optionnel).
+    """
+    s = load_llm_settings()
+    if s.get("base_url") and s.get("model") and s.get("api_key"):
+        return {"base_url": _normalize_base(s["base_url"]), "model": s["model"],
+                "api_key": s["api_key"], "source": "file",
+                "updated_at": s.get("updated_at"), "updated_by": s.get("updated_by")}
+    return {"base_url": _normalize_base(GB10_BASE), "model": GB10_MODEL,
+            "api_key": GB10_API_KEY, "source": "env"}
+
+
+def _probe_llm(base_url: str, api_key: str, timeout: int = 10) -> dict:
+    """Sonde GET {base}/models avec la clé fournie.
+
+    Returns:
+        dict {status: 'ok'|'unauthorized'|'unreachable', models: [str], http: int|None}.
+    """
+    import urllib.request, urllib.error
+    url = _normalize_base(base_url) + "/models"
+    req = urllib.request.Request(url, headers={"Authorization": "Bearer " + (api_key or ""),
+                                                "Accept": "application/json"})
+    try:
+        with urllib.request.urlopen(req, timeout=timeout) as resp:
+            d = json.loads(resp.read().decode("utf-8"))
+        ids = []
+        for m in (d.get("data") or []):
+            if isinstance(m, dict) and m.get("id"):
+                ids.append(str(m["id"]))
+        # Déduplique en préservant l'ordre.
+        seen = set(); uniq = []
+        for i in ids:
+            if i not in seen:
+                seen.add(i); uniq.append(i)
+        return {"status": "ok", "models": uniq, "http": 200}
+    except urllib.error.HTTPError as e:
+        if e.code in (401, 403):
+            return {"status": "unauthorized", "models": [], "http": e.code}
+        return {"status": "unreachable", "models": [], "http": e.code}
+    except Exception:
+        return {"status": "unreachable", "models": [], "http": None}
+
 
 def llm_complete(system, user, max_tokens=4000, provider="", model=""):
     """Appelle le moteur IA GB10 (serveur vLLM ONE ID, API OpenAI-compatible).
@@ -68,26 +153,62 @@ def llm_complete(system, user, max_tokens=4000, provider="", model=""):
         éventuel — champ reasoning_content — est ignoré).
 
     Raises:
-        HTTPException 400 si GB10_API_KEY absente ; 502 sur erreur de l'API GB10.
+        HTTPException 400 si aucune clé configurée ; 502 sur erreur de l'API GB10.
     """
-    if not GB10_API_KEY:
-        raise HTTPException(400, "GB10_API_KEY non configurée (voir fichier .env).")
+    cfg = active_llm()
+    if not cfg["api_key"]:
+        raise HTTPException(400, "Clé API LLM non configurée (voir ⚙ Paramètres LLM ou fichier .env).")
     import urllib.request, urllib.error
-    body = json.dumps({
-        "model": model or GB10_MODEL, "max_tokens": max_tokens,
+    payload = {
+        "model": model or cfg["model"], "max_tokens": max_tokens,
+        # Streaming SSE : indispensable pour tenir les longues générations sur GB10.
+        # Bifrost coupe une requête non-stream à 300 s d'attente ; en stream la connexion
+        # reçoit des chunks régulièrement et n'est jamais idle.
+        "stream": True,
         "messages": [{"role": "system", "content": system}, {"role": "user", "content": user}],
-    }).encode("utf-8")
+    }
+    # reasoning_effort n'est envoyé qu'aux modèles "thinking" / "reasoning" (Qwen3-Thinking,
+    # gpt-oss, o1…). Sur un modèle instruct classique (qwen3-coder-30b), Bifrost peut le refuser
+    # ou l'ignorer silencieusement — préfère ne pas l'envoyer pour éviter tout effet de bord.
+    mdl = (model or cfg["model"]).lower()
+    if any(k in mdl for k in ("thinking", "reasoning", "flash-next", "gpt-oss", "qwen3.5", "qwen3.8")):
+        payload["reasoning_effort"] = os.environ.get("LLM_REASONING_EFFORT", "medium")
+    body = json.dumps(payload).encode("utf-8")
     req = urllib.request.Request(
-        GB10_BASE.rstrip("/") + "/chat/completions", data=body,
-        headers={"Authorization": "Bearer " + GB10_API_KEY,
+        cfg["base_url"] + "/chat/completions", data=body,
+        headers={"Authorization": "Bearer " + cfg["api_key"],
                  "Content-Type": "application/json",
-                 "Accept": "application/json"})
+                 "Accept": "text/event-stream"})
+    # Timeout 900s : buffer de sécurité, mais le stream envoie des chunks bien avant.
     try:
-        with urllib.request.urlopen(req, timeout=300) as resp:
-            d = json.loads(resp.read().decode("utf-8"))
-        # Modèles "reasoning" (Qwen3 etc.) : ne garder que le contenu final,
-        # pas le raisonnement intermédiaire (champ reasoning_content séparé).
-        return d["choices"][0]["message"]["content"] or ""
+        parts = []
+        with urllib.request.urlopen(req, timeout=900) as resp:
+            # Lecture SSE : chaque event = "data: {json}\n\n". "data: [DONE]" clôt le flux.
+            buf = b""
+            while True:
+                chunk = resp.read(4096)
+                if not chunk:
+                    break
+                buf += chunk
+                while b"\n\n" in buf:
+                    event, buf = buf.split(b"\n\n", 1)
+                    for line in event.split(b"\n"):
+                        if not line.startswith(b"data:"):
+                            continue
+                        data = line[5:].strip()
+                        if not data or data == b"[DONE]":
+                            continue
+                        try:
+                            j = json.loads(data.decode("utf-8"))
+                        except Exception:
+                            continue
+                        ch = (j.get("choices") or [{}])[0]
+                        delta = ch.get("delta") or {}
+                        # Certains modèles envoient reasoning en delta séparé — on l'ignore.
+                        piece = delta.get("content") or ""
+                        if piece:
+                            parts.append(piece)
+        return "".join(parts)
     except urllib.error.HTTPError as e:
         try:
             detail = e.read().decode("utf-8", "replace")[:500]
@@ -102,7 +223,7 @@ def llm_complete(system, user, max_tokens=4000, provider="", model=""):
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 FICHES_DIR.mkdir(parents=True, exist_ok=True)
 
-APP_VERSION = "2.3"
+APP_VERSION = "2.5"
 
 
 def _archive_frontend():
@@ -157,8 +278,98 @@ def index(request: Request):
 
 @app.get("/api/health")
 def health():
-    return {"ok": True, "model": GB10_MODEL, "api_key_set": bool(GB10_API_KEY),
+    cfg = active_llm()
+    return {"ok": True, "model": cfg["model"], "api_key_set": bool(cfg["api_key"]),
+            "base_url": cfg["base_url"], "source": cfg["source"],
             "doc_base": DOC_BASE, "out_dir": str(OUT_DIR)}
+
+
+# ---------------------------------------------------------------- Paramètres LLM (UI)
+def _mask_key(k: str) -> str:
+    if not k:
+        return ""
+    if len(k) <= 8:
+        return "*" * len(k)
+    return k[:4] + "…" + k[-4:]
+
+
+@app.get("/api/settings/llm")
+def get_llm_settings():
+    """Retourne la config LLM active (SANS la clé en clair, uniquement masquée).
+
+    Effets de bord : lecture SETTINGS_FILE.
+    """
+    cfg = active_llm()
+    return {"base_url": cfg["base_url"], "model": cfg["model"],
+            "api_key_masked": _mask_key(cfg["api_key"]),
+            "source": cfg["source"],
+            "updated_at": cfg.get("updated_at"),
+            "updated_by": cfg.get("updated_by")}
+
+
+@app.put("/api/settings/llm")
+def put_llm_settings(payload: dict):
+    """Enregistre base_url + model + api_key. Si api_key vide, conserve la clé actuelle.
+
+    Effets de bord : lecture/écriture SETTINGS_FILE, appel réseau vers base_url.
+    Raises: 400 (base_url ou model manquant, ou clé refusée), 502 (LLM injoignable).
+    """
+    base_url = _normalize_base((payload or {}).get("base_url", ""))
+    model = ((payload or {}).get("model") or "").strip()
+    api_key = ((payload or {}).get("api_key") or "").strip()
+    if not base_url or not model:
+        raise HTTPException(400, "base_url et model sont requis.")
+    # Clé vide → on garde celle déjà enregistrée (fichier > env). Permet de changer juste le modèle.
+    if not api_key:
+        current = active_llm()
+        api_key = current["api_key"]
+        if not api_key:
+            raise HTTPException(400, "Aucune clé actuellement enregistrée : saisissez-en une.")
+    probe = _probe_llm(base_url, api_key)
+    if probe["status"] == "unauthorized":
+        raise HTTPException(400, "Clé API refusée par le serveur LLM.")
+    # On tolère unreachable (on enregistre quand même mais on signale).
+    data = {"base_url": base_url, "model": model, "api_key": api_key,
+            "updated_at": datetime.datetime.now().timestamp(),
+            "updated_by": (payload or {}).get("updated_by") or ""}
+    save_llm_settings(data)
+    if probe["status"] == "ok":
+        return {"ok": True, "nb_modeles_listes": len(probe["models"]), "probe": "ok"}
+    # unreachable
+    return JSONResponse(status_code=502,
+                        content={"ok": False, "detail": {"probe": "failed_saved_anyway"}})
+
+
+@app.post("/api/settings/llm/probe")
+def probe_llm_settings(payload: dict):
+    """Sonde une base_url + api_key sans rien persister.
+
+    Effets de bord : appel réseau vers base_url. Raises: 422 si champs manquants.
+    """
+    base_url = _normalize_base((payload or {}).get("base_url", ""))
+    api_key = ((payload or {}).get("api_key") or "").strip()
+    if not base_url or not api_key:
+        raise HTTPException(422, "base_url et api_key sont requis.")
+    p = _probe_llm(base_url, api_key)
+    return {"status": p["status"], "nb_modeles": len(p["models"]), "models": p["models"]}
+
+
+@app.get("/api/settings/llm/models")
+def list_llm_models(probe_url: str = ""):
+    """Liste les modèles exposés par le LLM avec la clé enregistrée.
+
+    Effets de bord : lecture SETTINGS_FILE, appel réseau. Raises: 400 (pas de clé), 502.
+    """
+    cfg = active_llm()
+    if not cfg["api_key"]:
+        raise HTTPException(400, "Aucune clé enregistrée.")
+    base = _normalize_base(probe_url) or cfg["base_url"]
+    p = _probe_llm(base, cfg["api_key"])
+    if p["status"] == "unauthorized":
+        raise HTTPException(400, "Clé enregistrée refusée par le LLM.")
+    if p["status"] != "ok":
+        raise HTTPException(502, "Serveur LLM injoignable.")
+    return {"models": p["models"]}
 
 
 # ---------------------------------------------------------------- Extraction texte
@@ -331,12 +542,14 @@ async def analyse_cctp(file: UploadFile = File(None), text: str = Form(None), so
     if not cctp:
         raise HTTPException(400, "CCTP vide : fournissez un fichier (PDF/Word/TXT) ou du texte.")
     sol_summary = summarize_solution(solution)
-    user = "TEXTE DU CCTP :\n\n" + cctp[:120000]
+    # Bifrost gateway coupe à 300 s. Sur qwen3-coder-30b, ~60 K chars d'entrée + 4 K tokens
+    # de sortie tiennent dans le budget. Au-delà, l'utilisateur peut coller le CCTP par tranches.
+    user = "TEXTE DU CCTP :\n\n" + cctp[:60000]
     if sol_summary:
-        user += "\n\nSOLUTION ACTUELLEMENT CONFIGURÉE :\n" + sol_summary[:20000]
+        user += "\n\nSOLUTION ACTUELLEMENT CONFIGURÉE :\n" + sol_summary[:15000]
     else:
         user += "\n\n(Aucune solution configurée pour le moment : marque les exigences en 'a_preciser'.)"
-    raw = await run_in_threadpool(llm_complete, sysp(CCTP_PROMPT), user, 8000, provider, model)
+    raw = await run_in_threadpool(llm_complete, sysp(CCTP_PROMPT), user, 4000, provider, model)
     p = parse_cctp(raw)
     contexte, points = p["contexte"], p["points"]
     clarifications, verification = p["clarifications"], p["verification"]
