@@ -57,15 +57,16 @@ Arrêt : `docker compose down`.
 
 ---
 
-## Utilisation — l'assistant en 7 étapes
+## Utilisation — l'assistant en 8 étapes
 
 1. **CCTP & contexte** — déposer le CCTP (PDF/Word/TXT) ; l'IA en extrait le contexte et les points d'attention.
 2. **Récap CCTP & focus technique** — trois tableaux générés par l'IA juste après l'analyse, puis modifiables : *Matrice de couverture technique*, *Plan de prise en charge recommandé*, *Ressources minimales à proposer*. Statuts : À confirmer / À préparer / À qualifier / Validé (seul l'humain peut mettre « Validé »). Repris dans le Word, en page paysage.
-3. **Équipements** — importer l'export Excel Dell (Solutions Configurator) et compléter à la main (firewall, switch, wifi…).
-4. **Fonctionnalité** — PRA/PCA (RTO/RPO, cible, méthode) et sauvegarde (Veeam/PPDM, baie SAN / Data Domain, réplication Cloud), avec argumentaires par cas.
-5. **Structure du dossier & prestations (Kanban)** — regrouper les points d'attention en chapitres (proposition automatique par l'IA), décrire chaque chapitre (argumentaire, complément, durée).
-6. **Planning** — diagramme de Gantt (dérivable des chapitres) ; couleurs par type (tâche / réception matériel / télétravail / congé).
-7. **Documents & historique** — générer le **mémoire technique Word**, le **chiffrage Excel**, remplir le **cadre de mémoire technique** du client (IA), **vérifier la conformité** au CCTP, puis **enregistrer le dossier** dans l'historique.
+3. **Focus administratif** — déposer les documents administratifs du DCE (RC, CCAP, AE, BPU/DPGF) ; l'IA produit la *Checklist de remise*, les *Points contractuels et financiers* et les *Questions à déposer sur PLACE* avec la date limite lue dans les documents. Tout reste modifiable ; repris dans le Word.
+4. **Équipements** — importer l'export Excel Dell (Solutions Configurator) et compléter à la main (firewall, switch, wifi…).
+5. **Fonctionnalité** — PRA/PCA (RTO/RPO, cible, méthode) et sauvegarde (Veeam/PPDM, baie SAN / Data Domain, réplication Cloud), avec argumentaires par cas.
+6. **Structure du dossier & prestations (Kanban)** — regrouper les points d'attention en chapitres (proposition automatique par l'IA), décrire chaque chapitre (argumentaire, complément, durée).
+7. **Planning** — diagramme de Gantt (dérivable des chapitres) ; couleurs par type (tâche / réception matériel / télétravail / congé).
+8. **Documents & historique** — générer le **mémoire technique Word**, le **chiffrage Excel**, remplir le **cadre de mémoire technique** du client (IA), **vérifier la conformité** au CCTP, puis **enregistrer le dossier** dans l'historique.
 
 Le choix du **moteur IA** (Claude ou Mammouth) se fait dans la barre du bas et s'applique à tous les boutons IA.
 

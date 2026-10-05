@@ -72,6 +72,12 @@ réponse IA. Il est importé par `main.py` (`/api/recap-cctp`) et par
 ni d'E/S. Les colonnes sont recopiées en dur dans `index.html` (`RECAP_TABLES`) ; un test
 vérifie qu'elles restent identiques des deux côtés.
 
+### `app/recap_admin.py` — focus administratif et contractuel (module pur)
+Il a la même structure que `recap_cctp.py`, dont il réutilise les fonctions de cellule et de
+statut : `TABLES` (checklist, contractuel, questions), `NIVEAUX`, `WIDE_COLS`, prompt
+système, assemblage des documents (`build_user_message`) et normalisation. Il est importé par
+`main.py` (`/api/recap-admin`) et par `engine/generer_doc.py`.
+
 ### `app/engine/parser_dell_excel.py` — parseur Excel Dell
 Script exécuté en sous-processus, transforme un export Dell Solutions Configurator
 (.xlsx) en JSON classé par catégorie (serveurs/stockages/switches/sauvegardes/logiciels)
@@ -108,6 +114,10 @@ bibliothèques XML restent servies par AO-ID (`GET /drawio-libs/{name}`).
    + clarifications + résumé de la solution) → 3 tableaux affichés dans l'onglet 2, modifiables,
    stockés dans `affaire.recap_cctp` de la fiche, puis rendus dans le Word par
    `section_recap_cctp` (section paysage, après le planning).
+1ter. Onglet 3 : l'utilisateur dépose les documents administratifs → `POST /api/admin-docs/extract`
+   (texte renvoyé et stocké dans `affaire.admin_docs`) → bouton « Générer » → `POST /api/recap-admin`
+   → tableaux modifiables stockés dans `affaire.recap_admin`, puis rendus par `section_recap_admin`
+   (même section paysage que le récap technique).
 2. L'utilisateur importe un export Dell (.xlsx) → `POST /api/import-excel` → sous-processus
    `parser_dell_excel.py` → JSON classé renvoyé au frontend.
 3. Le frontend accumule un objet JSON unique ("spec") en mémoire navigateur au fil des 7

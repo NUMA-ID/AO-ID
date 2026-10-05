@@ -11,6 +11,7 @@ from fastapi.responses import HTMLResponse, JSONResponse, FileResponse
 from starlette.concurrency import run_in_threadpool
 from drawio_url import resolve_drawio_base
 import recap_cctp as recap_mod
+import recap_admin as admin_mod
 
 HERE = Path(__file__).resolve().parent
 ENGINE = HERE / "engine"
@@ -374,12 +375,10 @@ def list_llm_models(probe_url: str = ""):
 
 
 # ---------------------------------------------------------------- Extraction texte
-def extract_docx_text(path) -> str:
-    """Extrait le texte (paragraphes + tableaux) d'un .docx généré, pour la comparaison CCTP."""
-    import docx
-    d = docx.Document(str(path))
-    out = [p.text.strip() for p in d.paragraphs if p.text.strip()]
-    for t in d.tables:
+def _docx_to_text(doc) -> str:
+    """Paragraphes puis tableaux d'un document python-docx (cellules séparées par « | »)."""
+    out = [p.text.strip() for p in doc.paragraphs if p.text.strip()]
+    for t in doc.tables:
         for row in t.rows:
             cells = [c.text.strip() for c in row.cells]
             if any(cells):
@@ -387,14 +386,54 @@ def extract_docx_text(path) -> str:
     return "\n".join(out)
 
 
+def extract_docx_text(path) -> str:
+    """Extrait le texte (paragraphes + tableaux) d'un .docx généré, pour la comparaison CCTP."""
+    import docx
+    return _docx_to_text(docx.Document(str(path)))
+
+
+def extract_xlsx_text(data: bytes) -> str:
+    """Extrait le texte d'un classeur .xlsx/.xlsm : une section par feuille, une ligne par rangée.
+
+    Valeurs calculées (``data_only=True`` : résultat des formules tel qu'enregistré par Excel),
+    cellules vides ignorées, cellules d'une rangée séparées par « | ».
+    Effets de bord : aucun (lecture en mémoire).
+    """
+    import io
+    import openpyxl
+    wb = openpyxl.load_workbook(io.BytesIO(data), read_only=True, data_only=True)
+    out: list[str] = []
+    try:
+        for ws in wb.worksheets:
+            rows = []
+            for row in ws.iter_rows(values_only=True):
+                cells = [str(v).strip() for v in row if v is not None and str(v).strip()]
+                if cells:
+                    rows.append(" | ".join(cells))
+            if rows:
+                out.append("### Feuille : %s\n%s" % (ws.title, "\n".join(rows)))
+    finally:
+        wb.close()
+    return "\n\n".join(out)
+
+
 def extract_text(filename: str, data: bytes) -> str:
+    """Extrait le texte d'un document déposé (.txt, .docx, .pdf, .xlsx/.xlsm ; sinon décodage UTF-8).
+
+    Le .docx inclut désormais ses tableaux (AE, annexes financières…).
+    Raises:
+        ValueError: format .xls (Excel 97-2003) non pris en charge.
+    """
     name = (filename or "").lower()
     if name.endswith(".txt"):
         return data.decode("utf-8", errors="replace")
     if name.endswith(".docx"):
         import docx, io
-        d = docx.Document(io.BytesIO(data))
-        return "\n".join(p.text for p in d.paragraphs)
+        return _docx_to_text(docx.Document(io.BytesIO(data)))
+    if name.endswith((".xlsx", ".xlsm")):
+        return extract_xlsx_text(data)
+    if name.endswith(".xls"):
+        raise ValueError("format .xls non pris en charge : enregistrez le classeur en .xlsx")
     if name.endswith(".pdf"):
         import pdfplumber, io
         out = []
@@ -582,6 +621,63 @@ async def recap_cctp(payload: dict):
                                   payload.get("provider"), payload.get("model"))
     rec = recap_mod.parse_recap(raw)
     return {**rec, "raw": "" if rec["ok"] else (raw or "")[:4000]}
+
+
+# ---------------------------------------------------------------- Focus administratif et contractuel (étape 3)
+ADMIN_DOC_MAX = 150000   # caractères conservés par document administratif (renvoyés au front, stockés en fiche)
+ADMIN_DOC_EXT = (".pdf", ".docx", ".txt", ".xlsx", ".xlsm")
+
+
+@app.post("/api/admin-docs/extract")
+async def admin_docs_extract(files: list[UploadFile] = File(...)):
+    """Extrait le texte des documents administratifs du DCE (RC, CCAP, AE, BPU/DPGF…).
+
+    Entrée : multipart, un ou plusieurs fichiers PDF / DOCX / TXT / XLSX / XLSM (champ ``files``).
+    Sortie : ``{docs: [{name, text, chars, truncated}], budget}``. Le texte est tronqué à
+    ``ADMIN_DOC_MAX`` caractères ; ``chars`` est la longueur avant troncature ; ``budget`` =
+    caractères analysés au total par /api/recap-admin (``recap_admin.MAX_INPUT``).
+    Erreurs : 400 si un format n'est pas pris en charge (.doc, .xls, autre) ou si aucun texte
+    n'est extrait.
+    Effets de bord : aucun (traitement en mémoire, rien n'est écrit sur disque).
+    """
+    out = []
+    for f in files:
+        name = Path(f.filename or "document").name
+        if not name.lower().endswith(ADMIN_DOC_EXT):
+            raise HTTPException(400, "« %s » : format non pris en charge (acceptés : PDF, DOCX, TXT, XLSX). "
+                                     "Enregistrez les .doc en .docx et les .xls en .xlsx." % name)
+        try:
+            text = (extract_text(name, await f.read()) or "").strip()
+        except Exception as e:
+            raise HTTPException(400, "« %s » : lecture impossible (%s)." % (name, e))
+        out.append({"name": name, "text": text[:ADMIN_DOC_MAX], "chars": len(text),
+                    "truncated": len(text) > ADMIN_DOC_MAX})
+    if not any(d["text"] for d in out):
+        raise HTTPException(400, "Aucun texte lisible dans les documents fournis (PDF scanné ?).")
+    return {"docs": out, "budget": admin_mod.MAX_INPUT}
+
+
+@app.post("/api/recap-admin")
+async def recap_admin(payload: dict):
+    """Génère le focus administratif et contractuel (checklist, points contractuels, questions PLACE).
+
+    Entrée JSON : docs ([{name, text}], documents administratifs déjà extraits), cctp_text (str,
+    optionnel, ajouté en contexte), provider/model (optionnels). Au moins des docs ou un CCTP.
+    Sortie : ``{reference_marche, date_limite_questions, date_limite_offres, checklist,
+    contractuel, questions, ok, raw}``.
+    Erreurs : 400 si ni document ni CCTP ; 400/502 remontées par llm_complete.
+    Effet de bord : un appel réseau au LLM (aucune écriture disque).
+    """
+    docs = [(str(d.get("name") or "document"), str(d.get("text") or ""))
+            for d in (payload.get("docs") or []) if isinstance(d, dict)]
+    cctp = (payload.get("cctp_text") or "").strip()
+    if not any(t.strip() for _, t in docs) and not cctp:
+        raise HTTPException(400, "Chargez d'abord les documents administratifs (RC, CCAP, AE…) ou analysez le CCTP.")
+    user = admin_mod.build_user_message(docs, cctp)
+    raw = await run_in_threadpool(llm_complete, sysp(admin_mod.RECAP_ADMIN_PROMPT), user, 6000,
+                                  payload.get("provider") or "", payload.get("model") or "")
+    res = admin_mod.parse_admin(raw)
+    return {**res, "raw": "" if res["ok"] else (raw or "")[:4000]}
 
 
 # ---------------------------------------------------------------- Import Excel Dell

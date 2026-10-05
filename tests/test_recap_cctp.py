@@ -142,6 +142,7 @@ class WordExportTests(unittest.TestCase):
             "ressources": [{"role": "Chef de projet", "go_nogo": "Go", "statut": "a_confirmer"}]}}}
         n_sections = len(doc.sections)
         gd.section_recap_cctp(doc, spec)
+        gd._landscape_close(doc)
         self.assertEqual(len(doc.tables), 3)
         self.assertEqual([c.text for c in doc.tables[0].rows[0].cells],
                          [lbl for _, lbl in rc.TABLES["matrice"]["colonnes"]])

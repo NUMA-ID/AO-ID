@@ -969,8 +969,30 @@ def _set_orientation(section, landscape):
     section.orientation = WD_ORIENT.LANDSCAPE if landscape else WD_ORIENT.PORTRAIT
 
 
+def _landscape_open(doc):
+    """Ouvre (ou poursuit) une section paysage ; renvoie la section courante.
+
+    Si la dernière section est déjà en paysage (récap technique juste avant), on enchaîne sur
+    une nouvelle page sans recréer de section : évite une page portrait vide entre deux focus.
+    """
+    last = doc.sections[-1]
+    if last.page_width > last.page_height:
+        doc.add_page_break()
+        return last
+    sec = doc.add_section(WD_SECTION.NEW_PAGE); _set_orientation(sec, True)
+    return sec
+
+
+def _landscape_close(doc):
+    """Revient en portrait si la dernière section est en paysage (à appeler après les focus)."""
+    last = doc.sections[-1]
+    if last.page_width > last.page_height:
+        sec = doc.add_section(WD_SECTION.NEW_PAGE); _set_orientation(sec, False)
+
+
 def section_recap_cctp(doc, spec):
-    """Récapitulatif du CCTP — Focus technique : 3 tableaux (matrice, plan, ressources) en page paysage.
+    """Récapitulatif du CCTP — Focus technique : 3 tableaux (matrice, plan, ressources) en page paysage
+    (retour en portrait : _landscape_close, appelé par main()).
 
     Lit spec["affaire"]["recap_cctp"] (normalisé par recap_cctp.normalize_recap, statut « Validé »
     autorisé car saisi par l'humain). N'écrit rien si les 3 tableaux sont vides.
@@ -980,7 +1002,7 @@ def section_recap_cctp(doc, spec):
     rec = rc.normalize_recap((spec.get("affaire") or {}).get("recap_cctp"), allow_valide=True)
     if not any(rec[k] for k in rc.TABLES):
         return
-    sec = doc.add_section(WD_SECTION.NEW_PAGE); _set_orientation(sec, True)
+    sec = _landscape_open(doc)
     h = add_heading(doc, "Récapitulatif du CCTP — Focus technique", 1)
     h.paragraph_format.page_break_before = False     # la nouvelle section crée déjà la page
     add_para(doc, "Synthèse des exigences du CCTP et du dispositif de réponse proposé. Les statuts "
@@ -1015,7 +1037,80 @@ def section_recap_cctp(doc, spec):
         tot = sum(weights)
         _set_widths(t, [int(usable * w / tot) for w in weights])
         add_para(doc, "")
-    sec2 = doc.add_section(WD_SECTION.NEW_PAGE); _set_orientation(sec2, False)
+
+
+ADMIN_NAVY = "1F3B63"     # bandeau de titre (charte des tableaux « Focus administratif »)
+ADMIN_TEAL = "0F6A75"     # ligne d'en-têtes
+ADMIN_SKY = "DCEAF5"      # bandeau « Objectif »
+
+
+def _merge_row(table, row_idx):
+    """Fusionne toutes les cellules d'une ligne et renvoie la cellule fusionnée."""
+    cells = table.rows[row_idx].cells
+    return cells[0].merge(cells[-1])
+
+
+def section_recap_admin(doc, spec):
+    """Focus administratif et contractuel : bandeau + objectif + 3 tableaux, en page paysage
+    (enchaîne sur la section paysage du récap technique s'il précède).
+
+    Lit spec["affaire"]["recap_admin"] (normalisé par recap_admin.normalize_admin, « Validé »
+    autorisé). Titre suffixé de la référence du marché ; titre du 3e tableau suffixé de la date
+    limite des questions PLACE. Statuts non validés et dates « à préciser » en rouge.
+    N'écrit rien si les 3 tableaux sont vides.
+    """
+    import recap_admin as ra
+    rec = ra.normalize_admin((spec.get("affaire") or {}).get("recap_admin"), allow_valide=True)
+    if not any(rec[k] for k in ra.TABLES):
+        return
+    sec = _landscape_open(doc)
+    ref = rec["reference_marche"]
+    titre = ra.TITRE + ("" if ref == ra.A_PRECISER else " – " + ref)
+    h = add_heading(doc, titre, 1)
+    h.paragraph_format.page_break_before = False
+    usable = sec.page_width - sec.left_margin - sec.right_margin
+    # Bandeau Objectif (tableau 1 cellule, fond bleu clair)
+    bt = doc.add_table(rows=1, cols=1)
+    _gcell(bt.rows[0].cells[0], ra.OBJECTIF, 9); _shade(bt.rows[0].cells[0], ADMIN_SKY)
+    _set_widths(bt, [usable])
+    if rec["date_limite_offres"] != ra.A_PRECISER:
+        add_para(doc, "Date limite de remise des offres : " + rec["date_limite_offres"], bold=True, size=9)
+    add_para(doc, "")
+    for key, tspec in ra.TABLES.items():
+        rows = rec[key]
+        if not rows:
+            continue
+        cols = tspec["colonnes"]
+        ttl = tspec["titre"]
+        if key == "questions":
+            ttl += " " + ra.date_courte(rec["date_limite_questions"])
+        t = doc.add_table(rows=2, cols=len(cols))
+        try:
+            t.style = doc.styles["Table Grid"]
+        except KeyError:
+            pass
+        tc = _merge_row(t, 0)
+        _gcell(tc, ttl, 9, True, "ffffff"); _shade(tc, ADMIN_NAVY)
+        if key == "questions" and rec["date_limite_questions"] == ra.A_PRECISER:
+            tc.paragraphs[0].runs[0].font.color.rgb = RGBColor.from_string("FFC7CE")
+        for i, (_, lbl) in enumerate(cols):
+            c = t.rows[1].cells[i]; _gcell(c, lbl, 8, True, "ffffff"); _shade(c, ADMIN_TEAL)
+        for row in rows:
+            cells = t.add_row().cells
+            for i, (ck, _) in enumerate(cols):
+                v = row.get(ck, "")
+                if ck == "statut":
+                    _gcell(cells[i], ra.statut_label(v), 8, True,
+                           None if v == "valide" else "C00000", center=True)
+                elif ck in ra.NIVEAU_COLS or ck == "num":
+                    _gcell(cells[i], v, 8, ck != "num", None, center=True)
+                else:
+                    _gcell(cells[i], v, 8)
+        weights = [0.5 if ck in ("num",) else 0.75 if ck in ra.NIVEAU_COLS + ("statut",)
+                   else 1.6 if ck in ra.WIDE_COLS else 1.0 for ck, _ in cols]
+        tot = sum(weights)
+        _set_widths(t, [int(usable * w / tot) for w in weights])
+        add_para(doc, "")
 
 
 def patch_cover(path, aff):
@@ -1140,6 +1235,8 @@ def main():
     section_prestations(doc, spec)
     section_planning(doc, spec)
     section_recap_cctp(doc, spec)
+    section_recap_admin(doc, spec)
+    _landscape_close(doc)
     composer = _append_admin(doc)        # chapitres administratifs figés, à la fin
     section_verification(doc, spec)
     (composer or doc).save(out_path)

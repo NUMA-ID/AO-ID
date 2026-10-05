@@ -75,6 +75,23 @@ propagés par `llm_complete` si clé API manquante ou erreur amont.
 **Erreurs possibles** : `400` si `cctp_text` est vide ; `400`/`502` propagés par `llm_complete`.
 **Effets de bord** : un appel réseau sortant vers GB10 (`max_tokens` 6000). Aucune écriture disque.
 
+## `POST /api/admin-docs/extract`
+**Rôle** : extrait le texte des documents administratifs du DCE (RC, CCAP, AE, BPU/DPGF, annexes) pour le focus administratif.
+**Entrées** : multipart, champ `files` répété (un ou plusieurs fichiers PDF, DOCX, TXT, XLSX ou XLSM).
+**Sortie** : JSON `{docs: [{name, text, chars, truncated}], budget}`. `text` est tronqué à `ADMIN_DOC_MAX` = 150 000 caractères ; `chars` donne la longueur avant troncature ; `budget` = nombre de caractères analysés au total par `/api/recap-admin` (`recap_admin.MAX_INPUT`). Un `.docx` est lu avec ses tableaux ; un `.xlsx` est lu feuille par feuille (`### Feuille : <nom>`, une ligne par rangée, cellules séparées par « | », valeurs calculées).
+**Erreurs possibles** : `400` si le format n'est pas pris en charge (`.doc`, `.xls` ou autre extension), si la lecture échoue ou si aucun texte n'est extrait (par exemple un PDF scanné).
+**Effets de bord** : aucun, tout se fait en mémoire.
+
+## `POST /api/recap-admin`
+**Rôle** : génère le « Focus administratif et contractuel » : métadonnées (référence du marché, date limite des questions PLACE, date limite des offres) et trois tableaux (checklist de remise, points contractuels et financiers, questions à déposer sur PLACE).
+**Entrées** : JSON
+- `docs: list[{name: str, text: str}]` : documents déjà extraits. Budget total de 240 000 caractères (environ 56 000 tokens, variable d'environnement `RECAP_ADMIN_MAX_CHARS`), réparti à parts égales ; un document court cède sa part inutilisée aux autres.
+- `cctp_text: str` (optionnel, ajouté en contexte, tronqué à 8 000 caractères)
+- `provider: str`, `model: str` (optionnels)
+**Sortie** : JSON `{reference_marche, date_limite_questions, date_limite_offres, checklist, contractuel, questions, ok, raw}`. Colonnes : voir `recap_admin.TABLES`. `statut` ∈ `a_confirmer | a_preparer | a_qualifier`. `criticite`, `niveau` et `priorite` ∈ `Élevée | Moyenne | Faible | À évaluer`. Les questions sont renumérotées `Q1…Qn`. Une valeur introuvable dans les documents vaut « à préciser ».
+**Erreurs possibles** : `400` si aucun document ni CCTP n'est fourni ; `400`/`502` propagés par `llm_complete`.
+**Effets de bord** : un appel réseau sortant vers GB10 (`max_tokens` 6000). Aucune écriture disque.
+
 ## `POST /api/import-excel`
 **Rôle** : convertit un export Dell Solutions Configurator OU un devis distributeur
 TD SYNNEX (.xlsx) en fiche JSON classée par catégorie d'équipement (auto-détection du
@@ -261,7 +278,9 @@ en PROD les libs restent servies par AO-ID sur le même origin HTTPS).
 |---|---|---|---|
 | `llm_complete(system, user, max_tokens, provider, model)` | main.py | Point d'entrée unique vers GB10 (timeout HTTP 300s) | Appel réseau sortant |
 | `resolve_drawio_base(override, scheme, hostname, port)` | drawio_url.py | URL publique de draw.io (:8081 local, /drawio en prod HTTPS) | Aucun |
-| `extract_text(filename, data)` | main.py | Extraction de texte depuis .txt/.docx/.pdf | Aucun (traitement en mémoire) |
+| `extract_text(filename, data)` | main.py | Extraction de texte depuis .txt / .docx (paragraphes **et tableaux** depuis le 2026-10-05) / .pdf / .xlsx-.xlsm ; `.xls` → `ValueError` ; autre extension → décodage UTF-8 | Aucun (traitement en mémoire) |
+| `extract_xlsx_text(data)` | main.py | Classeur Excel → texte, une section par feuille, une ligne par rangée (openpyxl, `data_only=True`) | Aucun |
+| `_docx_to_text(doc)` | main.py | Paragraphes puis tableaux d'un document python-docx (partagé par `extract_text` et `extract_docx_text`) | Aucun |
 | `extract_docx_text(path)` | main.py | Extraction texte + tableaux d'un .docx généré | Lecture disque |
 | `parse_cctp(raw)` | main.py | Parsing tolérant du JSON renvoyé par l'IA (fallback regex si JSON malformé) | Aucun |
 | `summarize_solution(sol)` | main.py | Résumé textuel de la solution configurée (pour comparaison CCTP) | Aucun |
@@ -275,3 +294,11 @@ en PROD les libs restent servies par AO-ID sur le même origin HTTPS).
 | `recap_cctp.build_user_message(cctp, points, clarifications, solution_summary)` | recap_cctp.py | Message utilisateur envoyé au LLM pour le récapitulatif | Aucun |
 | `section_recap_cctp(doc, spec)` | app/engine/generer_doc.py | Rend `affaire.recap_cctp` en 3 tableaux dans une section paysage (puis repasse en portrait) ; statuts non validés en rouge ; rien si les tableaux sont vides | Aucun (modifie le document en mémoire) |
 | `_set_orientation(section, landscape)` | app/engine/generer_doc.py | Passe une section Word en paysage ou en portrait | Aucun |
+| `_landscape_open(doc)` / `_landscape_close(doc)` | app/engine/generer_doc.py | Ouvre une section paysage, ou continue celle qui est en cours (les deux focus partagent la même section, sans page vide entre eux), puis revient en portrait | Aucun |
+| `section_recap_admin(doc, spec)` | app/engine/generer_doc.py | Rend `affaire.recap_admin` : titre « Focus administratif et contractuel – <réf.> », bandeau Objectif, 3 tableaux (bandeau marine, en-têtes bleu-vert), titre des questions suivi de la date limite PLACE ; statuts non validés en rouge ; rien si les tableaux sont vides | Aucun (modifie le document en mémoire) |
+| `recap_admin.parse_admin(raw)` | recap_admin.py | Décode la réponse IA du focus administratif → résultat normalisé + `ok` | Aucun |
+| `recap_admin.normalize_admin(data, allow_valide=False)` | recap_admin.py | Métadonnées non vides, 3 tableaux complets, statuts et niveaux autorisés, questions renumérotées, ≤ 30 lignes par tableau | Aucun |
+| `recap_admin.normalize_niveau(v)` | recap_admin.py | Valeur libre → `Élevée` / `Moyenne` / `Faible` / `À évaluer` | Aucun |
+| `recap_admin.build_user_message(docs, cctp)` | recap_admin.py | Assemble les documents sous des en-têtes `===== DOCUMENT : <nom> =====` (budget réparti, ordre conservé), plus un extrait du CCTP | Aucun |
+| `recap_admin.statut_label(key)` | recap_admin.py | Clé de statut → libellé affiché | Aucun |
+| `recap_admin.date_courte(v)` | recap_admin.py | Extrait « jj/mm/aaaa [à hh h mm] » d'une date commentée, pour les titres ; sinon la valeur est renvoyée telle quelle (miroir JS : `adminDateCourte`) | Aucun |

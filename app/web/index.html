@@ -87,6 +87,13 @@
   .ptab.rtab td{vertical-align:top}
   .rtab textarea{width:100%;box-sizing:border-box;font-size:12.5px;line-height:1.45;min-height:150px;resize:vertical;overflow:hidden;border:1px solid var(--line);border-radius:6px;padding:7px}
   .ptab.rtab td.rs select{width:100%;font-size:11.5px;padding:5px 2px}
+  /* Focus administratif : charte des tableaux Excel fournis (bandeau marine, en-têtes bleu-vert) */
+  .abar{background:#1f3b63;color:#fff;font-weight:700;padding:8px 12px;border-radius:10px 10px 0 0;font-size:13.5px}
+  .aobj{background:#dceaf5;padding:8px 12px;border:1px solid #c5d9ea;border-radius:0 0 10px 10px;font-size:13px}
+  .ptab.rtab.atab{border-radius:0 0 10px 10px}
+  .ptab.rtab.atab th{background:#0f6a75}
+  .ameta{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px;margin-top:10px}
+  .adocs .adoc{display:flex;align-items:center;gap:8px;padding:5px 8px;border:1px solid var(--line);border-radius:8px;margin-top:6px;background:#fafcfe;font-size:12.5px}
   @media(max-width:760px){.layout{flex-direction:column}.sidebar{width:auto;flex:none;position:static;min-height:0;border-right:none;border-bottom:1px solid var(--line)}.wrap{padding:18px 16px 90px}}
   .ptab{border-collapse:separate;border-spacing:0;width:100%;font-size:12px;border:1px solid var(--line);border-radius:10px;overflow:hidden}
   .ptab th,.ptab td{border-bottom:1px solid var(--line);border-right:1px solid var(--line);padding:5px 7px;vertical-align:middle}
@@ -285,16 +292,17 @@ async function saveSettings(){
   <div class="tabs">
     <button class="tab active" data-t="cctp" onclick="tab('cctp')">1 · CCTP &amp; contexte</button>
     <button class="tab" data-t="recap" onclick="tab('recap')">2 · Récap CCTP &amp; focus technique</button>
-    <button class="tab" data-t="equip" onclick="tab('equip')">3 · Équipements</button>
-    <button class="tab" data-t="fonc" onclick="tab('fonc')">4 · Fonctionnalité</button>
-    <button class="tab" data-t="kanban" onclick="tab('kanban')">5 · Structure du dossier &amp; prestations</button>
-    <button class="tab" data-t="plan" onclick="tab('plan')">6 · Planning</button>
-    <button class="tab" data-t="gen" onclick="tab('gen')">7 · Documents &amp; historique</button>
+    <button class="tab" data-t="admin" onclick="tab('admin')">3 · Focus administratif</button>
+    <button class="tab" data-t="equip" onclick="tab('equip')">4 · Équipements</button>
+    <button class="tab" data-t="fonc" onclick="tab('fonc')">5 · Fonctionnalité</button>
+    <button class="tab" data-t="kanban" onclick="tab('kanban')">6 · Structure du dossier &amp; prestations</button>
+    <button class="tab" data-t="plan" onclick="tab('plan')">7 · Planning</button>
+    <button class="tab" data-t="gen" onclick="tab('gen')">8 · Documents &amp; historique</button>
     <button class="tab" data-t="arg" onclick="tab('arg')" style="margin-left:auto">⚙️ Argumentaires</button>
   </div>
   <div style="display:flex;align-items:center;gap:10px;margin:0 0 16px">
-    <div style="flex:1;height:6px;background:var(--line);border-radius:999px;overflow:hidden"><div id="stepBar" style="height:100%;width:14%;background:var(--oneid);transition:width .2s"></div></div>
-    <span id="stepInfo" class="small" style="white-space:nowrap">Étape 1 / 7</span>
+    <div style="flex:1;height:6px;background:var(--line);border-radius:999px;overflow:hidden"><div id="stepBar" style="height:100%;width:12.5%;background:var(--oneid);transition:width .2s"></div></div>
+    <span id="stepInfo" class="small" style="white-space:nowrap">Étape 1 / 8</span>
   </div>
 
   <!-- ===== CCTP ===== -->
@@ -331,6 +339,28 @@ async function saveSettings(){
       <span class="msg" id="recapstatus" style="margin-left:8px"></span>
     </div>
     <div id="recapTables"></div>
+  </div>
+
+  <!-- ===== FOCUS ADMINISTRATIF & CONTRACTUEL ===== -->
+  <div id="p-admin" class="panel">
+    <div class="card">
+      <h2>Documents administratifs du DCE <span class="small">(RC, CCAP, AE, BPU/DPGF, annexes…)</span></h2>
+      <p class="hint">Déposez un ou plusieurs documents (PDF, Word .docx, Excel .xlsx, TXT). Le texte est extrait puis conservé dans la fiche : la régénération ne demande pas de recharger les fichiers. Le CCTP de l'étape 1 est ajouté en contexte. Les PDF scannés (images sans texte) ne sont pas lisibles.</p>
+      <div class="dz" id="admindz">📎 Déposez les documents administratifs ou cliquez<input type="file" id="adminfile" accept=".pdf,.docx,.txt,.xlsx,.xlsm" multiple style="display:none"></div>
+      <div class="adocs" id="adminDocs"></div>
+      <div style="margin-top:10px"><button class="btn btn-primary" id="goAdmin" onclick="genAdmin()" title="(Re)génère les 3 tableaux à partir des documents chargés (et du CCTP). Remplace le contenu actuel.">⚙️ Générer le focus administratif (IA)</button><span class="msg" id="adminstatus" style="margin-left:8px"></span></div>
+    </div>
+    <div class="card" id="adminHead" style="display:none">
+      <div class="abar" id="adminTitle">Focus administratif et contractuel</div>
+      <div class="aobj">Objectif : sécuriser la recevabilité, les engagements contractuels et les conditions économiques avant validation du GO.</div>
+      <div class="ameta">
+        <div><label>Référence du marché</label><input id="adm_ref" oninput="adminMeta('reference_marche',this.value)"></div>
+        <div><label>Date limite des questions (PLACE)</label><input id="adm_dq" oninput="adminMeta('date_limite_questions',this.value)"></div>
+        <div><label>Date limite de remise des offres</label><input id="adm_do" oninput="adminMeta('date_limite_offres',this.value)"></div>
+      </div>
+      <p class="hint" style="margin-top:6px">Valeurs lues dans les documents par l'IA : vérifiez-les (« à préciser » = non trouvée). Statuts : À confirmer · À préparer · À qualifier · Validé (réservé à votre relecture).</p>
+    </div>
+    <div id="adminTables"></div>
   </div>
 
   <!-- ===== ÉQUIPEMENTS ===== -->
@@ -638,9 +668,9 @@ document.addEventListener('DOMContentLoaded', _refreshFooterModels);
 function aiSel(){return {provider:'gb10',model:(($('aiModelGb10')||{}).value||'').trim()};}
 // Empêche le navigateur d'ouvrir le fichier quand on dépose à côté d'une zone
 ['dragenter','dragover','drop'].forEach(ev=>window.addEventListener(ev,e=>{e.preventDefault();},false));
-const STEP_ORDER=['cctp','recap','equip','fonc','kanban','plan','gen'];
+const STEP_ORDER=['cctp','recap','admin','equip','fonc','kanban','plan','gen'];
 function tab(n){document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));const p=$('p-'+n);if(p)p.classList.add('active');const b=document.querySelector('.tab[data-t='+n+']');if(b)b.classList.add('active');
-  if(n==='recap'&&typeof recapFit==='function')recapFit();
+  if((n==='recap'||n==='admin')&&typeof recapFit==='function')recapFit();
   const i=STEP_ORDER.indexOf(n);if(i>=0){const bar=$('stepBar');if(bar)bar.style.width=Math.round((i+1)/STEP_ORDER.length*100)+'%';const inf=$('stepInfo');if(inf)inf.textContent='Étape '+(i+1)+' / '+STEP_ORDER.length;}
   try{window.scrollTo({top:0,behavior:'smooth'});}catch(e){}}
 function stepNav(d){const cur=document.querySelector('.tab.active');const i=cur?STEP_ORDER.indexOf(cur.getAttribute('data-t')):0;const j=Math.min(STEP_ORDER.length-1,Math.max(0,i+d));tab(STEP_ORDER[j]);}
@@ -827,10 +857,10 @@ function renderRecap(){const w=$('recapTables');if(!w)return;w.innerHTML='';
     card.innerHTML=h;w.appendChild(card);});
   recapFit();}
 /* Ajuste la hauteur des cellules au texte (l'onglet doit être visible pour mesurer scrollHeight). */
-function recapFit(){requestAnimationFrame(()=>{document.querySelectorAll('#recapTables textarea').forEach(recapGrow);
+function recapFit(){requestAnimationFrame(()=>{document.querySelectorAll('.rtab textarea').forEach(recapGrow);
   /* même hauteur pour toutes les cellules d'une ligne (lecture en grille) */
-  document.querySelectorAll('#recapTables tbody tr').forEach(tr=>{const tas=[...tr.querySelectorAll('textarea')];const h=Math.max(...tas.map(t=>t.offsetHeight));tas.forEach(t=>t.style.height=h+'px');});});}
-window.addEventListener('resize',()=>{if($('p-recap')&&$('p-recap').classList.contains('active'))recapFit();});
+  document.querySelectorAll('.rtab tbody tr').forEach(tr=>{const tas=[...tr.querySelectorAll('textarea')];const h=Math.max(...tas.map(t=>t.offsetHeight));tas.forEach(t=>t.style.height=h+'px');});});}
+window.addEventListener('resize',()=>{const a=document.querySelector('.panel.active');if(a&&(a.id==='p-recap'||a.id==='p-admin'))recapFit();});
 async function genRecap(auto){
   const cctp=$('cctp_text').value.trim();
   if(!cctp){if(!auto)alert("Aucun CCTP : collez ou analysez d'abord le CCTP dans l'onglet « CCTP & contexte ».");return;}
@@ -847,6 +877,81 @@ async function genRecap(auto){
   }catch(err){$('recapstatus').textContent='Erreur : '+(err.message||err);}
   if(btn)btn.disabled=false;
 }
+/* Focus administratif et contractuel (étape 3). Colonnes = contrat de app/recap_admin.py (TABLES). */
+const ADMIN_TABLES=[
+  {key:'checklist',titre:'Checklist de remise',cols:[['piece','Pièce / exigence'],['attendu_dce','Attendu DCE'],['controle_oneid','Point de contrôle ONEID'],['criticite','Criticité'],['responsable','Responsable'],['echeance','Échéance'],['statut','Statut']]},
+  {key:'contractuel',titre:'Points contractuels et financiers',cols:[['theme','Thème'],['clause','Clause / exigence'],['impact_oneid','Impact ONEID'],['position','Position recommandée'],['niveau','Niveau'],['source','Source'],['statut','Statut']]},
+  {key:'questions',titre:'Questions à déposer sur PLACE avant le',cols:[['num','N°'],['question','Question proposée'],['enjeu','Enjeu'],['priorite','Priorité'],['owner','Owner'],['reponse_attendue','Réponse attendue'],['statut','Statut']]}];
+const ADMIN_WIDE=['attendu_dce','controle_oneid','clause','impact_oneid','position','question','enjeu','reponse_attendue'];
+const ADMIN_NIVEAUX=['Élevée','Moyenne','Faible','À évaluer'];
+const ADMIN_NIV_COLS=['criticite','niveau','priorite'];
+const ADMIN_META=['reference_marche','date_limite_questions','date_limite_offres'];
+let adminRec=null,adminDocs=[];
+let ADMIN_BUDGET=240000;  /* caractères analysés au total par /api/recap-admin (recap_admin.MAX_INPUT) ; mis à jour par /api/admin-docs/extract */
+function adminEmpty(){const o={reference_marche:'à préciser',date_limite_questions:'à préciser',date_limite_offres:'à préciser'};ADMIN_TABLES.forEach(t=>o[t.key]=[]);return o;}
+function adminNorm(r){const o=adminEmpty();if(!r||typeof r!=='object')return o;ADMIN_META.forEach(k=>{if(r[k])o[k]=String(r[k]);});
+  ADMIN_TABLES.forEach(t=>{o[t.key]=Array.isArray(r[t.key])?r[t.key].filter(x=>x&&typeof x==='object').map(x=>{const y={};t.cols.forEach(c=>y[c[0]]=x[c[0]]==null?'':String(x[c[0]]));if(!RECAP_STATUTS.some(s=>s[0]===y.statut))y.statut='a_confirmer';ADMIN_NIV_COLS.forEach(c=>{if(c in y&&!ADMIN_NIVEAUX.includes(y[c]))y[c]='À évaluer';});return y;}):[];});
+  o.questions.forEach((q,i)=>q.num='Q'+(i+1));return o;}
+adminRec=adminEmpty();
+function adminHasRows(){return ADMIN_TABLES.some(t=>adminRec[t.key].length);}
+function adminMeta(k,v){adminRec[k]=v;adminTitles();save();}
+/* « 05/10/2026 à 12h00 (commentaire) » → « 05/10/2026 à 12h00 » pour le titre (même règle que recap_admin.date_courte). */
+function adminDateCourte(v){const m=String(v||'').match(/\d{1,2}\/\d{1,2}\/\d{2,4}(?:\s*(?:à|a|-)?\s*\d{1,2}\s*[hH:]\s*\d{0,2})?/);return m?m[0].trim():(v||'à préciser');}
+function adminTitles(){const ref=(adminRec.reference_marche||'').trim();$('adminTitle').textContent='Focus administratif et contractuel'+(ref&&ref!=='à préciser'?' – '+ref:'');
+  const q=document.getElementById('adminQTitle');if(q){q.textContent='Questions à déposer sur PLACE avant le '+adminDateCourte(adminRec.date_limite_questions);q.style.color=(adminRec.date_limite_questions||'à préciser')==='à préciser'?'#ffc7ce':'';}}
+function adminSet(k,i,c,v){if(adminRec[k]&&adminRec[k][i]){adminRec[k][i][c]=v;save();}}
+function adminAdd(k){const t=ADMIN_TABLES.find(x=>x.key===k);const y={};t.cols.forEach(c=>y[c[0]]='');y.statut='a_qualifier';ADMIN_NIV_COLS.forEach(c=>{if(c in y)y[c]='À évaluer';});adminRec[k].push(y);if(k==='questions')adminRec.questions.forEach((q,i)=>q.num='Q'+(i+1));renderAdmin();save();}
+function adminDel(k,i){adminRec[k].splice(i,1);if(k==='questions')adminRec.questions.forEach((q,j)=>q.num='Q'+(j+1));renderAdmin();save();}
+function adminCls(k){return ADMIN_WIDE.includes(k)?'rw':(['statut','num'].concat(ADMIN_NIV_COLS).includes(k)?'rs':'rn');}
+function renderAdmin(){const w=$('adminTables');if(!w)return;w.innerHTML='';
+  $('adminHead').style.display=(adminHasRows()||adminDocs.length)?'block':'none';
+  $('adm_ref').value=adminRec.reference_marche||'';$('adm_dq').value=adminRec.date_limite_questions||'';$('adm_do').value=adminRec.date_limite_offres||'';
+  ADMIN_TABLES.forEach(t=>{const card=document.createElement('div');card.className='card';
+    let h='<div class="abar"'+(t.key==='questions'?' id="adminQTitle"':'')+'>'+esch(t.titre)+'</div><div style="overflow-x:auto"><table class="ptab rtab atab"><thead><tr>'+t.cols.map(c=>'<th class="'+adminCls(c[0])+'">'+esch(c[1])+'</th>').join('')+'<th class="rx"></th></tr></thead><tbody>';
+    adminRec[t.key].forEach((r,i)=>{h+='<tr>'+t.cols.map(c=>{const k=c[0],v=r[k]||'',cl=adminCls(k);
+      if(k==='num')return '<td class="'+cl+'" style="font-weight:700;text-align:center;padding-top:12px">'+esch(v)+'</td>';
+      if(k==='statut'){const col=v==='valide'?'#1e7e34':'#c0392b';return '<td class="'+cl+'"><select style="color:'+col+';font-weight:600" onchange="adminSet(\''+t.key+'\','+i+',\'statut\',this.value);renderAdmin()">'+RECAP_STATUTS.map(s=>'<option value="'+s[0]+'"'+(s[0]===v?' selected':'')+'>'+s[1]+'</option>').join('')+'</select></td>';}
+      if(ADMIN_NIV_COLS.includes(k)){const col=v==='Élevée'?'#c0392b':(v==='Moyenne'?'#b8860b':(v==='Faible'?'#1e7e34':'#555'));return '<td class="'+cl+'"><select style="color:'+col+';font-weight:600" onchange="adminSet(\''+t.key+'\','+i+',\''+k+'\',this.value);renderAdmin()">'+ADMIN_NIVEAUX.map(n=>'<option'+(n===v?' selected':'')+'>'+n+'</option>').join('')+'</select></td>';}
+      return '<td class="'+cl+'"><textarea oninput="recapGrow(this);recapRow(this);adminSet(\''+t.key+'\','+i+',\''+k+'\',this.value)">'+esch(v)+'</textarea></td>';}).join('')+
+      '<td class="rowact rx"><button title="Supprimer la ligne" onclick="adminDel(\''+t.key+'\','+i+')">🗑</button></td></tr>';});
+    h+='</tbody></table></div><button class="btn btn-ghost" style="margin-top:6px" onclick="adminAdd(\''+t.key+'\')">+ Ajouter une ligne</button>';
+    card.innerHTML=h;w.appendChild(card);});
+  adminTitles();recapFit();}
+/* Texte binaire = document lu avant le support .xlsx (contenu ZIP décodé tel quel) : à recharger. */
+function adminDocBroken(d){const t=String(d.text||'');return /^PK/.test(t)||(t.length>200&&(t.slice(0,2000).match(/\uFFFD/g)||[]).length>50);}
+function renderAdminDocs(){const c=$('adminDocs');if(!c)return;c.innerHTML='';
+  adminDocs.forEach((d,i)=>{const x=document.createElement('div');x.className='adoc';const bad=adminDocBroken(d);
+    x.innerHTML='📄 <b>'+esch(d.name)+'</b> <span class="small">'+(d.chars||(d.text||'').length).toLocaleString('fr-FR')+' caractères'+(d.truncated?' — tronqué':'')+'</span>'+(bad?' <span style="color:#c0392b;font-weight:600">⚠ contenu illisible (ancienne lecture) : retirez puis rechargez ce fichier</span>':'')+'<span style="flex:1"></span><button class="btn btn-del" title="Retirer ce document">×</button>';
+    x.querySelector('button').onclick=()=>{adminDocs.splice(i,1);renderAdminDocs();save();};c.appendChild(x);});
+  if(adminDocs.length){const tot=adminDocs.reduce((a,d)=>a+(d.text||'').length,0);const ok=tot<=ADMIN_BUDGET;const t=document.createElement('div');t.className='small';t.style.cssText='margin-top:6px;font-weight:600;color:'+(ok?'#1e7e34':'#b8860b');
+    t.textContent=(ok?'✔ ':'⚠ ')+'Total : '+tot.toLocaleString('fr-FR')+' / '+ADMIN_BUDGET.toLocaleString('fr-FR')+' caractères analysés'+(ok?' — tous les documents sont lus en entier.':' — au-delà, chaque document est réduit à une part équitable : retirez les pièces inutiles.');c.appendChild(t);}
+  if($('adminHead'))$('adminHead').style.display=(adminHasRows()||adminDocs.length)?'block':'none';}
+async function adminUpload(files){if(!files||!files.length)return;
+  const fd=new FormData();[...files].forEach(f=>fd.append('files',f));
+  $('adminstatus').innerHTML='<span class="spin"></span> Lecture de '+files.length+' document(s)…';
+  try{const r=await fetch('/api/admin-docs/extract',{method:'POST',body:fd});if(!r.ok)throw new Error((await r.json()).detail||r.statusText);
+    const d=await r.json();if(d.budget)ADMIN_BUDGET=d.budget;(d.docs||[]).forEach(nd=>{const j=adminDocs.findIndex(x=>x.name===nd.name);if(j>=0)adminDocs[j]=nd;else adminDocs.push(nd);});
+    renderAdminDocs();save();const empty=(d.docs||[]).filter(x=>!x.text).map(x=>x.name);
+    $('adminstatus').textContent='✔ '+(d.docs||[]).length+' document(s) chargé(s)'+(empty.length?' — sans texte lisible : '+empty.join(', '):'')+'. Cliquez « Générer ».';
+  }catch(err){$('adminstatus').textContent='Erreur : '+(err.message||err);}}
+(function(){const dz=$('admindz'),f=$('adminfile');if(!dz||!f)return;dz.onclick=()=>f.click();
+  dz.ondragover=e=>{e.preventDefault();dz.classList.add('over');};dz.ondragleave=()=>dz.classList.remove('over');
+  dz.ondrop=e=>{e.preventDefault();dz.classList.remove('over');adminUpload(e.dataTransfer.files);};
+  f.onchange=e=>{adminUpload(e.target.files);e.target.value='';};})();
+async function genAdmin(){
+  const cctp=$('cctp_text').value.trim();
+  if(!adminDocs.length&&!cctp){alert("Chargez d'abord les documents administratifs (RC, CCAP, AE…).");return;}
+  const bad=adminDocs.filter(adminDocBroken).map(d=>d.name);if(bad.length){alert('Contenu illisible, à recharger avant génération : '+bad.join(', '));return;}
+  if(!adminDocs.length&&!confirm("Aucun document administratif chargé : générer à partir du CCTP seul ? (résultat limité)"))return;
+  if(adminHasRows()&&!confirm('Régénérer le focus administratif ? Les modifications manuelles seront remplacées.'))return;
+  const btn=$('goAdmin');btn.disabled=true;$('adminstatus').innerHTML='<span class="spin"></span> Analyse administrative par l\'IA (peut prendre plusieurs minutes)…';
+  try{const r=await fetch('/api/recap-admin',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(Object.assign({docs:adminDocs.map(d=>({name:d.name,text:d.text})),cctp_text:cctp},aiSel()))});
+    if(!r.ok)throw new Error((await r.json()).detail||r.statusText);
+    const d=await r.json();
+    if(!d.ok){$('adminstatus').textContent='⚠ Réponse IA non exploitable — relancez la génération.';console.warn('admin raw',d.raw);}
+    else{adminRec=adminNorm(d);renderAdmin();save();$('adminstatus').textContent='✔ Focus administratif généré ('+adminRec.checklist.length+' / '+adminRec.contractuel.length+' / '+adminRec.questions.length+' lignes) — à relire et valider.';}
+  }catch(err){$('adminstatus').textContent='Erreur : '+(err.message||err);}
+  btn.disabled=false;}
 function pac(){$('pac').textContent=points.filter(p=>p.checked).length+' / '+points.length;}
 function addPA(){const v=$('panew').value.trim();if(!v)return;points.push({label:v,checked:true});$('panew').value='';renderPA();save();}
 async function verifierConformite(){
@@ -945,7 +1050,7 @@ function buildData(){return{_type:'fiche_specs_oneid',_version:3,genere_le:new D
     contexte:val('aff_contexte'),solution_proposee:val('aff_solution'),
     contacts:contacts.map(c=>({nom:c.nom||'',prenom:c.prenom||'',fonction:c.fonction||'',telephone:c.telephone||'',email:c.email||''})),
     points_attention:points.map(p=>({label:p.label,checked:p.checked})),points_notes:val('pa_notes'),
-    clarifications:clars||[],verification:verif||[],recap_cctp:recap,cctp_text:$('cctp_text').value,images_architecture:imgStore.arch||[],
+    clarifications:clars||[],verification:verif||[],recap_cctp:recap,recap_admin:adminRec,admin_docs:adminDocs.map(d=>({name:d.name,text:d.text,chars:d.chars||0,truncated:!!d.truncated})),cctp_text:$('cctp_text').value,images_architecture:imgStore.arch||[],
     sauv_veeam:$('sauv_veeam').checked,sauv_datadomain:$('sauv_datadomain').checked,
     pra_pca:{mode:$('pra_mode').value,actif:$('pra_mode').value!=='aucun',rto:val('pra_rto'),rpo:val('pra_rpo'),cible:$('pra_cible').value,methode:$('pra_methode').value,texte:$('pra_text').value}},
   serveurs:items('serveurs'),stockages:items('stockages'),switches:items('switches'),sauvegardes:items('sauvegardes'),logiciels_services:items('logiciels_services'),
@@ -966,6 +1071,7 @@ function loadData(d){const a=d.affaire||{};
   clars=a.clarifications||[];renderClars();
   verif=a.verification||[];renderVerif();
   recap=recapNorm(a.recap_cctp);renderRecap();
+  adminRec=adminNorm(a.recap_admin);adminDocs=Array.isArray(a.admin_docs)?a.admin_docs.filter(d=>d&&d.name):[];renderAdminDocs();renderAdmin();
   $('sauv_veeam').checked=!!a.sauv_veeam;$('sauv_datadomain').checked=!!a.sauv_datadomain;
   const sv=d.sauvegarde||{};$('sauv_logiciel').value=sv.logiciel||'';$('sauv_licence').value=sv.licence||'acheter';$('sauv_cible').value=sv.cible||'';$('sauv_cloud').checked=!!sv.cloud;sauvSites=(sv.sites||[]).map(s=>({nom:s.nom||'',cells:s.cells||{}}));renderSauv();
   const ai=d.ai||{};if(ai.modelGb10!==undefined)$('aiModelGb10').value=ai.modelGb10;aiToggle();
@@ -1293,7 +1399,12 @@ function loadDefaultPlan(){
   if(planTasks.length && !confirm("Remplacer le planning actuel par le planning type ONE ID (dates calées à aujourd'hui + 1 mois) ?"))return;
   planTasks=defaultPlan(); renderPlan(); save(); $('msg').textContent='Planning type chargé (démarrage à J+1 mois).';
 }
-function save(){try{localStorage.setItem('ao_oneid_app',JSON.stringify(buildData()));}catch(e){}}
+function save(){let d;try{d=buildData();localStorage.setItem('ao_oneid_app',JSON.stringify(d));}catch(e){
+  /* Quota localStorage (~5 Mo) dépassé, typiquement par le texte des documents administratifs :
+     sauvegarde locale sans ces textes (les noms restent) ; la fiche serveur (💾) garde tout. */
+  try{if(d&&d.affaire&&Array.isArray(d.affaire.admin_docs)){d.affaire.admin_docs=d.affaire.admin_docs.map(x=>({name:x.name,text:'',chars:x.chars,truncated:x.truncated}));
+    localStorage.setItem('ao_oneid_app',JSON.stringify(d));
+    if(!window._quotaWarned){window._quotaWarned=true;const m=$('adminstatus');if(m)m.textContent="⚠ Documents volumineux : leur texte n'est pas conservé dans la sauvegarde automatique du navigateur. Enregistrez la fiche (💾) pour le garder.";}}}catch(e2){}}}
 
 /* Barre latérale : bibliothèque de fiches (persistées côté serveur) */
 async function loadFichesList(){
@@ -1335,7 +1446,7 @@ async function delFiche(name){
 function newFiche(){
   if(!confirm('Démarrer une nouvelle fiche vide ?'))return;
   clearAll();['aff_client','aff_projet','aff_ref','aff_auteur','aff_contexte','aff_solution','pa_notes','ficheName','cctp_text','cctpname'].forEach(id=>{const e=$(id);if(e)e.value='';});
-  $('aff_version').value='1.0';points=[];clars=[];verif=[];recap=recapNorm(null);renderPA();renderClars();renderVerif();renderRecap();imgStore.arch=[];renderThumbs('arch');$('resCard').style.display='none';
+  $('aff_version').value='1.0';points=[];clars=[];verif=[];recap=recapNorm(null);adminRec=adminEmpty();adminDocs=[];renderPA();renderClars();renderVerif();renderRecap();renderAdminDocs();renderAdmin();imgStore.arch=[];renderThumbs('arch');$('resCard').style.display='none';
   ['pra_rto','pra_rpo','pra_text'].forEach(id=>{const e=$(id);if(e)e.value='';});$('pra_mode').value='aucun';$('sauv_veeam').checked=false;$('sauv_datadomain').checked=false;praToggle();
   chapitres=[];renderKanban();prestations=[];renderPrest();contacts=[];renderContacts();
   $('sauv_logiciel').value='';$('sauv_licence').value='acheter';$('sauv_cible').value='';$('sauv_cloud').checked=false;sauvSites=[];renderSauv();

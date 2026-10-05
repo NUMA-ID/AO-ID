@@ -5,6 +5,22 @@ Une entrée par problème. Les entrées ne sont jamais supprimées, seulement pa
 
 ---
 
+## 2026-10-05 — PREPROD : montages fichier par fichier figés après une édition atomique (contourné)
+- **Constat** : `/api/generer` a renvoyé HTTP 500 (`module 'recap_admin' has no attribute 'date_courte'`) alors que la fonction était bien dans le fichier sur le disque et que les tests passaient.
+- **Cause** : `docker-compose.yml` monte `main.py`, `drawio_url.py`, `recap_cctp.py` et `recap_admin.py` un par un. Docker suit l'inode d'origine, et les outils d'édition qui écrivent par remplacement atomique créent un nouvel inode.
+- **Impact** : en PREPROD, du code modifié peut ne pas être pris en compte. Aucun impact en PROD, où l'image est construite.
+- **Contournement** : `docker compose up -d --no-deps --force-recreate ao-oneid` après toute modification de ces fichiers (documenté dans EXPLOITATION.md). Correctif durable possible, non appliqué : monter `app/` entier (il faudrait vérifier ce qu'il expose, notamment `.env`).
+
+## 2026-10-05 — Focus administratif : hypothèses et limites (ouvert)
+- [HYPOTHÈSE] « M2026-30 », présent dans la maquette, est la référence du marché : il est lu dans les documents et n'est pas écrit en dur.
+- [HYPOTHÈSE] Les valeurs Élevée / Moyenne / Faible pour Criticité, Niveau et Priorité ne sont pas précisées par l'utilisateur.
+- **Limite** : les PDF scannés (images) ne sont pas lisibles : pas d'OCR. L'UI signale les documents sans texte.
+- **Limite** : au-delà de 240 000 caractères au total (le seuil était de 70 000 jusqu'au correctif du même jour), chaque document est tronqué à sa part. L'interface affiche le total par rapport au budget et prévient en cas de dépassement. Contournement : retirer les pièces inutiles, ou augmenter `RECAP_ADMIN_MAX_CHARS` (le modèle accepte au moins 600 000 caractères, d'après la mesure du 2026-10-05).
+- **Résolu (même jour)** : un `.xlsx` déposé était décodé comme du texte brut (binaire ZIP, environ 62 000 caractères illisibles envoyés au LLM), et les tableaux des `.docx` étaient ignorés. Correctif : lecture openpyxl et `_docx_to_text`. Les fiches déjà enregistrées avec un `.xlsx` mal lu affichent « contenu illisible » : il faut retirer puis recharger le fichier.
+- [HYPOTHÈSE] La qualité d'analyse reste bonne à environ 56 000 tokens d'entrée. Seule l'acceptation du contexte a été mesurée, pas la précision sur un long DCE.
+- **Limite `.xlsx`** : les cellules à formule sont lues avec la valeur qu'Excel a enregistrée avec le fichier (`data_only=True`). Un classeur produit par un logiciel qui ne recalcule pas les formules (export automatique, script) donne des totaux vides. Un fichier enregistré par Excel n'est pas concerné.
+- **Non vérifié** : la qualité de la sortie IA sur un vrai DCE (seulement des tests avec un LLM simulé, plus un essai réel sur un jeu de démonstration).
+
 ## 2026-10-05 — Récapitulatif CCTP : qualité de sortie IA non mesurée sur un vrai CCTP (ouvert)
 - **Description** : le prompt Lyra et le parseur sont testés unitairement avec un LLM simulé. Un seul essai réel sur GB10 a été fait, avec un extrait synthétique de CCTP. Aucun CCTP client complet n'a encore été passé.
 - **Hypothèses** : [HYPOTHÈSE] Qwen3.8-Flash-Next respecte le contrat JSON dans la limite de 6 000 tokens de sortie. [HYPOTHÈSE] Les éventuels blocs `<think>` arrivent dans `reasoning_content` (ignoré) ou dans le contenu, où le parseur les retire.
