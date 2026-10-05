@@ -9,11 +9,12 @@ import sys, json, zipfile, shutil, os, datetime, re, glob, base64, io
 from docx import Document
 from docx.shared import Cm, Pt, RGBColor
 from docx.enum.text import WD_ALIGN_PARAGRAPH
-from docx.enum.section import WD_ORIENT
+from docx.enum.section import WD_ORIENT, WD_SECTION
 from docx.oxml.ns import qn
 from docx.oxml import OxmlElement
 
 HERE = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, os.path.dirname(HERE))   # app/ : modules partagés (recap_cctp)
 
 def find_base():
     cands = [os.environ.get("BASE_DOCX"),
@@ -960,6 +961,63 @@ def section_verification(doc, spec):
             add_para(doc, "Exigence CCTP : " + str(v["exigence"]), color=REVIEW, italic=True, size=9)
 
 
+def _set_orientation(section, landscape):
+    """Bascule une section Word en paysage (True) ou portrait (False) en permutant les dimensions."""
+    w, h = section.page_width, section.page_height
+    if landscape and w < h or (not landscape) and w > h:
+        section.page_width, section.page_height = h, w
+    section.orientation = WD_ORIENT.LANDSCAPE if landscape else WD_ORIENT.PORTRAIT
+
+
+def section_recap_cctp(doc, spec):
+    """Récapitulatif du CCTP — Focus technique : 3 tableaux (matrice, plan, ressources) en page paysage.
+
+    Lit spec["affaire"]["recap_cctp"] (normalisé par recap_cctp.normalize_recap, statut « Validé »
+    autorisé car saisi par l'humain). N'écrit rien si les 3 tableaux sont vides.
+    Les statuts autres que « Validé » sont écrits en rouge (à vérifier avant envoi).
+    """
+    import recap_cctp as rc
+    rec = rc.normalize_recap((spec.get("affaire") or {}).get("recap_cctp"), allow_valide=True)
+    if not any(rec[k] for k in rc.TABLES):
+        return
+    sec = doc.add_section(WD_SECTION.NEW_PAGE); _set_orientation(sec, True)
+    h = add_heading(doc, "Récapitulatif du CCTP — Focus technique", 1)
+    h.paragraph_format.page_break_before = False     # la nouvelle section crée déjà la page
+    add_para(doc, "Synthèse des exigences du CCTP et du dispositif de réponse proposé. Les statuts "
+                  "en rouge restent à confirmer, préparer ou qualifier avant envoi.", italic=True, size=9)
+    usable = sec.page_width - sec.left_margin - sec.right_margin
+    for key, tspec in rc.TABLES.items():
+        rows = rec[key]
+        if not rows:
+            continue
+        add_heading(doc, tspec["titre"], 2)
+        cols = tspec["colonnes"]
+        t = doc.add_table(rows=1, cols=len(cols))
+        try:
+            t.style = doc.styles["Table Grid"]
+        except KeyError:
+            pass
+        for i, (_, lbl) in enumerate(cols):
+            c = t.rows[0].cells[i]; _gcell(c, lbl, 8, True, "ffffff"); _shade(c, HDR_HEX)
+        for row in rows:
+            cells = t.add_row().cells
+            for i, (ck, _) in enumerate(cols):
+                v = row.get(ck, "")
+                if ck == "statut":
+                    _gcell(cells[i], rc.STATUTS.get(v, v), 8, True,
+                           None if v == "valide" else "C00000", center=True)
+                else:
+                    _gcell(cells[i], v, 8)
+        # Colonnes à fort contenu élargies (même liste que RECAP_WIDE dans index.html),
+        # colonnes courtes (Réf., Statut, Go/No Go) étroites.
+        weights = [0.55 if ck in ("ref", "statut", "go_nogo") else 1.6 if ck in rc.WIDE_COLS else 1.0
+                   for ck, _ in cols]
+        tot = sum(weights)
+        _set_widths(t, [int(usable * w / tot) for w in weights])
+        add_para(doc, "")
+    sec2 = doc.add_section(WD_SECTION.NEW_PAGE); _set_orientation(sec2, False)
+
+
 def patch_cover(path, aff):
     d = aff.get("date","")
     try:
@@ -1081,6 +1139,7 @@ def main():
     section_chapitres(doc, spec)
     section_prestations(doc, spec)
     section_planning(doc, spec)
+    section_recap_cctp(doc, spec)
     composer = _append_admin(doc)        # chapitres administratifs figés, à la fin
     section_verification(doc, spec)
     (composer or doc).save(out_path)

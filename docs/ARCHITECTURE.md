@@ -63,6 +63,15 @@ template `TEMPLATE_BASE_ONEID.docx`, en insérant les argumentaires sourcés dep
 `Documentation_Constructeur/`. Fusionne en fin de document les chapitres administratifs
 figés (`CHAPITRES_ADMIN.docx` via `docxcompose`).
 
+### `app/recap_cctp.py` — récapitulatif CCTP (module pur)
+Contrat des 3 tableaux du récapitulatif CCTP (`TABLES` : clés et libellés des colonnes),
+statuts autorisés, colonnes à fort contenu à élargir (`WIDE_COLS`), prompt système (issu
+de l'optimisation Lyra) et normalisation de la
+réponse IA. Il est importé par `main.py` (`/api/recap-cctp`) et par
+`engine/generer_doc.py`, qui ajoute `app/` à son `sys.path`. Il ne fait aucun appel réseau
+ni d'E/S. Les colonnes sont recopiées en dur dans `index.html` (`RECAP_TABLES`) ; un test
+vérifie qu'elles restent identiques des deux côtés.
+
 ### `app/engine/parser_dell_excel.py` — parseur Excel Dell
 Script exécuté en sous-processus, transforme un export Dell Solutions Configurator
 (.xlsx) en JSON classé par catégorie (serveurs/stockages/switches/sauvegardes/logiciels)
@@ -95,6 +104,10 @@ bibliothèques XML restent servies par AO-ID (`GET /drawio-libs/{name}`).
 
 1. L'utilisateur dépose un CCTP → `POST /api/analyse-cctp` → appel au moteur IA choisi →
    contexte + points d'attention renvoyés au frontend (rien n'est persisté à cette étape).
+1bis. Dès que l'analyse réussit, le frontend enchaîne `POST /api/recap-cctp` (CCTP + points
+   + clarifications + résumé de la solution) → 3 tableaux affichés dans l'onglet 2, modifiables,
+   stockés dans `affaire.recap_cctp` de la fiche, puis rendus dans le Word par
+   `section_recap_cctp` (section paysage, après le planning).
 2. L'utilisateur importe un export Dell (.xlsx) → `POST /api/import-excel` → sous-processus
    `parser_dell_excel.py` → JSON classé renvoyé au frontend.
 3. Le frontend accumule un objet JSON unique ("spec") en mémoire navigateur au fil des 7

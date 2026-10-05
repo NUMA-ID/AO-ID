@@ -5,6 +5,19 @@ Une entrée par problème. Les entrées ne sont jamais supprimées, seulement pa
 
 ---
 
+## 2026-10-05 — Récapitulatif CCTP : qualité de sortie IA non mesurée sur un vrai CCTP (ouvert)
+- **Description** : le prompt Lyra et le parseur sont testés unitairement avec un LLM simulé. Un seul essai réel sur GB10 a été fait, avec un extrait synthétique de CCTP. Aucun CCTP client complet n'a encore été passé.
+- **Hypothèses** : [HYPOTHÈSE] Qwen3.8-Flash-Next respecte le contrat JSON dans la limite de 6 000 tokens de sortie. [HYPOTHÈSE] Les éventuels blocs `<think>` arrivent dans `reasoning_content` (ignoré) ou dans le contenu, où le parseur les retire.
+- **Impact** : risque de tableaux incomplets si la sortie est tronquée (gros CCTP). L'UI affiche alors « Réponse IA non exploitable » et propose de relancer.
+- **Contournement** : régénération manuelle (bouton) et édition des cellules dans l'UI.
+
+## 2026-10-05 — Rendu visuel de la section paysage du Word non vérifié (ouvert)
+- **Description** : les tests contrôlent la structure du `.docx` (3 tableaux, en-têtes, orientation des sections), pas son rendu dans Word. Le saut de page ajouté par `_append_admin` juste après la section portrait de retour peut produire une page blanche avant les chapitres administratifs.
+- **Impact** : cosmétique.
+- **État** : à vérifier visuellement par l'utilisateur sur un Word généré en PREPROD. L'écran (onglet 2) a, lui, été vérifié par capture Edge headless sur le poste Windows, en 1366 et 1920 px de large.
+
+---
+
 ## 2026-08-21 — Disque `/var` saturé pendant le premier build Docker sur Hermes Linux (résolu)
 **Description factuelle** : premier `docker compose up -d --build` exécuté sur la
 machine Linux Hermes (`djinn-bot`) après le passage au pilotage 100% Linux. Le build a

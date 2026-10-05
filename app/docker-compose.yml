@@ -23,6 +23,7 @@ services:
       - ./engine:/app/engine
       - ./main.py:/app/main.py
       - ./drawio_url.py:/app/drawio_url.py
+      - ./recap_cctp.py:/app/recap_cctp.py
     restart: unless-stopped
 
   # Éditeur de schémas d'architecture draw.io (web, 100 % local)

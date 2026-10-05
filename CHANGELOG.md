@@ -1,5 +1,14 @@
 # Journal des versions — Générateur d'appel d'offre ONE ID
 
+## Non publié — PREPROD (version à fixer à la bascule ; `APP_VERSION` reste 2.5)
+- **Nouvelle étape 2 « Récap CCTP & focus technique »** : trois tableaux générés par l'IA juste après l'analyse du CCTP, puis modifiables (cellules, ajout et suppression de lignes) : *Matrice de couverture technique*, *Plan de prise en charge recommandé*, *Ressources minimales à proposer*. Statuts : À confirmer / À préparer / À qualifier / Validé (« Validé » est réservé à l'humain). L'assistant passe à 7 étapes.
+- **Nouvel endpoint** `POST /api/recap-cctp` et nouveau module `app/recap_cctp.py` (prompt optimisé Lyra + parseur tolérant).
+- **Word** : nouvelle section paysage « Récapitulatif du CCTP — Focus technique » après le planning, avec les statuts non validés en rouge.
+- **Fiche** : nouveau champ `affaire.recap_cctp`. Les anciennes fiches se chargent sans ce champ (tableaux vides).
+- **docker-compose** : `recap_cctp.py` ajouté aux bind-mounts (le conteneur doit être recréé : `docker compose up -d`).
+- **Affichage pleine largeur et responsive** : le contenu n'est plus limité à 1240 px et occupe toute la largeur de l'écran (marges qui s'adaptent à la taille de l'écran). La barre latérale « Mes fiches » se réduit à 196 px sous 1440 px de large ; le passage en une colonne sous 760 px est conservé.
+- **Tableaux du récap** : les colonnes à fort contenu (Exigences principales, Attendus de preuve, Capacité ONEID, Risque, Action de réponse, et leurs équivalents dans le plan et les ressources) se partagent la largeur disponible. Les colonnes Réf., Statut et Go/No Go ont une largeur fixe de 112 px. Les cellules font au moins 150 px de haut, s'agrandissent avec le texte et gardent la même hauteur sur toute la ligne. Dans le Word, ces colonnes sont élargies (poids 1,6 contre 1,0).
+
 ## v2.5
 - **Bouton ⚙ Paramètres LLM dans le header** : modale de configuration runtime du moteur IA (Base URL, Modèle en liste déroulante, Clé API), test de connexion + listing des modèles exposés par le serveur (endpoint `/v1/models` OpenAI-compatible).
 - **Persistance côté serveur** : la config est stockée dans `$OUT_DIR/llm_settings.json` (mode 0600, volume Docker → survit au redémarrage du conteneur et à la mise à jour d'image). Prioritaire sur les variables d'env `GB10_*`.

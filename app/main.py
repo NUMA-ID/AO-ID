@@ -10,6 +10,7 @@ from fastapi import FastAPI, UploadFile, File, Form, HTTPException, Request
 from fastapi.responses import HTMLResponse, JSONResponse, FileResponse
 from starlette.concurrency import run_in_threadpool
 from drawio_url import resolve_drawio_base
+import recap_cctp as recap_mod
 
 HERE = Path(__file__).resolve().parent
 ENGINE = HERE / "engine"
@@ -559,6 +560,28 @@ async def analyse_cctp(file: UploadFile = File(None), text: str = Form(None), so
     return {"contexte": contexte, "points": points,
             "clarifications": clarifications, "verification": verification, "cctp_text": cctp,
             "raw": "" if p["ok"] else raw}
+
+
+# ---------------------------------------------------------------- Récapitulatif CCTP — Focus technique (étape 2)
+@app.post("/api/recap-cctp")
+async def recap_cctp(payload: dict):
+    """Génère les 3 tableaux du récapitulatif CCTP (matrice, plan, ressources) via le LLM.
+
+    Entrée JSON : cctp_text (str, requis), points (list), clarifications (list),
+    solution (dict fiche, optionnel), provider/model (str, optionnels).
+    Sortie : {matrice, plan, ressources, ok, raw}. raw = texte LLM brut si ok est False.
+    Erreurs : 400 si CCTP vide ; 400/502 remontées par llm_complete.
+    Effet de bord : un appel réseau au LLM (aucune écriture disque).
+    """
+    cctp = (payload.get("cctp_text") or "").strip()
+    if not cctp:
+        raise HTTPException(400, "Analysez ou collez d'abord le CCTP avant de générer le récapitulatif.")
+    user = recap_mod.build_user_message(cctp, payload.get("points"), payload.get("clarifications"),
+                                        summarize_solution(payload.get("solution")))
+    raw = await run_in_threadpool(llm_complete, sysp(recap_mod.RECAP_PROMPT), user, 6000,
+                                  payload.get("provider"), payload.get("model"))
+    rec = recap_mod.parse_recap(raw)
+    return {**rec, "raw": "" if rec["ok"] else (raw or "")[:4000]}
 
 
 # ---------------------------------------------------------------- Import Excel Dell

@@ -63,6 +63,18 @@ points d'attention, clarifications et grille de vérification préliminaire.
 propagés par `llm_complete` si clé API manquante ou erreur amont.
 **Effets de bord** : appel réseau sortant vers le serveur vLLM GB10 (`GB10_BASE`).
 
+## `POST /api/recap-cctp`
+**Rôle** : génère le « Récapitulatif du CCTP — Focus technique » en trois tableaux (matrice de couverture technique, plan de prise en charge recommandé, ressources minimales à proposer) via le moteur IA.
+**Entrées** : JSON
+- `cctp_text: str` (requis, tronqué à 60 000 caractères)
+- `points: list[str | {label}]` (optionnel, points d'attention de l'analyse)
+- `clarifications: list[str]` (optionnel)
+- `solution: dict` (optionnel, fiche complète ; résumée par `summarize_solution`)
+- `provider: str`, `model: str` (optionnels)
+**Sortie** : JSON `{matrice: [...], plan: [...], ressources: [...], ok: bool, raw: str}`. Colonnes de chaque ligne : voir `recap_cctp.TABLES`. `statut` ∈ `a_confirmer | a_preparer | a_qualifier` (la sortie IA ne contient jamais `valide`). `go_nogo` ∈ `Go | No Go | À arbitrer`. Si `ok` vaut `false`, aucun tableau n'a pu être extrait et `raw` contient les 4 000 premiers caractères de la réponse brute.
+**Erreurs possibles** : `400` si `cctp_text` est vide ; `400`/`502` propagés par `llm_complete`.
+**Effets de bord** : un appel réseau sortant vers GB10 (`max_tokens` 6000). Aucune écriture disque.
+
 ## `POST /api/import-excel`
 **Rôle** : convertit un export Dell Solutions Configurator OU un devis distributeur
 TD SYNNEX (.xlsx) en fiche JSON classée par catégorie d'équipement (auto-détection du
@@ -257,3 +269,9 @@ en PROD les libs restent servies par AO-ID sur le même origin HTTPS).
 | `build_memoire_docx(client, text, path)` | main.py | Construction du .docx de mémoire technique depuis un texte structuré (titres `#`/`##`/`###`, listes `-`) | Écriture disque |
 | `generer_doc.py` (script complet) | app/engine/ | Génération du document Word principal (voir en-tête du fichier) | Écriture disque, lecture de `Documentation_Constructeur/` et du template |
 | `parser_dell_excel.py` (script complet) | app/engine/ | Parsing de l'export Dell → JSON classé | Lecture du .xlsx fourni |
+| `recap_cctp.parse_recap(raw)` | recap_cctp.py | Décode la réponse IA (fences, `<think>`, texte autour tolérés) → `{matrice, plan, ressources, ok}` normalisé | Aucun |
+| `recap_cctp.normalize_recap(data, allow_valide=False)` | recap_cctp.py | Garantit les 3 tableaux, toutes les colonnes non vides (« à préciser »), cellules ≤ 600 caractères, ≤ 30 lignes, statut et Go/No Go autorisés ; `valide` est rétrogradé en `a_confirmer` sauf si `allow_valide` | Aucun |
+| `recap_cctp.normalize_statut(v, allow_valide=False)` | recap_cctp.py | Clé ou libellé libre → clé de `STATUTS` (défaut `a_confirmer`) | Aucun |
+| `recap_cctp.build_user_message(cctp, points, clarifications, solution_summary)` | recap_cctp.py | Message utilisateur envoyé au LLM pour le récapitulatif | Aucun |
+| `section_recap_cctp(doc, spec)` | app/engine/generer_doc.py | Rend `affaire.recap_cctp` en 3 tableaux dans une section paysage (puis repasse en portrait) ; statuts non validés en rouge ; rien si les tableaux sont vides | Aucun (modifie le document en mémoire) |
+| `_set_orientation(section, landscape)` | app/engine/generer_doc.py | Passe une section Word en paysage ou en portrait | Aucun |

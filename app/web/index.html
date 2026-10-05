@@ -20,7 +20,7 @@
   header::after{content:"";position:absolute;right:-60px;top:-90px;width:280px;height:280px;background:radial-gradient(circle,rgba(22,160,133,.35),transparent 62%);pointer-events:none}
   header h1{margin:0;font-size:20px;font-weight:700;letter-spacing:-.2px;position:relative;z-index:1}
   header p{margin:5px 0 0;font-size:12px;opacity:.82;position:relative;z-index:1;max-width:900px}
-  .wrap{max-width:1240px;margin:0 auto;padding:22px 26px 96px}
+  .wrap{max-width:none;width:100%;box-sizing:border-box;margin:0;padding:22px clamp(12px,2vw,32px) 96px}
   .tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin-bottom:20px;flex-wrap:wrap}
   .tab{padding:11px 18px;cursor:pointer;font-weight:600;color:var(--muted);border:none;background:none;border-bottom:2.5px solid transparent;margin-bottom:-1px;font-size:14px;border-radius:8px 8px 0 0;transition:color .15s,background .15s,border-color .15s}
   .tab:hover{color:var(--oneid);background:rgba(30,96,145,.06)}
@@ -77,6 +77,16 @@
   .fiche .nm{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer}
   .fiche .ic{border:none;background:none;cursor:pointer;font-size:13px;padding:2px;line-height:1;border-radius:5px}
   .fiche .ic:hover{background:#dce7ef}
+  @media(max-width:1440px){.sidebar{width:196px;flex:0 0 196px}}
+  /* Récap CCTP : tableaux pleine largeur, colonnes à fort contenu élargies, cellules auto-hauteur */
+  .rtab{table-layout:fixed;width:100%;min-width:1040px}
+  .rtab th.rw,.rtab td.rw{width:auto}
+  .rtab th.rn,.rtab td.rn{width:10%}
+  .rtab th.rs,.rtab td.rs{width:112px}
+  .rtab th.rx,.rtab td.rx{width:36px;text-align:center}
+  .ptab.rtab td{vertical-align:top}
+  .rtab textarea{width:100%;box-sizing:border-box;font-size:12.5px;line-height:1.45;min-height:150px;resize:vertical;overflow:hidden;border:1px solid var(--line);border-radius:6px;padding:7px}
+  .ptab.rtab td.rs select{width:100%;font-size:11.5px;padding:5px 2px}
   @media(max-width:760px){.layout{flex-direction:column}.sidebar{width:auto;flex:none;position:static;min-height:0;border-right:none;border-bottom:1px solid var(--line)}.wrap{padding:18px 16px 90px}}
   .ptab{border-collapse:separate;border-spacing:0;width:100%;font-size:12px;border:1px solid var(--line);border-radius:10px;overflow:hidden}
   .ptab th,.ptab td{border-bottom:1px solid var(--line);border-right:1px solid var(--line);padding:5px 7px;vertical-align:middle}
@@ -274,16 +284,17 @@ async function saveSettings(){
 <div class="wrap">
   <div class="tabs">
     <button class="tab active" data-t="cctp" onclick="tab('cctp')">1 · CCTP &amp; contexte</button>
-    <button class="tab" data-t="equip" onclick="tab('equip')">2 · Équipements</button>
-    <button class="tab" data-t="fonc" onclick="tab('fonc')">3 · Fonctionnalité</button>
-    <button class="tab" data-t="kanban" onclick="tab('kanban')">4 · Structure du dossier &amp; prestations</button>
-    <button class="tab" data-t="plan" onclick="tab('plan')">5 · Planning</button>
-    <button class="tab" data-t="gen" onclick="tab('gen')">6 · Documents &amp; historique</button>
+    <button class="tab" data-t="recap" onclick="tab('recap')">2 · Récap CCTP &amp; focus technique</button>
+    <button class="tab" data-t="equip" onclick="tab('equip')">3 · Équipements</button>
+    <button class="tab" data-t="fonc" onclick="tab('fonc')">4 · Fonctionnalité</button>
+    <button class="tab" data-t="kanban" onclick="tab('kanban')">5 · Structure du dossier &amp; prestations</button>
+    <button class="tab" data-t="plan" onclick="tab('plan')">6 · Planning</button>
+    <button class="tab" data-t="gen" onclick="tab('gen')">7 · Documents &amp; historique</button>
     <button class="tab" data-t="arg" onclick="tab('arg')" style="margin-left:auto">⚙️ Argumentaires</button>
   </div>
   <div style="display:flex;align-items:center;gap:10px;margin:0 0 16px">
-    <div style="flex:1;height:6px;background:var(--line);border-radius:999px;overflow:hidden"><div id="stepBar" style="height:100%;width:16%;background:var(--oneid);transition:width .2s"></div></div>
-    <span id="stepInfo" class="small" style="white-space:nowrap">Étape 1 / 6</span>
+    <div style="flex:1;height:6px;background:var(--line);border-radius:999px;overflow:hidden"><div id="stepBar" style="height:100%;width:14%;background:var(--oneid);transition:width .2s"></div></div>
+    <span id="stepInfo" class="small" style="white-space:nowrap">Étape 1 / 7</span>
   </div>
 
   <!-- ===== CCTP ===== -->
@@ -309,6 +320,17 @@ async function saveSettings(){
         <p class="hint">Comparaison de la demande du CCTP avec la solution configurée. ✅ couvert · ⚠️ écart · ❔ à préciser. Les écarts / éléments à préciser sont ajoutés au Word en couleur de relecture.</p>
         <div id="verif"></div></div>
     </div>
+  </div>
+
+  <!-- ===== RÉCAP CCTP & FOCUS TECHNIQUE ===== -->
+  <div id="p-recap" class="panel">
+    <div class="card">
+      <h2>Récapitulatif du CCTP — Focus technique <span class="small">(intégré au Word, page paysage)</span></h2>
+      <p class="hint">Généré par l'IA à partir du CCTP analysé (lancé automatiquement après l'analyse), puis modifiable ici. Statuts : <b>À confirmer</b> · <b>À préparer</b> · <b>À qualifier</b> · <b>Validé</b> (« Validé » est réservé à votre relecture : l'IA ne l'attribue jamais). Les statuts non validés apparaissent en rouge dans le Word.</p>
+      <button class="btn btn-primary" id="goRecap" onclick="genRecap()" title="(Re)génère les 3 tableaux à partir du CCTP, des points d'attention et de la solution configurée. Remplace le contenu actuel.">⚙️ Générer le récapitulatif (IA)</button>
+      <span class="msg" id="recapstatus" style="margin-left:8px"></span>
+    </div>
+    <div id="recapTables"></div>
   </div>
 
   <!-- ===== ÉQUIPEMENTS ===== -->
@@ -616,8 +638,9 @@ document.addEventListener('DOMContentLoaded', _refreshFooterModels);
 function aiSel(){return {provider:'gb10',model:(($('aiModelGb10')||{}).value||'').trim()};}
 // Empêche le navigateur d'ouvrir le fichier quand on dépose à côté d'une zone
 ['dragenter','dragover','drop'].forEach(ev=>window.addEventListener(ev,e=>{e.preventDefault();},false));
-const STEP_ORDER=['cctp','equip','fonc','kanban','plan','gen'];
+const STEP_ORDER=['cctp','recap','equip','fonc','kanban','plan','gen'];
 function tab(n){document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));const p=$('p-'+n);if(p)p.classList.add('active');const b=document.querySelector('.tab[data-t='+n+']');if(b)b.classList.add('active');
+  if(n==='recap'&&typeof recapFit==='function')recapFit();
   const i=STEP_ORDER.indexOf(n);if(i>=0){const bar=$('stepBar');if(bar)bar.style.width=Math.round((i+1)/STEP_ORDER.length*100)+'%';const inf=$('stepInfo');if(inf)inf.textContent='Étape '+(i+1)+' / '+STEP_ORDER.length;}
   try{window.scrollTo({top:0,behavior:'smooth'});}catch(e){}}
 function stepNav(d){const cur=document.querySelector('.tab.active');const i=cur?STEP_ORDER.indexOf(cur.getAttribute('data-t')):0;const j=Math.min(STEP_ORDER.length-1,Math.max(0,i+d));tab(STEP_ORDER[j]);}
@@ -759,7 +782,9 @@ $('goAnalyse').onclick=async()=>{
     points=(d.points||[]).map(p=>({label:typeof p==='string'?p:(p.label||''),checked:false}));
     clars=d.clarifications||[];verif=(d.verification||[]).filter(v=>v&&(v.exigence||v.suggestion||v.theme));
     renderPA();renderClars();renderVerif();
-    $('cstatus').textContent='✔ Analyse terminée.';save();
+    $('cstatus').textContent='✔ Analyse terminée — récapitulatif CCTP en cours de génération (onglet 2).';save();
+    if(!RECAP_TABLES.some(t=>recap[t.key].length)||confirm('Régénérer aussi le récapitulatif CCTP (onglet 2) ? Les modifications manuelles seront remplacées.'))genRecap(true);
+    else $('cstatus').textContent='✔ Analyse terminée.';
   }catch(err){$('cstatus').textContent='Erreur : '+(err.message||err);}
   $('goAnalyse').disabled=false;
 };
@@ -774,6 +799,54 @@ function renderVerif(showEmpty){const w=$('verifwrap');if(!w)return;const c=$('v
     if(v.exigence){const e=document.createElement('div');e.className='small';e.textContent='Exigence : '+v.exigence;d.appendChild(e);}
     if(v.suggestion){const s=document.createElement('div');s.style.color=(COL[st]||'#555');s.textContent=(st==='couvert'?'✔ ':'➕ ')+v.suggestion;d.appendChild(s);}
     c.appendChild(d);});}
+/* Récapitulatif CCTP — Focus technique (étape 2). Colonnes = contrat de app/recap_cctp.py (TABLES). */
+const RECAP_TABLES=[
+  {key:'matrice',titre:'Matrice de couverture technique',cols:[['domaine','Domaine'],['exigences','Exigences principales'],['preuves',"Attendus de preuve dans l'offre"],['capacite_oneid','Capacité ONEID à confirmer'],['risque','Risque'],['action','Action de réponse'],['ref','Réf.'],['statut','Statut']]},
+  {key:'plan',titre:'Plan de prise en charge recommandé',cols:[['periode','Période'],['objectifs','Objectifs'],['actions','Actions / livrables'],['criteres','Critères de réussite'],['contribution_note','Contribution à la note'],['pilote','Pilote'],['risque','Risque à maîtriser'],['statut','Statut']]},
+  {key:'ressources',titre:'Ressources minimales à proposer',cols:[['role','Rôle'],['responsabilite','Responsabilité'],['competences','Compétences attendues'],['presence','Exigence de présence'],['preuve','Preuve à joindre'],['backup','Back-up'],['go_nogo','Go / No Go'],['statut','Statut']]}];
+const RECAP_STATUTS=[['a_confirmer','À confirmer'],['a_preparer','À préparer'],['a_qualifier','À qualifier'],['valide','Validé']];
+const RECAP_GO=['Go','No Go','À arbitrer'];
+let recap={matrice:[],plan:[],ressources:[]};
+function recapNorm(r){const o={};RECAP_TABLES.forEach(t=>{o[t.key]=Array.isArray(r&&r[t.key])?r[t.key].filter(x=>x&&typeof x==='object').map(x=>{const y={};t.cols.forEach(c=>y[c[0]]=x[c[0]]==null?'':String(x[c[0]]));if(!RECAP_STATUTS.some(s=>s[0]===y.statut))y.statut='a_confirmer';return y;}):[];});return o;}
+function recapSet(k,i,c,v){if(recap[k]&&recap[k][i]){recap[k][i][c]=v;save();}}
+function recapAdd(k){const t=RECAP_TABLES.find(x=>x.key===k);const y={};t.cols.forEach(c=>y[c[0]]='');y.statut='a_qualifier';if('go_nogo' in y)y.go_nogo='À arbitrer';recap[k].push(y);renderRecap();save();}
+function recapDel(k,i){recap[k].splice(i,1);renderRecap();save();}
+const RECAP_WIDE=['exigences','preuves','capacite_oneid','risque','action','objectifs','actions','criteres','responsabilite','competences','preuve'];
+function recapCls(k){return RECAP_WIDE.includes(k)?'rw':(['ref','statut','go_nogo'].includes(k)?'rs':'rn');}
+function recapRow(ta){const tr=ta.closest('tr');if(!tr)return;const tas=[...tr.querySelectorAll('textarea')];tas.forEach(t=>{if(t!==ta){t.style.height='auto';t.style.height=Math.max(150,t.scrollHeight+2)+'px';}});const h=Math.max(...tas.map(t=>t.offsetHeight));tas.forEach(t=>t.style.height=h+'px');}
+function recapGrow(ta){ta.style.height='auto';ta.style.height=Math.max(150,ta.scrollHeight+2)+'px';}
+function renderRecap(){const w=$('recapTables');if(!w)return;w.innerHTML='';
+  RECAP_TABLES.forEach(t=>{const card=document.createElement('div');card.className='card';
+    let h='<h2>'+esch(t.titre)+' <span class="badge">'+recap[t.key].length+'</span></h2><div style="overflow-x:auto"><table class="ptab rtab"><thead><tr>'+t.cols.map(c=>'<th class="'+recapCls(c[0])+'">'+esch(c[1])+'</th>').join('')+'<th class="rx"></th></tr></thead><tbody>';
+    recap[t.key].forEach((r,i)=>{h+='<tr>'+t.cols.map(c=>{const k=c[0],v=r[k]||'',cl=recapCls(k);
+      if(k==='statut'){const col=v==='valide'?'#1e7e34':'#c0392b';return '<td class="'+cl+'"><select style="color:'+col+';font-weight:600" onchange="recapSet(\''+t.key+'\','+i+',\'statut\',this.value);renderRecap()">'+RECAP_STATUTS.map(s=>'<option value="'+s[0]+'"'+(s[0]===v?' selected':'')+'>'+s[1]+'</option>').join('')+'</select></td>';}
+      if(k==='go_nogo')return '<td class="'+cl+'"><select onchange="recapSet(\''+t.key+'\','+i+',\'go_nogo\',this.value)">'+RECAP_GO.map(g=>'<option'+(g===v?' selected':'')+'>'+g+'</option>').join('')+'</select></td>';
+      return '<td class="'+cl+'"><textarea oninput="recapGrow(this);recapRow(this);recapSet(\''+t.key+'\','+i+',\''+k+'\',this.value)">'+esch(v)+'</textarea></td>';}).join('')+
+      '<td class="rowact rx"><button title="Supprimer la ligne" onclick="recapDel(\''+t.key+'\','+i+')">🗑</button></td></tr>';});
+    h+='</tbody></table></div><button class="btn btn-ghost" style="margin-top:6px" onclick="recapAdd(\''+t.key+'\')">+ Ajouter une ligne</button>';
+    card.innerHTML=h;w.appendChild(card);});
+  recapFit();}
+/* Ajuste la hauteur des cellules au texte (l'onglet doit être visible pour mesurer scrollHeight). */
+function recapFit(){requestAnimationFrame(()=>{document.querySelectorAll('#recapTables textarea').forEach(recapGrow);
+  /* même hauteur pour toutes les cellules d'une ligne (lecture en grille) */
+  document.querySelectorAll('#recapTables tbody tr').forEach(tr=>{const tas=[...tr.querySelectorAll('textarea')];const h=Math.max(...tas.map(t=>t.offsetHeight));tas.forEach(t=>t.style.height=h+'px');});});}
+window.addEventListener('resize',()=>{if($('p-recap')&&$('p-recap').classList.contains('active'))recapFit();});
+async function genRecap(auto){
+  const cctp=$('cctp_text').value.trim();
+  if(!cctp){if(!auto)alert("Aucun CCTP : collez ou analysez d'abord le CCTP dans l'onglet « CCTP & contexte ».");return;}
+  const has=RECAP_TABLES.some(t=>recap[t.key].length);
+  if(!auto&&has&&!confirm('Régénérer le récapitulatif ? Les modifications manuelles des 3 tableaux seront remplacées.'))return;
+  const btn=$('goRecap');if(btn)btn.disabled=true;
+  $('recapstatus').innerHTML='<span class="spin"></span> Génération du récapitulatif par l\'IA (peut prendre plusieurs minutes)…';
+  try{
+    const r=await fetch('/api/recap-cctp',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(Object.assign({cctp_text:cctp,points:points.map(p=>p.label),clarifications:clars||[],solution:buildData()},aiSel()))});
+    if(!r.ok)throw new Error((await r.json()).detail||r.statusText);
+    const d=await r.json();
+    if(!d.ok){$('recapstatus').textContent='⚠ Réponse IA non exploitable — relancez la génération.';console.warn('recap raw',d.raw);}
+    else{recap=recapNorm(d);renderRecap();save();$('recapstatus').textContent='✔ Récapitulatif généré ('+recap.matrice.length+' / '+recap.plan.length+' / '+recap.ressources.length+' lignes) — à relire et valider.';}
+  }catch(err){$('recapstatus').textContent='Erreur : '+(err.message||err);}
+  if(btn)btn.disabled=false;
+}
 function pac(){$('pac').textContent=points.filter(p=>p.checked).length+' / '+points.length;}
 function addPA(){const v=$('panew').value.trim();if(!v)return;points.push({label:v,checked:true});$('panew').value='';renderPA();save();}
 async function verifierConformite(){
@@ -872,7 +945,7 @@ function buildData(){return{_type:'fiche_specs_oneid',_version:3,genere_le:new D
     contexte:val('aff_contexte'),solution_proposee:val('aff_solution'),
     contacts:contacts.map(c=>({nom:c.nom||'',prenom:c.prenom||'',fonction:c.fonction||'',telephone:c.telephone||'',email:c.email||''})),
     points_attention:points.map(p=>({label:p.label,checked:p.checked})),points_notes:val('pa_notes'),
-    clarifications:clars||[],verification:verif||[],cctp_text:$('cctp_text').value,images_architecture:imgStore.arch||[],
+    clarifications:clars||[],verification:verif||[],recap_cctp:recap,cctp_text:$('cctp_text').value,images_architecture:imgStore.arch||[],
     sauv_veeam:$('sauv_veeam').checked,sauv_datadomain:$('sauv_datadomain').checked,
     pra_pca:{mode:$('pra_mode').value,actif:$('pra_mode').value!=='aucun',rto:val('pra_rto'),rpo:val('pra_rpo'),cible:$('pra_cible').value,methode:$('pra_methode').value,texte:$('pra_text').value}},
   serveurs:items('serveurs'),stockages:items('stockages'),switches:items('switches'),sauvegardes:items('sauvegardes'),logiciels_services:items('logiciels_services'),
@@ -892,6 +965,7 @@ function loadData(d){const a=d.affaire||{};
   points=(a.points_attention||[]).map(p=>({label:p.label,checked:!!p.checked}));renderPA();
   clars=a.clarifications||[];renderClars();
   verif=a.verification||[];renderVerif();
+  recap=recapNorm(a.recap_cctp);renderRecap();
   $('sauv_veeam').checked=!!a.sauv_veeam;$('sauv_datadomain').checked=!!a.sauv_datadomain;
   const sv=d.sauvegarde||{};$('sauv_logiciel').value=sv.logiciel||'';$('sauv_licence').value=sv.licence||'acheter';$('sauv_cible').value=sv.cible||'';$('sauv_cloud').checked=!!sv.cloud;sauvSites=(sv.sites||[]).map(s=>({nom:s.nom||'',cells:s.cells||{}}));renderSauv();
   const ai=d.ai||{};if(ai.modelGb10!==undefined)$('aiModelGb10').value=ai.modelGb10;aiToggle();
@@ -1261,7 +1335,7 @@ async function delFiche(name){
 function newFiche(){
   if(!confirm('Démarrer une nouvelle fiche vide ?'))return;
   clearAll();['aff_client','aff_projet','aff_ref','aff_auteur','aff_contexte','aff_solution','pa_notes','ficheName','cctp_text','cctpname'].forEach(id=>{const e=$(id);if(e)e.value='';});
-  $('aff_version').value='1.0';points=[];clars=[];verif=[];renderPA();renderClars();renderVerif();imgStore.arch=[];renderThumbs('arch');$('resCard').style.display='none';
+  $('aff_version').value='1.0';points=[];clars=[];verif=[];recap=recapNorm(null);renderPA();renderClars();renderVerif();renderRecap();imgStore.arch=[];renderThumbs('arch');$('resCard').style.display='none';
   ['pra_rto','pra_rpo','pra_text'].forEach(id=>{const e=$(id);if(e)e.value='';});$('pra_mode').value='aucun';$('sauv_veeam').checked=false;$('sauv_datadomain').checked=false;praToggle();
   chapitres=[];renderKanban();prestations=[];renderPrest();contacts=[];renderContacts();
   $('sauv_logiciel').value='';$('sauv_licence').value='acheter';$('sauv_cible').value='';$('sauv_cloud').checked=false;sauvSites=[];renderSauv();

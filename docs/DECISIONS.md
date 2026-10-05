@@ -1,5 +1,14 @@
 # Décisions techniques — Générateur d'appel d'offre ONE ID
 
+## 2026-10-05 — Étape « Récapitulatif du CCTP — Focus technique » (onglet 2)
+- **Décidé** : nouvelle étape après l'analyse CCTP, avec 3 tableaux (matrice de couverture, plan de prise en charge, ressources minimales) aux colonnes imposées par l'utilisateur. « Capacité IMS » est renommé « Capacité ONEID à confirmer ».
+- **Appel IA séparé** (`/api/recap-cctp`, 6 000 tokens) plutôt qu'une extension de `/api/analyse-cctp` : la sortie de l'analyse est déjà plafonnée à 4 000 tokens, et la fusionner risquerait la coupure Bifrost à 300 s. Le frontend enchaîne l'appel automatiquement après l'analyse ; un bouton permet de régénérer.
+- **Statuts** : liste fermée À confirmer / À préparer / À qualifier / Validé. L'IA n'attribue jamais « Validé » : le prompt l'interdit et le parseur la rétrograde. La validation reste une décision humaine.
+- **Prompt** : rédigé par un sous-agent Lyra (méthode 4-D). Il impose un contrat JSON strict, une règle de repli « à préciser » par champ, l'interdiction d'inventer des références d'article, des pondérations ou des capacités ONE ID, et des volumes bornés.
+- **Module pur `app/recap_cctp.py`**, partagé entre l'API et le moteur Word (`sys.path`), qui reste un sous-processus. Les colonnes sont dupliquées dans `index.html`, avec un test de cohérence (écarté : un endpoint de schéma, jugé surdimensionné).
+- **Export Word** : section paysage dédiée, placée après le planning et avant les chapitres administratifs. Les statuts non validés sont en rouge (convention « à vérifier » du document).
+- **Mise en page (demande utilisateur, même jour)** : l'interface passe en pleine largeur (fin du `max-width:1240px`). Les colonnes à fort contenu sont listées une seule fois dans `recap_cctp.WIDE_COLS`, recopiées dans `RECAP_WIDE` (index.html) et vérifiées par un test. Les tableaux utilisent `table-layout:fixed` avec une largeur minimale de 1040 px : en dessous, un défilement horizontal apparaît au lieu d'écraser les colonnes. Écarté : une mise en page en cartes empilées sur mobile, non demandée, l'outil étant utilisé sur poste fixe.
+
 ## 2026-09-30 — Réglages LLM runtime persistés en JSON (pas de chiffrement)
 Introduction d'une modale ⚙ Paramètres LLM (bouton dans le header) permettant de
 changer base URL / modèle / clé API sans redéployer le conteneur. La config est

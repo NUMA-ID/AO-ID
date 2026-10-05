@@ -42,11 +42,12 @@ docker compose up -d --build
 
 Puis ouvrir : **http://localhost:8080**
 
-Tests (stdlib, sans Docker) :
+Tests (`unittest`). Ils nécessitent les dépendances de `app/requirements.txt`, en plus de `httpx` pour les tests d'endpoint ; sans elles, les tests concernés sont ignorés (*skipped*) ou ne se chargent pas. Les dépendances ne sont pas installées sur l'hôte : passer par un venv.
 
 ```
 cd /home/numa/projets/appel-offre
-python3 -m unittest discover -s tests -v
+python3 -m venv /tmp/venv-aoid && /tmp/venv-aoid/bin/pip install -r app/requirements.txt httpx
+/tmp/venv-aoid/bin/python -m unittest discover -s tests -v
 ```
 
 - Après une simple modification de code, `docker compose up -d` suffit (rechargement auto activé).
@@ -59,11 +60,11 @@ Arrêt : `docker compose down`.
 ## Utilisation — l'assistant en 7 étapes
 
 1. **CCTP & contexte** — déposer le CCTP (PDF/Word/TXT) ; l'IA en extrait le contexte et les points d'attention.
-2. **Équipements** — importer l'export Excel Dell (Solutions Configurator) et compléter à la main (firewall, switch, wifi…).
-3. **Fonctionnalité** — PRA/PCA (RTO/RPO, cible, méthode) et sauvegarde (Veeam/PPDM, baie SAN / Data Domain, réplication Cloud), avec argumentaires par cas.
-4. **Structure du dossier (Kanban)** — regrouper les points d'attention en chapitres (proposition automatique par l'IA), décrire chaque chapitre (saisie/dictée/reformulation + images).
-5. **Prestations & méthodologie** — intitulé, durée et méthodologie par prestation.
-6. **Planning** — diagramme de Gantt (dérivable des prestations) ; couleurs par type (tâche / réception matériel / télétravail / congé).
+2. **Récap CCTP & focus technique** — trois tableaux générés par l'IA juste après l'analyse, puis modifiables : *Matrice de couverture technique*, *Plan de prise en charge recommandé*, *Ressources minimales à proposer*. Statuts : À confirmer / À préparer / À qualifier / Validé (seul l'humain peut mettre « Validé »). Repris dans le Word, en page paysage.
+3. **Équipements** — importer l'export Excel Dell (Solutions Configurator) et compléter à la main (firewall, switch, wifi…).
+4. **Fonctionnalité** — PRA/PCA (RTO/RPO, cible, méthode) et sauvegarde (Veeam/PPDM, baie SAN / Data Domain, réplication Cloud), avec argumentaires par cas.
+5. **Structure du dossier & prestations (Kanban)** — regrouper les points d'attention en chapitres (proposition automatique par l'IA), décrire chaque chapitre (argumentaire, complément, durée).
+6. **Planning** — diagramme de Gantt (dérivable des chapitres) ; couleurs par type (tâche / réception matériel / télétravail / congé).
 7. **Documents & historique** — générer le **mémoire technique Word**, le **chiffrage Excel**, remplir le **cadre de mémoire technique** du client (IA), **vérifier la conformité** au CCTP, puis **enregistrer le dossier** dans l'historique.
 
 Le choix du **moteur IA** (Claude ou Mammouth) se fait dans la barre du bas et s'applique à tous les boutons IA.
