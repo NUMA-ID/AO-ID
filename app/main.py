@@ -47,7 +47,10 @@ def sysp(specific: str) -> str:
 
 GB10_API_KEY = os.environ.get("GB10_API_KEY", "")
 GB10_BASE = os.environ.get("GB10_BASE", "https://llm.one-id.fr/v1")
-GB10_MODEL = os.environ.get("GB10_MODEL", "unsloth/Qwen3.8-Flash-Next-GGUF")
+# Identifiant tel qu'exposé par /v1/models du serveur GB10 (vérifié le 2026-10-06).
+# L'ancien défaut "unsloth/Qwen3.8-Flash-Next-GGUF" n'existe plus côté serveur : il ne
+# renvoie pas d'erreur mais laisse la requête suspendue jusqu'au timeout.
+GB10_MODEL = os.environ.get("GB10_MODEL", "unsloth-oneid/Qwen3.8-Flash-Next-GGUF")
 # Moteur IA unique : GB10 (serveur vLLM ONE ID, API OpenAI-compatible).
 # Les moteurs Claude / Mammouth / Mistral ont été retirés le 2026-09-09 (décision utilisateur).
 DEFAULT_PROVIDER = os.environ.get("DEFAULT_PROVIDER", "gb10").lower()
@@ -225,7 +228,7 @@ def llm_complete(system, user, max_tokens=4000, provider="", model=""):
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 FICHES_DIR.mkdir(parents=True, exist_ok=True)
 
-APP_VERSION = "2.5"
+APP_VERSION = "2.7"
 
 
 def _archive_frontend():

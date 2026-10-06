@@ -5,6 +5,14 @@ Une entrée par problème. Les entrées ne sont jamais supprimées, seulement pa
 
 ---
 
+## 2026-10-06 — Identifiant de modèle GB10 obsolète : appels IA suspendus (résolu)
+- **Constat** : le défaut `GB10_MODEL` valait `unsloth/Qwen3.8-Flash-Next-GGUF`. Cet identifiant n'est plus exposé par `llm.one-id.fr/v1/models`, qui publie `unsloth-oneid/Qwen3.8-Flash-Next-GGUF`, `unsloth-oneid/unsloth/Qwen3.8-Flash-Next-GGUF`, `unsloth-oneid/unsloth/Qwen3.5-4B-MTP-GGUF`, `gptoss20b/gpt-oss-20b-1node`, `gptpss20b-agent/gpt-oss-20b-maxctx` et `qwencoder30b/qwen3-coder-30b-a3b`.
+- **Cause** : renommage des modèles côté serveur GB10, non répercuté dans le code ni dans le Deployment.
+- **Impact** : un identifiant inconnu ne provoque pas d'erreur HTTP — la requête reste **suspendue** (sonde du 2026-10-06 : aucune réponse après 90 s, contre HTTP 200 immédiat avec l'identifiant valide). En PROD, chaque appel IA aurait été coupé par le timeout Envoy à 300 s. La PREPROD n'était pas touchée : son `llm_settings.json` (modale ⚙) porte déjà l'identifiant correct, ce qui a masqué le problème.
+- **Jamais déclenché en PROD** : les 73 898 lignes de log du pod `ao-id` (13 jours, image 2.6.0) ne contiennent aucun appel IA, uniquement `GET /` et les probes. La panne était latente, pas constatée par un utilisateur.
+- **Correctif (v2.7)** : défaut corrigé dans `app/main.py` **et** `GB10_MODEL` posé explicitement dans `03-deployment-ao-id.yaml` pour ne plus dépendre d'un défaut codé.
+- **Surveillance** : après tout renommage côté GB10, comparer `GET $GB10_BASE/models` avec la valeur servie par `/api/health`.
+
 ## 2026-10-05 — PREPROD : montages fichier par fichier figés après une édition atomique (contourné)
 - **Constat** : `/api/generer` a renvoyé HTTP 500 (`module 'recap_admin' has no attribute 'date_courte'`) alors que la fonction était bien dans le fichier sur le disque et que les tests passaient.
 - **Cause** : `docker-compose.yml` monte `main.py`, `drawio_url.py`, `recap_cctp.py` et `recap_admin.py` un par un. Docker suit l'inode d'origine, et les outils d'édition qui écrivent par remplacement atomique créent un nouvel inode.
