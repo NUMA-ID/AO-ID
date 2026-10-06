@@ -1,0 +1,1549 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ONE ID — Appel d'offre</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{--oneid:#0a3d62;--oneid2:#1e6091;--accent:#16a085;--accent2:#12b6a0;--line:#e4e9f0;--muted:#6b7785;--danger:#c0392b;--bg:#eef2f7;--ink:#182633;--radius:14px;--shadow-sm:0 1px 2px rgba(16,42,67,.06);--shadow:0 4px 16px -6px rgba(16,42,67,.14);--shadow-lg:0 18px 48px -12px rgba(16,42,67,.28);--ring:0 0 0 3px rgba(30,96,145,.18)}
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;font-family:"Inter","Segoe UI",Roboto,-apple-system,Arial,sans-serif;background:radial-gradient(1200px 600px at 100% -10%,#e9f2f0 0,transparent 60%),var(--bg);color:var(--ink);font-size:13.5px;line-height:1.5;-webkit-font-smoothing:antialiased}
+  ::selection{background:rgba(22,160,133,.22)}
+  ::-webkit-scrollbar{width:10px;height:10px}
+  ::-webkit-scrollbar-thumb{background:#c4d0dc;border-radius:20px;border:2px solid transparent;background-clip:padding-box}
+  ::-webkit-scrollbar-thumb:hover{background:#a9b8c7;background-clip:padding-box}
+  header{background:linear-gradient(120deg,var(--oneid) 0,var(--oneid2) 58%,#2a7bb0 100%);color:#fff;padding:18px 26px;position:relative;overflow:hidden;box-shadow:var(--shadow)}
+  header::after{content:"";position:absolute;right:-60px;top:-90px;width:280px;height:280px;background:radial-gradient(circle,rgba(22,160,133,.35),transparent 62%);pointer-events:none}
+  header h1{margin:0;font-size:20px;font-weight:700;letter-spacing:-.2px;position:relative;z-index:1}
+  header p{margin:5px 0 0;font-size:12px;opacity:.82;position:relative;z-index:1;max-width:900px}
+  .wrap{max-width:none;width:100%;box-sizing:border-box;margin:0;padding:22px clamp(12px,2vw,32px) 96px}
+  .tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin-bottom:20px;flex-wrap:wrap}
+  .tab{padding:11px 18px;cursor:pointer;font-weight:600;color:var(--muted);border:none;background:none;border-bottom:2.5px solid transparent;margin-bottom:-1px;font-size:14px;border-radius:8px 8px 0 0;transition:color .15s,background .15s,border-color .15s}
+  .tab:hover{color:var(--oneid);background:rgba(30,96,145,.06)}
+  .tab.active{color:var(--oneid);border-bottom-color:var(--accent)}
+  .panel{display:none;animation:fade .25s ease}.panel.active{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  .card{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px;margin-bottom:16px;box-shadow:var(--shadow-sm);transition:box-shadow .2s,transform .2s}
+  .card:hover{box-shadow:var(--shadow)}
+  .card h2{margin:0 0 4px;font-size:15px;font-weight:700;color:var(--oneid);letter-spacing:-.1px}
+  .hint{color:var(--muted);font-size:12px;margin:0 0 14px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+  label{display:block;font-size:11.5px;font-weight:600;color:#42505e;margin-bottom:4px;letter-spacing:.1px}
+  input,select,textarea{width:100%;padding:9px 11px;border:1px solid var(--line);border-radius:9px;font-size:13px;font-family:inherit;background:#fff;color:var(--ink);transition:border-color .15s,box-shadow .15s}
+  input:focus,select:focus,textarea:focus{outline:none;border-color:var(--oneid2);box-shadow:var(--ring)}
+  input:hover,select:hover,textarea:hover{border-color:#c7d3e0}
+  textarea{resize:vertical;min-height:46px}
+  .item{border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:11px;padding:15px 17px;margin-bottom:12px;background:linear-gradient(180deg,#fbfdfe,#f7fbfa);transition:box-shadow .2s,border-color .2s}
+  .item:hover{box-shadow:var(--shadow-sm);border-left-color:var(--accent2)}
+  .item-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+  .item-head strong{color:var(--oneid)}
+  .full{grid-column:1/-1}
+  .btn{cursor:pointer;border:none;border-radius:9px;padding:9px 16px;font-size:13px;font-weight:600;font-family:inherit;transition:background .15s,box-shadow .15s,transform .08s;display:inline-flex;align-items:center;gap:6px}
+  .btn:active{transform:translateY(1px)}
+  .btn:focus-visible{outline:none;box-shadow:var(--ring)}
+  .btn-primary{background:linear-gradient(180deg,var(--oneid2),var(--oneid));color:#fff;box-shadow:0 2px 8px -2px rgba(10,61,98,.5)}.btn-primary:hover{background:linear-gradient(180deg,#2a72a8,var(--oneid2))}
+  .btn-accent{background:linear-gradient(180deg,var(--accent2),var(--accent));color:#fff;box-shadow:0 2px 8px -2px rgba(22,160,133,.5)}.btn-accent:hover{filter:brightness(1.06)}
+  .btn-excel{background:linear-gradient(180deg,#22874f,#1d6f42);color:#fff;box-shadow:0 2px 8px -2px rgba(29,111,66,.5)}.btn-excel:hover{filter:brightness(1.06)}
+  .btn-ghost{background:#fff;border:1px solid var(--line);color:var(--ink)}.btn-ghost:hover{background:#f3f7fb;border-color:#c7d3e0}
+  .btn-del{background:transparent;color:var(--danger);border:1px solid #e9c4bf;padding:4px 9px;font-size:12px;border-radius:8px}.btn-del:hover{background:#fdecea}
+  .badge{display:inline-block;background:var(--accent);color:#fff;border-radius:20px;padding:2px 10px;font-size:11px;font-weight:700;box-shadow:0 1px 3px rgba(22,160,133,.4)}
+  .dz{border:1.5px dashed #b8cdde;border-radius:11px;padding:14px;text-align:center;color:var(--muted);font-size:12px;cursor:pointer;background:#fbfdff;margin-top:8px;transition:border-color .15s,background .15s,color .15s}
+  .dz:hover{border-color:var(--oneid2);background:#f2f8fd;color:var(--oneid)}
+  .dz.over{border-color:var(--accent);background:#eaf7f1;color:#13683f}
+  .thumbs{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+  .thumb{position:relative}.thumb img{height:50px;border:1px solid var(--line);border-radius:7px;display:block}
+  .thumb button{position:absolute;top:-6px;right:-6px;width:17px;height:17px;border-radius:50%;border:none;background:var(--danger);color:#fff;font-size:11px;cursor:pointer;padding:0}
+  .pa{display:flex;align-items:flex-start;gap:8px;padding:7px 0;border-bottom:1px solid #f0f3f6}
+  .pa input{width:15px;height:15px;margin-top:2px;flex:0 0 auto}.pa span{flex:1}
+  .clar{background:#fffbe9;border:1px solid #f0e3b0;border-radius:9px;padding:8px 11px;margin:5px 0;font-size:12.5px;color:#6b551a}
+  .spin{display:inline-block;width:15px;height:15px;border:3px solid #cfe3ef;border-top-color:var(--oneid2);border-radius:50%;animation:s .8s linear infinite;vertical-align:-3px}
+  @keyframes s{to{transform:rotate(360deg)}}
+  .foot{position:sticky;bottom:0;background:rgba(255,255,255,.88);backdrop-filter:blur(8px);border-top:1px solid var(--line);padding:13px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap;box-shadow:0 -4px 16px -6px rgba(16,42,67,.14)}
+  .msg{font-size:12px;color:var(--muted);align-self:center}
+  .small{font-size:11.5px;color:var(--muted)}
+  .layout{display:flex;align-items:flex-start}
+  .sidebar{width:244px;flex:0 0 244px;background:#fff;border-right:1px solid var(--line);padding:16px 13px;position:sticky;top:0;align-self:stretch;min-height:calc(100vh - 58px)}
+  .sidebar h3{font-size:13px;color:var(--oneid);margin:0 0 12px;font-weight:700}
+  .sidebar .sb-save{display:flex;gap:6px;margin-bottom:8px}
+  .sidebar .sb-save input{font-size:12px;padding:7px 9px}
+  .sidebar #newFicheBtn{width:100%;margin-bottom:14px;font-size:12.5px;padding:8px;justify-content:center}
+  .content{flex:1;min-width:0}
+  .fiche{display:flex;align-items:center;gap:2px;padding:7px 8px;border-radius:8px;font-size:12.5px;transition:background .12s}
+  .fiche:hover{background:#eef4f8}
+  .fiche .nm{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer}
+  .fiche .ic{border:none;background:none;cursor:pointer;font-size:13px;padding:2px;line-height:1;border-radius:5px}
+  .fiche .ic:hover{background:#dce7ef}
+  @media(max-width:1440px){.sidebar{width:196px;flex:0 0 196px}}
+  /* Récap CCTP : tableaux pleine largeur, colonnes à fort contenu élargies, cellules auto-hauteur */
+  .rtab{table-layout:fixed;width:100%;min-width:1040px}
+  .rtab th.rw,.rtab td.rw{width:auto}
+  .rtab th.rn,.rtab td.rn{width:10%}
+  .rtab th.rs,.rtab td.rs{width:112px}
+  .rtab th.rx,.rtab td.rx{width:36px;text-align:center}
+  .ptab.rtab td{vertical-align:top}
+  .rtab textarea{width:100%;box-sizing:border-box;font-size:12.5px;line-height:1.45;min-height:150px;resize:vertical;overflow:hidden;border:1px solid var(--line);border-radius:6px;padding:7px}
+  .ptab.rtab td.rs select{width:100%;font-size:11.5px;padding:5px 2px}
+  /* Focus administratif : charte des tableaux Excel fournis (bandeau marine, en-têtes bleu-vert) */
+  .abar{background:#1f3b63;color:#fff;font-weight:700;padding:8px 12px;border-radius:10px 10px 0 0;font-size:13.5px}
+  .aobj{background:#dceaf5;padding:8px 12px;border:1px solid #c5d9ea;border-radius:0 0 10px 10px;font-size:13px}
+  .ptab.rtab.atab{border-radius:0 0 10px 10px}
+  .ptab.rtab.atab th{background:#0f6a75}
+  .ameta{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px;margin-top:10px}
+  .adocs .adoc{display:flex;align-items:center;gap:8px;padding:5px 8px;border:1px solid var(--line);border-radius:8px;margin-top:6px;background:#fafcfe;font-size:12.5px}
+  @media(max-width:760px){.layout{flex-direction:column}.sidebar{width:auto;flex:none;position:static;min-height:0;border-right:none;border-bottom:1px solid var(--line)}.wrap{padding:18px 16px 90px}}
+  .ptab{border-collapse:separate;border-spacing:0;width:100%;font-size:12px;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+  .ptab th,.ptab td{border-bottom:1px solid var(--line);border-right:1px solid var(--line);padding:5px 7px;vertical-align:middle}
+  .ptab tr td:last-child,.ptab tr th:last-child{border-right:none}
+  .ptab tr:last-child td{border-bottom:none}
+  .ptab th{background:var(--oneid);color:#fff;font-weight:600;font-size:11px}
+  .ptab tbody tr:nth-child(even){background:#f7fafc}
+  .ptab input[type=text],.ptab input[type=date]{border:1px solid var(--line);border-radius:6px;padding:6px;font-size:12px;width:100%}
+  .ptab .rowact button{border:none;background:none;cursor:pointer;font-size:13px;padding:1px 2px}
+  .gtt{border-collapse:collapse;font-size:10px}
+  .gtt th,.gtt td{border:1px solid #e3e9ef;padding:2px 3px;text-align:center;white-space:nowrap;min-width:22px}
+  .gtt th.info,.gtt td.info{text-align:left;white-space:normal;min-width:90px}
+  .gtt thead th{background:var(--oneid);color:#fff}
+  .gtt .bar{background:#f4b183}
+  .gtt .conge{background:#c9b8e8}
+  .gtt .recep{background:#8bc98b}
+  .gtt .tele{background:#6aaed6}
+  .modal-ov{position:fixed;inset:0;background:rgba(16,32,48,.5);backdrop-filter:blur(3px);display:flex;align-items:center;justify-content:center;z-index:1000;padding:20px;animation:fade .2s ease}
+  .modal-box{background:#fff;border-radius:16px;padding:20px 22px;width:min(740px,96vw);max-height:90vh;overflow:auto;box-shadow:var(--shadow-lg)}
+</style>
+</head>
+<body>
+<header>
+  <h1>ONE ID — Générateur d'appel d'offre <span style="font-size:13px;font-weight:600;opacity:.75">v2.5</span>
+    <button id="btn-settings" type="button" onclick="openSettings()" title="Paramètres LLM"
+      style="float:right;background:transparent;border:1px solid rgba(255,255,255,.35);color:#fff;
+             cursor:pointer;font-size:16px;padding:4px 10px;border-radius:6px;line-height:1;margin-top:-2px">
+      ⚙ Paramètres
+    </button>
+  </h1>
+  <p>Analyse CCTP (IA : GB10 interne ONE ID) · Import Excel Dell · Équipements · PRA/PCA · Sauvegarde · Kanban · draw.io · Génération du Word ONE ID <span style="opacity:.6">— version 2.5 · build __BUILD__</span></p>
+</header>
+
+<!-- Modale Paramètres LLM (v2.5) -->
+<div id="settings-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);
+     z-index:1000;align-items:center;justify-content:center" onclick="if(event.target===this)closeSettings()">
+  <div style="background:#fff;color:#222;padding:24px;border-radius:10px;width:560px;max-width:94vw;
+       max-height:90vh;overflow-y:auto;box-shadow:0 8px 32px rgba(0,0,0,.4)">
+    <h3 style="margin-top:0;color:var(--oneid)">⚙ Paramètres LLM</h3>
+    <p style="color:#666;font-size:12px;margin-bottom:16px">
+      Configure le moteur IA utilisé par l'application (base URL, modèle, clé API).
+      Stocké côté serveur dans <code>OUT_DIR/llm_settings.json</code> (prioritaire sur les variables d'env).
+    </p>
+    <div id="set-origin" style="font-size:12px;color:#888;margin-bottom:12px"></div>
+
+    <label style="display:block;font-size:13px;margin-bottom:4px">Base URL du serveur LLM</label>
+    <input id="set-baseurl" type="url" placeholder="https://llm.one-id.fr/v1"
+      style="width:100%;padding:8px;border:1px solid #ccc;border-radius:6px;margin-bottom:12px;box-sizing:border-box">
+
+    <label style="display:block;font-size:13px;margin-bottom:4px">Modèle</label>
+    <div style="display:flex;gap:8px;margin-bottom:12px">
+      <select id="set-model" style="flex:1;padding:8px;border:1px solid #ccc;border-radius:6px"></select>
+      <button type="button" onclick="loadModels()"
+        style="padding:8px 12px;background:#f5f5f5;border:1px solid #ccc;border-radius:6px;cursor:pointer;white-space:nowrap">
+        🔄 Tester et lister
+      </button>
+    </div>
+
+    <label style="display:block;font-size:13px;margin-bottom:4px">Clé API</label>
+    <input id="set-apikey" type="password" placeholder="sk-… (laisser vide pour ne pas changer)"
+      style="width:100%;padding:8px;border:1px solid #ccc;border-radius:6px;margin-bottom:12px;box-sizing:border-box">
+
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px;flex-wrap:wrap">
+      <button type="button" onclick="testConnection()"
+        style="padding:8px 14px;background:#fff;border:1px solid #ccc;border-radius:6px;cursor:pointer;margin-right:auto">
+        🔌 Tester la connexion
+      </button>
+      <button type="button" onclick="closeSettings()"
+        style="padding:8px 14px;background:#fff;border:1px solid #ccc;border-radius:6px;cursor:pointer">
+        Fermer
+      </button>
+      <button type="button" onclick="saveSettings()" class="btn btn-accent"
+        style="padding:8px 14px;font-weight:600">
+        Enregistrer et tester
+      </button>
+    </div>
+
+    <div id="set-status" style="margin-top:12px;font-size:13px;min-height:18px"></div>
+  </div>
+</div>
+
+<script>
+// ---- Paramètres LLM (v2.5) : réglages runtime + test connexion + liste des modèles.
+function _setStatus(txt, kind){
+  const el=document.getElementById('set-status'); if(!el)return;
+  el.textContent=txt||'';
+  el.style.color = kind==='error' ? '#c0392b' : kind==='ok' ? '#1e8449' : '#666';
+}
+async function openSettings(){
+  document.getElementById('settings-overlay').style.display='flex';
+  _setStatus('Chargement…');
+  try{
+    const r=await fetch('/api/settings/llm'); if(!r.ok){_setStatus('Erreur HTTP '+r.status,'error');return;}
+    const d=await r.json();
+    document.getElementById('set-baseurl').value = d.base_url||'';
+    const k=document.getElementById('set-apikey'); k.value=''; k.placeholder = d.api_key_masked ? (d.api_key_masked+' (laisser vide pour ne pas changer)') : 'sk-… (laisser vide pour ne pas changer)';
+    const parts=['Source : '+(d.source||'?')];
+    if(d.updated_by) parts.push('par '+d.updated_by);
+    if(d.updated_at){ parts.push('le '+new Date(d.updated_at*1000).toLocaleString('fr-FR')); }
+    document.getElementById('set-origin').textContent = parts.join(' — ');
+    // Peuple d'abord avec le modèle courant en placeholder, puis tente d'auto-charger la liste
+    // depuis la clé déjà enregistrée côté serveur (pas besoin que l'utilisateur re-saisisse).
+    const sel=document.getElementById('set-model'); sel.innerHTML='';
+    const opt=document.createElement('option'); opt.value=d.model||''; opt.textContent=(d.model||'(aucun)')+' — chargement…'; sel.appendChild(opt);
+    _setStatus('');
+    try{
+      const rm=await fetch('/api/settings/llm/models');
+      if(rm.ok){
+        const dm=await rm.json();
+        const ids=dm.models||[];
+        sel.innerHTML='';
+        if(!ids.length){ const o=document.createElement('option'); o.textContent='(aucun modèle listé)'; o.disabled=true; sel.appendChild(o); }
+        else{ for(const id of ids){ const o=document.createElement('option'); o.value=id; o.textContent=id+(id===d.model?' ★':''); if(id===d.model)o.selected=true; sel.appendChild(o); } }
+        _setStatus('✅ '+ids.length+' modèle(s) disponibles.','ok');
+      } else if(rm.status===400){
+        // Pas de clé enregistrée : on laisse le placeholder, l'utilisateur devra saisir puis « Tester et lister ».
+        sel.innerHTML=''; const o=document.createElement('option'); o.value=d.model||''; o.textContent=d.model||'(saisir la clé puis Tester et lister)'; sel.appendChild(o);
+        _setStatus('ℹ️ Saisissez la clé API puis « Tester et lister » pour peupler la liste.');
+      } else {
+        _setStatus('⚠️ Impossible de charger la liste (HTTP '+rm.status+') — bouton « Tester et lister » disponible.','error');
+      }
+    }catch(e2){ _setStatus('⚠️ Liste non chargée : '+(e2.message||e2),'error'); }
+  }catch(e){ _setStatus('Erreur : '+(e.message||e),'error'); }
+}
+function closeSettings(){ document.getElementById('settings-overlay').style.display='none'; }
+async function loadModels(){
+  const url=document.getElementById('set-baseurl').value.trim();
+  const key=document.getElementById('set-apikey').value;
+  const cur=document.getElementById('set-model').value;
+  _setStatus('Test et lecture des modèles…');
+  try{
+    let ids=[];
+    if(url && key){
+      const r=await fetch('/api/settings/llm/probe',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({base_url:url,api_key:key})});
+      if(!r.ok){_setStatus('Erreur HTTP '+r.status,'error');return;}
+      const d=await r.json();
+      if(d.status==='unauthorized'){_setStatus('❌ Clé API refusée par le serveur LLM.','error');return;}
+      if(d.status==='unreachable'){_setStatus('⚠️ Serveur LLM injoignable.','error');return;}
+      ids=d.models||[];
+    } else {
+      const r=await fetch('/api/settings/llm/models'+(url?('?probe_url='+encodeURIComponent(url)):''));
+      if(r.status===400){_setStatus('Aucune clé enregistrée : saisissez une clé pour tester.','error');return;}
+      if(r.status===502){_setStatus('⚠️ Serveur LLM injoignable.','error');return;}
+      if(!r.ok){_setStatus('Erreur HTTP '+r.status,'error');return;}
+      const d=await r.json(); ids=d.models||[];
+    }
+    const sel=document.getElementById('set-model'); sel.innerHTML='';
+    if(!ids.length){ const o=document.createElement('option'); o.textContent='(aucun modèle listé)'; o.disabled=true; sel.appendChild(o); }
+    else{ for(const id of ids){ const o=document.createElement('option'); o.value=id; o.textContent=id; if(id===cur)o.selected=true; sel.appendChild(o); } }
+    _setStatus('✅ '+ids.length+' modèle(s) listé(s).','ok');
+  }catch(e){ _setStatus('Erreur : '+(e.message||e),'error'); }
+}
+async function testConnection(){
+  const url=document.getElementById('set-baseurl').value.trim();
+  const key=document.getElementById('set-apikey').value;
+  if(!url){_setStatus('Base URL requise.','error');return;}
+  if(!key){_setStatus('Clé API requise pour tester (non persistée).','error');return;}
+  _setStatus('Sonde en cours…');
+  try{
+    const r=await fetch('/api/settings/llm/probe',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({base_url:url,api_key:key})});
+    if(!r.ok){_setStatus('Erreur HTTP '+r.status,'error');return;}
+    const d=await r.json();
+    if(d.status==='ok') _setStatus('✅ Connexion valide — '+d.nb_modeles+' modèle(s) exposé(s).','ok');
+    else if(d.status==='unauthorized') _setStatus('❌ Clé API refusée par le serveur LLM.','error');
+    else _setStatus('⚠️ Serveur LLM injoignable.','error');
+  }catch(e){ _setStatus('Erreur réseau : '+(e.message||e),'error'); }
+}
+async function saveSettings(){
+  const base_url=document.getElementById('set-baseurl').value.trim();
+  const model=document.getElementById('set-model').value;
+  const api_key=document.getElementById('set-apikey').value;
+  if(!base_url||!model){_setStatus('Base URL et modèle sont requis.','error');return;}
+  _setStatus('Enregistrement et sonde…');
+  try{
+    // api_key vide = on garde la clé actuellement enregistrée (le backend gère ce cas).
+    const body={base_url,model}; if(api_key) body.api_key=api_key;
+    const r=await fetch('/api/settings/llm',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    const d=await r.json().catch(()=>({}));
+    if(r.ok){ _setStatus('✅ Enregistré — '+(d.nb_modeles_listes||0)+' modèle(s) disponibles.','ok'); document.getElementById('set-apikey').value=''; if(typeof _refreshFooterModels==='function') _refreshFooterModels(); }
+    else if(r.status===400) _setStatus('❌ '+((d.detail)||'Clé refusée ou champs invalides.'),'error');
+    else if(r.status===502) _setStatus('⚠️ LLM injoignable — configuration enregistrée quand même.','error');
+    else _setStatus('Erreur HTTP '+r.status,'error');
+  }catch(e){ _setStatus('Erreur réseau : '+(e.message||e),'error'); }
+}
+</script>
+
+<div class="layout">
+<aside class="sidebar">
+  <h3>📁 Mes fiches</h3>
+  <div class="sb-save"><input id="ficheName" placeholder="Nom de la fiche"><button class="btn btn-accent" onclick="saveFiche()" title="Enregistrer la fiche courante">💾</button></div>
+  <button class="btn btn-ghost" id="newFicheBtn" onclick="newFiche()">＋ Nouvelle fiche</button>
+  <div id="fichesList"></div>
+</aside>
+<div class="content">
+<div class="wrap">
+  <div class="tabs">
+    <button class="tab active" data-t="cctp" onclick="tab('cctp')">1 · CCTP &amp; contexte</button>
+    <button class="tab" data-t="recap" onclick="tab('recap')">2 · Récap CCTP &amp; focus technique</button>
+    <button class="tab" data-t="admin" onclick="tab('admin')">3 · Focus administratif</button>
+    <button class="tab" data-t="equip" onclick="tab('equip')">4 · Équipements</button>
+    <button class="tab" data-t="fonc" onclick="tab('fonc')">5 · Fonctionnalité</button>
+    <button class="tab" data-t="kanban" onclick="tab('kanban')">6 · Structure du dossier &amp; prestations</button>
+    <button class="tab" data-t="plan" onclick="tab('plan')">7 · Planning</button>
+    <button class="tab" data-t="gen" onclick="tab('gen')">8 · Documents &amp; historique</button>
+    <button class="tab" data-t="arg" onclick="tab('arg')" style="margin-left:auto">⚙️ Argumentaires</button>
+  </div>
+  <div style="display:flex;align-items:center;gap:10px;margin:0 0 16px">
+    <div style="flex:1;height:6px;background:var(--line);border-radius:999px;overflow:hidden"><div id="stepBar" style="height:100%;width:12.5%;background:var(--oneid);transition:width .2s"></div></div>
+    <span id="stepInfo" class="small" style="white-space:nowrap">Étape 1 / 8</span>
+  </div>
+
+  <!-- ===== CCTP ===== -->
+  <div id="p-cctp" class="panel active">
+    <div class="card">
+      <h2>Import &amp; analyse du CCTP</h2>
+      <p class="hint">Déposez le CCTP (PDF, Word, TXT) ou collez le texte, puis lancez l'analyse : le moteur GB10 en extrait le contexte et les points d'attention.</p>
+      <div class="dz" id="cctpdz">📎 Déposez le CCTP (PDF / Word / TXT) ou cliquez<input type="file" id="cctpfile" accept=".pdf,.doc,.docx,.txt" style="display:none"></div>
+      <div id="cctpname" class="small" style="margin-top:6px"></div>
+      <textarea id="cctp_text" rows="6" style="margin-top:10px" placeholder="…ou collez ici le texte du CCTP"></textarea>
+      <div style="margin-top:10px"><button class="btn btn-ghost" onclick="dicter('cctp_text',this)" title="Dictée vocale (fr-FR) — cliquez pour parler, recliquez pour arrêter">🎤 Dicter</button> <button class="btn btn-primary" id="goAnalyse">⚙️ Analyser le CCTP avec l'IA</button><span class="msg" id="cstatus" style="margin-left:8px"></span></div>
+    </div>
+    <div class="card" id="resCard" style="display:none">
+      <h2>Contexte du projet <span class="small">(intégré au Word)</span> <button class="btn btn-ghost" style="font-size:13px;padding:2px 8px" onclick="dicter('aff_contexte',this)" title="Dictée vocale (fr-FR) — cliquez pour parler, recliquez pour arrêter">🎤</button></h2>
+      <textarea id="aff_contexte" rows="8"></textarea>
+      <h2 style="margin-top:14px">Points d'attention <span class="badge" id="pac">0</span></h2>
+      <p class="hint">Checklist interne (non intégrée au Word).</p>
+      <div id="points"></div>
+      <div style="display:flex;gap:8px;margin-top:8px"><input id="panew" placeholder="Ajouter un point…" onkeydown="if(event.key==='Enter')addPA()"><button class="btn btn-accent" onclick="addPA()">+</button></div>
+      <div style="margin-top:12px"><label>Notes libres</label><textarea id="pa_notes" rows="3"></textarea></div>
+      <div id="clarwrap" style="display:none"><h2 style="margin-top:14px">À clarifier</h2><div id="clars"></div></div>
+      <div id="verifwrap" style="display:none"><h2 style="margin-top:14px">Vérification de conformité au CCTP <span class="small">(relecture — intégrée au Word en couleur)</span></h2>
+        <p class="hint">Comparaison de la demande du CCTP avec la solution configurée. ✅ couvert · ⚠️ écart · ❔ à préciser. Les écarts / éléments à préciser sont ajoutés au Word en couleur de relecture.</p>
+        <div id="verif"></div></div>
+    </div>
+  </div>
+
+  <!-- ===== RÉCAP CCTP & FOCUS TECHNIQUE ===== -->
+  <div id="p-recap" class="panel">
+    <div class="card">
+      <h2>Récapitulatif du CCTP — Focus technique <span class="small">(intégré au Word, page paysage)</span></h2>
+      <p class="hint">Généré par l'IA à partir du CCTP analysé (lancé automatiquement après l'analyse), puis modifiable ici. Statuts : <b>À confirmer</b> · <b>À préparer</b> · <b>À qualifier</b> · <b>Validé</b> (« Validé » est réservé à votre relecture : l'IA ne l'attribue jamais). Les statuts non validés apparaissent en rouge dans le Word.</p>
+      <button class="btn btn-primary" id="goRecap" onclick="genRecap()" title="(Re)génère les 3 tableaux à partir du CCTP, des points d'attention et de la solution configurée. Remplace le contenu actuel.">⚙️ Générer le récapitulatif (IA)</button>
+      <span class="msg" id="recapstatus" style="margin-left:8px"></span>
+    </div>
+    <div id="recapTables"></div>
+  </div>
+
+  <!-- ===== FOCUS ADMINISTRATIF & CONTRACTUEL ===== -->
+  <div id="p-admin" class="panel">
+    <div class="card">
+      <h2>Documents administratifs du DCE <span class="small">(RC, CCAP, AE, BPU/DPGF, annexes…)</span></h2>
+      <p class="hint">Déposez un ou plusieurs documents (PDF, Word .docx, Excel .xlsx, TXT). Le texte est extrait puis conservé dans la fiche : la régénération ne demande pas de recharger les fichiers. Le CCTP de l'étape 1 est ajouté en contexte. Les PDF scannés (images sans texte) ne sont pas lisibles.</p>
+      <div class="dz" id="admindz">📎 Déposez les documents administratifs ou cliquez<input type="file" id="adminfile" accept=".pdf,.docx,.txt,.xlsx,.xlsm" multiple style="display:none"></div>
+      <div class="adocs" id="adminDocs"></div>
+      <div style="margin-top:10px"><button class="btn btn-primary" id="goAdmin" onclick="genAdmin()" title="(Re)génère les 3 tableaux à partir des documents chargés (et du CCTP). Remplace le contenu actuel.">⚙️ Générer le focus administratif (IA)</button><span class="msg" id="adminstatus" style="margin-left:8px"></span></div>
+    </div>
+    <div class="card" id="adminHead" style="display:none">
+      <div class="abar" id="adminTitle">Focus administratif et contractuel</div>
+      <div class="aobj">Objectif : sécuriser la recevabilité, les engagements contractuels et les conditions économiques avant validation du GO.</div>
+      <div class="ameta">
+        <div><label>Référence du marché</label><input id="adm_ref" oninput="adminMeta('reference_marche',this.value)"></div>
+        <div><label>Date limite des questions (PLACE)</label><input id="adm_dq" oninput="adminMeta('date_limite_questions',this.value)"></div>
+        <div><label>Date limite de remise des offres</label><input id="adm_do" oninput="adminMeta('date_limite_offres',this.value)"></div>
+      </div>
+      <p class="hint" style="margin-top:6px">Valeurs lues dans les documents par l'IA : vérifiez-les (« à préciser » = non trouvée). Statuts : À confirmer · À préparer · À qualifier · Validé (réservé à votre relecture).</p>
+      
+      <!-- Section de diagnostic : Affichage immédiat du prompt -->
+      <div id="adminPromptSectionDiag" style="margin-top:15px; padding:12px; background:#f8f9fa; border-radius:8px; border-left:4px solid #1e7e34;">
+        <h3 style="margin:0 0 8px 0; font-size:14px; color:#1e7e34;">Prompt IA (Diagnostic)</h3>
+        <div id="adminPromptDisplayDiag" style="font-family:monospace; font-size:12px; background:#fff; padding:8px; border-radius:4px; white-space:pre-wrap; max-height:300px; overflow:auto;"></div>
+      </div>
+      
+      <!-- Section d'affichage du prompt et réponse IA -->
+      <div id="adminPromptSection" style="margin-top:15px; padding:12px; background:#f8f9fa; border-radius:8px; border-left:4px solid #1e7e34; display:none;">
+        <h3 style="margin:0 0 8px 0; font-size:14px; color:#1e7e34;">Prompt IA</h3>
+        <div id="adminPromptDisplay" style="font-family:monospace; font-size:12px; background:#fff; padding:8px; border-radius:4px; white-space:pre-wrap; max-height:200px; overflow:auto;"></div>
+        <h3 style="margin:12px 0 8px 0; font-size:14px; color:#1e7e34;">Réponse IA</h3>
+        <div id="adminResponseDisplay" style="font-family:monospace; font-size:12px; background:#fff; padding:8px; border-radius:4px; white-space:pre-wrap; max-height:200px; overflow:auto;"></div>
+      </div>
+    </div>
+    <div id="adminTables"></div>
+  </div>
+
+  <!-- ===== ÉQUIPEMENTS ===== -->
+  <div id="p-equip" class="panel">
+    <div class="card" style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;background:#eaf5ee;border-color:#bfe0cb">
+      <button class="btn btn-excel" onclick="document.getElementById('xlsx').click()">📊 Importer un Excel (Dell Solutions Configurator)</button>
+      <input type="file" id="xlsx" accept=".xlsx,.xls" style="display:none">
+      <span class="small" id="xlsxmsg">Reconnaît serveurs / stockage / switches / sauvegarde et récupère la nomenclature.</span>
+    </div>
+
+    <div class="card">
+      <h2>Informations de l'affaire</h2>
+      <div class="grid">
+        <div><label>Client</label><input id="aff_client"></div>
+        <div><label>Projet / N° AO</label><input id="aff_projet"></div>
+        <div><label>Référence</label><input id="aff_ref"></div>
+        <div><label>Version</label><input id="aff_version" value="1.0"></div>
+        <div><label>Auteur</label><input id="aff_auteur"></div>
+        <div><label>Date</label><input id="aff_date" type="date"></div>
+      </div>
+      <div style="margin-top:12px">
+        <label>Vos contacts <span class="small">(page de garde du document)</span></label>
+        <div style="overflow-x:auto"><table id="contactsTable" class="ptab"></table></div>
+        <button class="btn btn-ghost" style="margin-top:6px" onclick="addContact()">+ Ajouter un contact</button>
+      </div>
+      <div style="margin-top:12px"><label>Solution proposée (texte personnalisé — « - » = puce, {client} substitué)</label><textarea id="aff_solution" rows="5" placeholder="Décrivez ici la solution de manière brute (notes, points clés). Cliquez ensuite sur « Reformuler » pour obtenir un texte avant-vente prêt à relire."></textarea>
+        <div style="margin-top:6px"><button class="btn btn-ghost" onclick="dicter('aff_solution',this)" title="Dictée vocale (fr-FR) — cliquez pour parler, recliquez pour arrêter">🎤 Dicter</button> <button class="btn btn-primary" id="goSolution" onclick="ameliorerSolution()" title="Réécrit votre texte brut dans un style d'ingénieur avant-vente ONE ID (arguments commerciaux), sans inventer de fait technique.">✨ Reformuler (style avant-vente IA)</button><span class="msg" id="solstatus" style="margin-left:8px"></span></div></div>
+      <div style="margin-top:10px"><label>Schéma d'architecture</label>
+        <div style="margin:2px 0 6px"><button class="btn btn-primary" onclick="openDrawio()" title="Dessiner le schéma d'architecture dans draw.io (local). À l'enregistrement, il est ajouté ci-dessous et inséré dans le Word.">✏️ Dessiner (draw.io)</button></div>
+        <div class="dz" data-imgzone="arch">📎 Déposez le schéma ou cliquez<input type="file" accept="image/*" multiple style="display:none"></div>
+        <div class="thumbs" data-thumbs="arch"></div></div>
+    </div>
+    <div id="cats"></div>
+  </div>
+
+  <!-- ===== PLANNING ===== -->
+  <div id="p-plan" class="panel">
+    <div class="card">
+      <h2>Planning prévisionnel <span class="badge" id="planCount">0</span></h2>
+      <p class="hint">Tâches intégrées au chapitre « Planning prévisionnel infra » du Word (page paysage, grille hebdomadaire). Couleurs des barres : orange = tâche, vert = réception matériel, bleu = télétravail (« Tél. » coché), violet = congé.</p>
+      <div style="overflow:auto"><table id="planTable" class="ptab"></table></div>
+      <button class="btn btn-accent" style="margin-top:10px" onclick="addTask()">+ Ajouter une tâche</button>
+      <button class="btn btn-ghost" style="margin-top:10px" onclick="loadDefaultPlan()">↻ Planning type ONE ID (démarrage J+1 mois)</button>
+      <button class="btn btn-ghost" style="margin-top:10px" onclick="prestToPlan()" title="Génère une tâche par chapitre ayant une durée (dates enchaînées en jours ouvrés)">↳ Depuis les chapitres</button>
+    </div>
+    <div class="card">
+      <h2>Aperçu Gantt</h2>
+      <p class="hint">Le bouton 🔗 d'une ligne la lie à la tâche du dessus (elle démarre après sa fin). « Appliquer » recalcule les dates des tâches liées (1er jour ouvré après la fin de la précédente, durée conservée) puis rafraîchit l'aperçu.</p>
+      <button class="btn btn-primary" style="margin-bottom:10px" onclick="recalcPlan()">✓ Appliquer (liens + aperçu)</button>
+      <div id="ganttPrev" style="overflow:auto"></div>
+    </div>
+  </div>
+
+  <!-- ===== FONCTIONNALITÉ (PRA/PCA) ===== -->
+  <div id="p-fonc" class="panel">
+    <div class="card">
+      <h2>Reprise / Continuité d'activité (PRA / PCA)</h2>
+      <p class="hint">Activez le dispositif puis renseignez les paramètres : un argumentaire adapté au cas est généré, intégrable au Word. Les valeurs spécifiques (RTO/RPO) apparaîtront en rouge dans le document (relecture).</p>
+      <div style="margin-top:8px"><label>Dispositif</label>
+        <select id="pra_mode" onchange="praToggle();save()">
+          <option value="aucun">Aucun</option>
+          <option value="pra">PRA — Plan de Reprise d'Activité</option>
+          <option value="pca">PCA — Plan de Continuité d'Activité</option>
+        </select></div>
+      <div id="praFields" style="display:none">
+        <div class="grid" style="margin-top:10px">
+          <div><label>RTO (délai de reprise visé)</label><input id="pra_rto" placeholder="ex : 4 heures" oninput="save()"></div>
+          <div><label>RPO (perte de données max admise)</label><input id="pra_rpo" placeholder="ex : 15 minutes" oninput="save()"></div>
+        </div>
+        <div style="margin-top:10px"><label>Cible de réplication</label>
+          <select id="pra_cible" onchange="save()">
+            <option value="ancien">Ancien matériel (reconditionné en site de repli)</option>
+            <option value="nouveau">Nouveau matériel dédié</option>
+            <option value="cloud">Cloud ONE ID</option>
+          </select></div>
+        <div style="margin-top:10px"><label>Méthode de réplication</label>
+          <select id="pra_methode" onchange="save()">
+            <option value="veeam">Veeam (logiciel, indépendant du matériel)</option>
+            <option value="natif">Native à la baie de stockage</option>
+          </select></div>
+        <div style="margin-top:12px">
+          <button class="btn btn-accent" onclick="genPra()">⚙️ Générer l'argumentaire</button>
+          <button class="btn btn-ghost" onclick="dicter('pra_text',this)" title="Dictée vocale (fr-FR)">🎤 Dicter</button>
+          <button class="btn btn-primary" id="goPra" onclick="reformulerPra()" title="Réécrit l'argumentaire dans un style avant-vente ONE ID, sans inventer de fait.">✨ Reformuler (IA)</button>
+          <span class="msg" id="prastatus" style="margin-left:8px"></span>
+        </div>
+        <div style="margin-top:10px"><label>Argumentaire PRA/PCA (intégré au Word — « - » = puce, {client} substitué)</label>
+          <textarea id="pra_text" rows="10" oninput="save()" placeholder="Cliquez sur « Générer l'argumentaire » pour produire un texte adapté au cas, puis ajustez-le / reformulez-le."></textarea></div>
+      </div>
+    </div>
+    <div class="card">
+      <h2>Contexte sauvegarde <span class="small">(chapitre auto PowerStore + PowerProtect)</span></h2>
+      <p class="hint">Active les blocs correspondants de l'argumentaire de sauvegarde, généré automatiquement quand la configuration contient à la fois une baie PowerStore et une PowerProtect. Veeam est aussi détecté automatiquement s'il figure dans les équipements.</p>
+      <label style="display:block;margin-top:6px"><input type="checkbox" id="sauv_veeam" onchange="save()"> Veeam déjà en place (sauvegardes quotidiennes)</label>
+      <label style="display:block;margin-top:6px"><input type="checkbox" id="sauv_datadomain" onchange="save()"> Baie Data Domain existante (synchronisation / compatibilité)</label>
+    </div>
+    <div class="card">
+      <h2>Sauvegarde</h2>
+      <p class="hint">Configurez la sauvegarde : l'argumentaire du cas (Veeam/PPDM × baie SAN / Data Domain) et la volumétrie sont intégrés au Word. Réplication Cloud ONE ID en option.</p>
+      <div class="grid">
+        <div><label>Logiciel de sauvegarde</label>
+          <select id="sauv_logiciel" onchange="save()">
+            <option value="">— Aucun —</option>
+            <option value="veeam">Veeam Backup &amp; Replication</option>
+            <option value="ppdm">Dell PowerProtect Data Manager (PPDM)</option>
+          </select></div>
+        <div><label>Licence</label>
+          <select id="sauv_licence" onchange="save()">
+            <option value="acheter">À acheter (incluse dans l'offre)</option>
+            <option value="deja">Déjà acquise par le client</option>
+          </select></div>
+        <div><label>Cible de sauvegarde</label>
+          <select id="sauv_cible" onchange="save()">
+            <option value="">— À définir —</option>
+            <option value="san">Baie SAN (Cas 1)</option>
+            <option value="dd">Baie PowerProtect Data Domain (Cas 2)</option>
+          </select></div>
+      </div>
+      <label style="display:block;margin-top:8px"><input type="checkbox" id="sauv_cloud" onchange="save()"> Réplication vers le Cloud ONE ID (externalisation hors site)</label>
+      <div style="margin-top:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+        <strong style="color:var(--oneid)">Volumétrie par site</strong>
+        <button class="btn btn-accent" onclick="addSauvSite()">+ Ajouter un site</button>
+      </div>
+      <div id="sauvSites" style="margin-top:8px;overflow-x:auto"></div>
+    </div>
+  </div>
+
+  <!-- ===== KANBAN (plan de rédaction) ===== -->
+  <div id="p-kanban" class="panel">
+    <div class="card">
+      <h2>Structure du dossier &amp; prestations <span class="small">(Kanban)</span></h2>
+      <p class="hint">Chaque chapitre = une partie du Word. Glissez-y les points d'attention (rouge = à traiter). Bouton « Décrire l'offre » : choisissez un <b>argumentaire</b>, un <b>complément / options / prérequis</b> et le <b>nombre de jours d'installation</b>. Le Word rend chaque chapitre : titre → argumentaire → complément → durée. L'ordre des chapitres (◀ ▶) = ordre dans le Word.</p>
+      <button class="btn btn-accent" onclick="addChap()">+ Ajouter un chapitre</button>
+      <button class="btn btn-ghost" onclick="renderKanban()">↻ Rafraîchir</button>
+      <span class="msg" id="chapstatus" style="margin-left:8px"></span>
+      <div id="kanboard" style="display:flex;gap:12px;overflow-x:auto;margin-top:12px;align-items:flex-start"></div>
+    </div>
+  </div>
+
+
+  <!-- ===== ÉTAPE 6 : GÉNÉRATION & VÉRIFICATION ===== -->
+  <div id="p-gen" class="panel">
+    <div class="card">
+      <h2>1. Mémoire technique (Word)</h2>
+      <p class="hint">Générez le document, puis vérifiez sa conformité au CCTP (compare le Word généré à la demande).</p>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn btn-primary" onclick="generer('standard')">📄 Générer le Word</button>
+        <button class="btn btn-primary" onclick="generer('design')" title="Réécrit intro/contexte/solution + thème via l'IA (sans inventer de fait).">✨ Générer (Design)</button>
+        <button class="btn btn-accent" onclick="verifierConformite()" title="Compare le Word généré au CCTP et liste les points à résoudre.">🔍 Vérifier la conformité</button>
+      </div>
+    </div>
+    <div class="card">
+      <h2>2. Chiffrage (Excel)</h2>
+      <p class="hint">Tableur de chiffrage (matériel + prestations) avec formules et totaux HT/TTC.</p>
+      <button class="btn btn-excel" onclick="genChiffrage()">📊 Générer le chiffrage (Excel)</button>
+    </div>
+    <div class="card">
+      <h2>3. Cadre de mémoire technique</h2>
+      <p class="hint">Chargez la trame du client (.docx, .pdf ou .txt) : l'IA la remplit à partir des données de l'AO. Valeurs inconnues (ex. taux de recyclage) laissées « à préciser ».</p>
+      <div class="dz" id="cadredz">📎 Déposez la trame ou cliquez<input type="file" id="cadrefile" accept=".docx,.pdf,.txt" style="display:none"></div>
+      <div id="cadrename" class="small" style="margin-top:6px"></div>
+      <div style="margin-top:10px"><button class="btn btn-primary" id="goMem" onclick="genMemoire()">🧩 Remplir la trame (IA)</button><span class="msg" id="memstatus" style="margin-left:8px"></span></div>
+    </div>
+    <div class="card">
+      <h2>4. Historique</h2>
+      <p class="hint">Enregistrez le dossier complet (toutes les étapes) pour le retrouver plus tard. Les dossiers sont listés dans « Mes fiches » (colonne de gauche). Les documents générés restent dans le dossier <code>Documents_Generes</code>.</p>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+        <input id="ficheNameGen" placeholder="Nom du dossier (ex : Barcarès 2026)" style="max-width:260px">
+        <button class="btn btn-accent" onclick="saveFicheFromGen()">💾 Enregistrer dans l'historique</button>
+        <button class="btn btn-ghost" onclick="expFiche()">⬇ Exporter la fiche (JSON)</button>
+        <span class="msg" id="histstatus"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== ÉDITEUR D'ARGUMENTAIRES ===== -->
+  <div id="p-arg" class="panel">
+    <div style="display:flex;gap:16px;align-items:flex-start">
+      <div style="width:240px;flex:0 0 240px">
+        <div class="card">
+          <h2>Argumentaires</h2>
+          <p class="hint">Base documentaire éditable (Documentation_Constructeur). Cliquez pour éditer.</p>
+          <button class="btn btn-ghost" style="width:100%" onclick="argRefresh()">↻ Rafraîchir</button>
+          <div id="argList" style="margin-top:8px"></div>
+          <div style="margin-top:10px;border-top:0.5px solid var(--line);padding-top:8px">
+            <input id="argNew" placeholder="Nouveau dossier (ex : POWERVAULT)" style="font-size:12px">
+            <button class="btn btn-accent" style="width:100%;margin-top:6px" onclick="argCreate()">+ Créer</button>
+          </div>
+        </div>
+      </div>
+      <div style="flex:1;min-width:0">
+        <div class="card"><div id="argEditor"><p class="hint">Sélectionnez un argumentaire à gauche pour l'éditer.</p></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+</div>
+
+<div class="foot">
+  <button class="btn btn-ghost" onclick="stepNav(-1)" title="Étape précédente">◀ Précédent</button>
+  <button class="btn btn-ghost" onclick="stepNav(1)" title="Étape suivante">Suivant ▶</button>
+  <button class="btn btn-primary" onclick="generer('standard')">📄 Générer le Word (modèle existant)</button>
+  <button class="btn btn-primary" onclick="generer('design')" title="Réécrit l'intro / le contexte / la solution proposée et applique un thème, via le moteur IA. Les caractéristiques techniques, tableaux et argumentaires restent inchangés.">✨ Générer (Design IA)</button>
+  <button class="btn btn-accent" id="goVerif" onclick="verifierConformite()" title="À lancer après la génération : compare la demande du CCTP au contenu généré et liste, dans une fenêtre, ce qui manque et les points à résoudre.">🔍 Vérifier la conformité</button>
+  <button class="btn btn-ghost" onclick="expFiche()">⬇ Exporter la fiche (JSON)</button>
+  <button class="btn btn-ghost" onclick="document.getElementById('loadf').click()">📂 Charger une fiche</button>
+  <input type="file" id="loadf" accept="application/json" style="display:none">
+  <span class="msg" style="align-self:center">Moteur IA :</span>
+  <select id="aiEngine" onchange="aiToggle();save()" style="width:auto;padding:6px 8px" title="Moteur utilisé par les boutons IA (Reformuler, Analyser, etc.)">
+    <option value="gb10" selected>GB10 (interne ONE ID)</option>
+  </select>
+  <select id="aiModelGb10" onchange="save()" style="width:auto;padding:6px 8px" title="Modèle GB10 (serveur interne ONE ID) — peuplé depuis ⚙ Paramètres LLM">
+    <option value="">(config runtime)</option>
+  </select>
+  <span class="msg" id="msg">Prêt.</span>
+</div>
+
+<div id="chapModal" class="modal-ov" style="display:none">
+  <div class="modal-box">
+    <h2 id="chapModalTitle" style="color:var(--oneid);margin:0 0 4px">Description de l'offre</h2>
+    <p class="hint">Choisissez un <b>argumentaire</b> (son contenu est inséré automatiquement dans le Word), ajoutez un <b>complément / options / prérequis</b> (saisie, dictée ou reformulation IA), puis le <b>nombre de jours d'installation estimé</b>.</p>
+    <div style="margin-bottom:10px">
+      <label>Argumentaire</label>
+      <select id="chapModalArg" style="width:100%"></select>
+    </div>
+    <label>Complément d'info, options ou prérequis</label>
+    <div style="margin:4px 0 6px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+      <button class="btn btn-ghost" onclick="dicter('chapModalText',this)" title="Dictée vocale (fr-FR) — cliquez pour parler, recliquez pour arrêter">🎤 Dicter</button>
+      <button class="btn btn-primary" id="goChapRef" onclick="reformulerChapModal()" title="Améliore le texte via l'IA (style avant-vente), sans inventer de fait.">✨ Reformuler (IA)</button>
+      <span class="msg" id="chapModalStatus"></span>
+    </div>
+    <textarea id="chapModalText" rows="8" style="width:100%" placeholder="Complément d'info, options, prérequis…"></textarea>
+    <div style="margin-top:10px">
+      <label>Nombre de jours d'installation estimé</label>
+      <input type="text" id="chapModalDuree" style="width:140px" placeholder="ex : 3 j">
+    </div>
+    <div style="margin-top:10px"><label>Images / captures d'écran (intégrées au Word)</label>
+      <div class="dz" data-imgzone="chap">📎 Déposez une image ou capture, cliquez, ou collez (Ctrl+V)<input type="file" accept="image/*" multiple style="display:none"></div>
+      <div class="thumbs" data-thumbs="chap"></div>
+    </div>
+    <div style="margin-top:10px;display:flex;gap:8px;justify-content:flex-end">
+      <button class="btn btn-ghost" onclick="closeChapModal()">Annuler</button>
+      <button class="btn btn-accent" onclick="saveChapModal()">✓ Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<div id="drawioModal" class="modal-ov" style="display:none;padding:0;align-items:stretch">
+  <div style="background:#fff;width:96vw;height:94vh;border-radius:12px;overflow:hidden;display:flex;flex-direction:column;margin:auto">
+    <div style="display:flex;align-items:center;gap:12px;padding:8px 14px;border-bottom:1px solid var(--line)">
+      <b style="color:var(--oneid)">Schéma d'architecture — draw.io</b>
+      <span class="small" id="drawioStatus"></span>
+      <button class="btn btn-ghost" style="margin-left:auto" onclick="closeDrawio()">Fermer</button>
+    </div>
+    <iframe id="drawioFrame" style="flex:1;border:0;width:100%" title="draw.io"></iframe>
+  </div>
+</div>
+
+<div id="argPreviewModal" class="modal-ov" style="display:none">
+  <div class="modal-box">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+      <b style="color:var(--oneid)">Aperçu de l'argumentaire</b>
+      <button class="btn btn-ghost" onclick="closeArgPreview()">Fermer</button>
+    </div>
+    <p class="hint">Rendu indicatif. Les marqueurs comme <code>{client}</code> apparaîtront en valeurs réelles (et en rouge) dans le Word généré.</p>
+    <div id="argPreviewBody"></div>
+  </div>
+</div>
+
+<div id="verifModal" class="modal-ov" style="display:none">
+  <div class="modal-box">
+    <h2 style="color:var(--oneid);margin:0 0 4px">Vérification de conformité au CCTP</h2>
+    <p class="hint">À lancer après la génération du Word : comparaison de la demande du CCTP avec la solution générée. Liste ce qui manque et les points à résoudre pour rendre l'AO conforme.</p>
+    <div id="verifModalStatus" class="msg"></div>
+    <div id="verifModalBody" style="margin-top:8px"></div>
+    <div style="margin-top:12px;display:flex;justify-content:flex-end">
+      <button class="btn btn-ghost" onclick="closeVerifModal()">Fermer</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+function aiToggle(){/* GB10 seul moteur : liste de modèles toujours visible. */const g=$('aiModelGb10');if(g)g.style.display='inline-block';}
+// Peuple #aiModelGb10 (footer) depuis /api/settings/llm/models — sélectionne le modèle
+// enregistré dans la config runtime. Silencieux en cas d'erreur (fallback = "(config runtime)").
+async function _refreshFooterModels(){
+  try{
+    const sel=document.getElementById('aiModelGb10'); if(!sel) return;
+    const [rSet, rMod] = await Promise.all([fetch('/api/settings/llm'), fetch('/api/settings/llm/models')]);
+    if(!rSet.ok || !rMod.ok) return;
+    const set=await rSet.json(); const mod=await rMod.json();
+    const cur=set.model||''; const ids=mod.models||[];
+    const previous=sel.value;
+    sel.innerHTML='';
+    const oDef=document.createElement('option'); oDef.value=''; oDef.textContent='(config runtime · '+(cur||'aucun')+')'; sel.appendChild(oDef);
+    for(const id of ids){ const o=document.createElement('option'); o.value=id; o.textContent=id+(id===cur?' ★':''); sel.appendChild(o); }
+    // Restaure la sélection précédente si toujours valide, sinon '' (= config runtime).
+    sel.value = ids.includes(previous) ? previous : '';
+  }catch(e){/* silencieux */}
+}
+document.addEventListener('DOMContentLoaded', _refreshFooterModels);
+function aiSel(){return {provider:'gb10',model:(($('aiModelGb10')||{}).value||'').trim()};}
+// Empêche le navigateur d'ouvrir le fichier quand on dépose à côté d'une zone
+['dragenter','dragover','drop'].forEach(ev=>window.addEventListener(ev,e=>{e.preventDefault();},false));
+const STEP_ORDER=['cctp','recap','admin','equip','fonc','kanban','plan','gen'];
+function tab(n){document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));const p=$('p-'+n);if(p)p.classList.add('active');const b=document.querySelector('.tab[data-t='+n+']');if(b)b.classList.add('active');
+  if((n==='recap'||n==='admin')&&typeof recapFit==='function')recapFit();
+  const i=STEP_ORDER.indexOf(n);if(i>=0){const bar=$('stepBar');if(bar)bar.style.width=Math.round((i+1)/STEP_ORDER.length*100)+'%';const inf=$('stepInfo');if(inf)inf.textContent='Étape '+(i+1)+' / '+STEP_ORDER.length;}
+  try{window.scrollTo({top:0,behavior:'smooth'});}catch(e){}}
+function stepNav(d){const cur=document.querySelector('.tab.active');const i=cur?STEP_ORDER.indexOf(cur.getAttribute('data-t')):0;const j=Math.min(STEP_ORDER.length-1,Math.max(0,i+d));tab(STEP_ORDER[j]);}
+
+const CATS=[
+ {key:'serveurs',label:'Serveurs',fields:[['Rôle/désignation','role'],['Quantité','qte'],['Modèle','modele'],['Nb de VM','nb_vm'],['Facteur de forme','format'],['CPU','cpu_detail'],['RAM','ram'],['Type disques','disq_type'],['Config disques','disq_detail'],['RAID','raid'],['Réseau','reseau'],['Alimentation','alim'],['OS','os'],['Garantie','garantie'],['Remarques','remarques']]},
+ {key:'stockages',label:'Stockage',fields:[['Désignation','role'],['Quantité','qte'],['Modèle','modele'],['Mode','mode'],['Type disque','disq_type'],['Protocoles','protocoles'],['Taille RAW','raw'],['Taille utile','utile'],['Brute/baie (argu.)','raw_baie'],['Effective/baie (argu.)','effective_baie'],['Utile cluster (argu.)','utile_cluster'],['Compression/Dedup','dedup'],['Protection/RAID','raid'],['Contrôleurs','controleurs'],['Ports','ports'],['Évolutivité','eval'],['Garantie','garantie'],['Remarques','remarques']]},
+ {key:'switches',label:'Switches',fields:[['Désignation','role'],['Quantité','qte'],['Modèle','modele'],['Ports','ports'],['Débit','debit'],['PoE','poe'],['Stacking','stacking'],['L2/L3','l2l3'],['Garantie','garantie'],['Remarques','remarques']]},
+ {key:'sauvegardes',label:'Baies de sauvegarde',fields:[['Désignation','role'],['Quantité','qte'],['Modèle','modele'],['Type','type'],['Capacité','capacite'],['Capacité brute','raw'],['Capacité utile','utile'],['Dedup','dedup'],['Rétention','retention'],['Protocoles','protocoles'],['Garantie','garantie'],['Remarques','remarques']]},
+ {key:'logiciels_services',label:'Logiciels & Services',fields:[['Désignation','role'],['Quantité','qte'],['Produit','modele'],['Remarques','remarques']]}
+];
+const idx={}; CATS.forEach(c=>idx[c.key]=0);
+const imgStore={arch:[]};
+
+function buildCats(){const root=$('cats');root.innerHTML='';CATS.forEach(c=>{const card=document.createElement('div');card.className='card';card.innerHTML=`<h2>${c.label} <span class="badge" id="b-${c.key}">0</span></h2><div id="list-${c.key}"></div><button class="btn btn-accent" onclick="addItem('${c.key}')">+ Ajouter</button>`;root.appendChild(card);});}
+function addItem(key,data){
+  const c=CATS.find(x=>x.key===key);idx[key]++;const id=key+'-'+idx[key];
+  const div=document.createElement('div');div.className='item';div.id=id;div.dataset.key=key;
+  let g='<div class="grid">';
+  c.fields.forEach(f=>{g+=`<div${f[1]==='remarques'?' class="full"':''}><label>${f[0]}</label>`+(f[1]==='remarques'?`<textarea data-f="remarques"></textarea>`:`<input data-f="${f[1]}">`)+`</div>`;});
+  g+='</div>';
+  const zid='img-'+id;
+  div.innerHTML=`<div class="item-head"><strong class="ititle">${c.label}</strong><button class="btn btn-del" onclick="this.closest('.item').remove();recount();save()">Supprimer</button></div>${g}
+    <div class="dz" data-imgzone="${zid}">📎 Images produit (déposez ou cliquez)<input type="file" accept="image/*" multiple style="display:none"></div>
+    <div class="thumbs" data-thumbs="${zid}"></div>`;
+  $('list-'+key).appendChild(div);imgStore[zid]=[];bindZone(div.querySelector('[data-imgzone]'));
+  if(data)fill(div,data,zid);recount();save();
+}
+function fill(div,d,zid){
+  div.querySelectorAll('[data-f]').forEach(el=>{const k=el.getAttribute('data-f');if(d[k]!==undefined&&d[k]!==null)el.value=d[k];});
+  div._extra={composants:d.composants||null,specs_extraites:d.specs_extraites||null,prix_unitaire:d.prix_unitaire||'',prix_etendu:d.prix_etendu||''};
+  div._source=d._source||'datasheet';
+  imgStore[zid]=d.images||[];renderThumbs(zid);updHead(div);
+}
+function readItem(div){const o={};o._source=div._source||'datasheet';
+  div.querySelectorAll('[data-f]').forEach(el=>{const v=el.value.trim();if(v)o[el.getAttribute('data-f')]=v;});
+  if(div._extra){if(div._extra.composants)o.composants=div._extra.composants;if(div._extra.specs_extraites)o.specs_extraites=div._extra.specs_extraites;if(div._extra.prix_unitaire)o.prix_unitaire=div._extra.prix_unitaire;if(div._extra.prix_etendu)o.prix_etendu=div._extra.prix_etendu;}
+  const z=div.querySelector('[data-thumbs]');if(z){const im=imgStore[z.getAttribute('data-thumbs')];if(im&&im.length)o.images=im;}
+  return o;}
+function recount(){CATS.forEach(c=>{const b=$('b-'+c.key);if(b)b.textContent=document.querySelectorAll('#list-'+c.key+' .item').length;});}
+function updHead(div){const cat=CATS.find(c=>c.key===div.dataset.key);const m=((div.querySelector('[data-f="modele"]')||{}).value||'').trim();const q=((div.querySelector('[data-f="qte"]')||{}).value||'').trim();let t=m||(cat?cat.label:'');if(q&&q!=='1')t+=' ×'+q;const el=div.querySelector('.ititle');if(el)el.textContent=t;}
+
+/* images */
+let activeZone=null;
+function bindZone(dz){const zid=dz.getAttribute('data-imgzone');const input=dz.querySelector('input');
+  dz.onclick=()=>{activeZone=zid;input.click();};dz.onmousedown=()=>{activeZone=zid;};
+  dz.ondragover=e=>{e.preventDefault();dz.classList.add('over');};dz.ondragleave=()=>dz.classList.remove('over');
+  dz.ondrop=e=>{e.preventDefault();dz.classList.remove('over');addImgs(zid,[...e.dataTransfer.files]);};
+  input.onchange=e=>{addImgs(zid,[...e.target.files]);e.target.value='';};}
+function addImgs(zid,files){files=files.filter(f=>f.type.startsWith('image/'));if(!files.length)return;imgStore[zid]=imgStore[zid]||[];let p=files.length;
+  files.forEach(f=>{const r=new FileReader();r.onload=()=>{imgStore[zid].push({name:f.name,data:r.result});if(--p===0){renderThumbs(zid);save();}};r.readAsDataURL(f);});}
+function renderThumbs(zid){const c=document.querySelector('[data-thumbs="'+zid+'"]');if(!c)return;c.innerHTML='';
+  (imgStore[zid]||[]).forEach((im,i)=>{const t=document.createElement('span');t.className='thumb';const g=document.createElement('img');g.src=im.data;const b=document.createElement('button');b.textContent='×';b.onclick=()=>{imgStore[zid].splice(i,1);renderThumbs(zid);save();};t.appendChild(g);
+    if(zid==='arch'&&im.drawio){const e=document.createElement('button');e.textContent='✏️';e.title='Éditer dans draw.io';e.style.cssText='right:18px';e.onclick=()=>openDrawio(im.drawio,i);t.appendChild(e);}
+    t.appendChild(b);c.appendChild(t);});}
+document.addEventListener('paste',e=>{if(!activeZone)return;const files=[];for(const it of (e.clipboardData||{}).items||[]){if(it.type&&it.type.startsWith('image/')){const f=it.getAsFile();if(f)files.push(f);}}if(files.length){e.preventDefault();addImgs(activeZone,files);}});
+
+/* draw.io : éditeur de schéma d'architecture (embed, 100 % local) */
+/* PREPROD : http://<hôte>:8081. PROD : même origin, préfixe /drawio (injecté par GET /). */
+const DRAWIO_BASE=(function(){
+  if(window.DRAWIO_BASE)return window.DRAWIO_BASE;
+  var inj='__DRAWIO_BASE__';
+  if(inj && inj.indexOf('__DRAWIO')!==0)return inj;
+  return location.origin+'/drawio';
+})();
+function drawioOrigin(){
+  try{return new URL(DRAWIO_BASE, location.href).origin;}catch(e){return location.origin;}
+}
+let _drawioXml='',_drawioEditIdx=null,_drawioHandler=null;
+async function openDrawio(xml,editIdx){
+  _drawioXml=xml||'';_drawioEditIdx=(editIdx===undefined?null:editIdx);
+  const frame=$('drawioFrame');
+  $('drawioStatus').textContent='Chargement de l’éditeur…';
+  // Bibliothèques de shapes ONE ID : servies par AO-ID (même origin que la page),
+  // pas par le pod draw.io (qui n'a pas le volume des XML en Kubernetes).
+  // draw.io décode clibs deux fois (parsing URL iframe + decodeURIComponent après split(';')),
+  // d'où le double encodeURIComponent ; le paramètre global n'est PAS ré-encodé.
+  let clibs='';
+  try{
+    const list=await fetch('/api/drawio-libs').then(r=>r.json()).catch(()=>({libs:[]}));
+    const libs=(list&&list.libs)||[];
+    clibs=libs.map(n=>'U'+encodeURIComponent(encodeURIComponent(location.origin+'/drawio-libs/'+n))).join(';');
+  }catch(e){/* l'éditeur reste utilisable sans les libs custom */}
+  let src=DRAWIO_BASE.replace(/\/$/,'')+'/?embed=1&proto=json&spin=1&ui=atlas&noExitBtn=1&saveAndExit=0&noSaveBtn=0&libraries=1';
+  // cors=<regex> : autorise draw.io à charger ces URLs en direct (isCorsEnabledForUrl),
+  // sinon il les route via son endpoint /proxy — absent de cette image → 404.
+  src+='&cors='+encodeURIComponent(location.origin.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'/drawio-libs/.*');
+  if(clibs)src+='&clibs='+clibs;
+  frame.src=src;
+  $('drawioModal').style.display='flex';
+  if(_drawioHandler)window.removeEventListener('message',_drawioHandler);
+  _drawioHandler=function(evt){
+    if(evt.origin!==drawioOrigin())return;
+    if(!evt.data||typeof evt.data!=='string'||evt.data.charAt(0)!=='{')return;
+    let msg;try{msg=JSON.parse(evt.data);}catch(e){return;}
+    if(msg.event==='init'){
+      frame.contentWindow.postMessage(JSON.stringify({action:'load',autosave:1,xml:_drawioXml}),evt.origin);
+      $('drawioStatus').textContent='Dessinez (shapes ONE ID dans le panneau de gauche), puis « Enregistrer » (disquette).';
+    }else if(msg.event==='save'){
+      _drawioXml=msg.xml;$('drawioStatus').textContent='Export en cours…';
+      frame.contentWindow.postMessage(JSON.stringify({action:'export',format:'xmlpng',spinKey:'saving'}),evt.origin);
+    }else if(msg.event==='export'){
+      pushArchDrawio(msg.data,msg.xml||_drawioXml);
+      $('drawioStatus').textContent='✔ Schéma enregistré. Vous pouvez continuer ou fermer.';
+    }else if(msg.event==='exit'){
+      closeDrawio();
+    }
+  };
+  window.addEventListener('message',_drawioHandler);
+}
+function pushArchDrawio(dataUrl,xml){
+  if(!dataUrl)return;imgStore.arch=imgStore.arch||[];
+  const entry={name:'schema-architecture.drawio.png',data:dataUrl,drawio:xml};
+  if(_drawioEditIdx!=null&&imgStore.arch[_drawioEditIdx]){imgStore.arch[_drawioEditIdx]=entry;}
+  else{imgStore.arch.push(entry);_drawioEditIdx=imgStore.arch.length-1;}
+  renderThumbs('arch');save();
+}
+function closeDrawio(){$('drawioModal').style.display='none';$('drawioFrame').src='about:blank';if(_drawioHandler){window.removeEventListener('message',_drawioHandler);_drawioHandler=null;}_drawioEditIdx=null;}
+
+/* CCTP */
+const cdz=$('cctpdz'),cfile=$('cctpfile');let cctpFile=null;
+cdz.onclick=()=>cfile.click();
+cdz.ondragover=e=>{e.preventDefault();cdz.classList.add('over');};cdz.ondragleave=()=>cdz.classList.remove('over');
+cdz.ondrop=e=>{e.preventDefault();cdz.classList.remove('over');const f=e.dataTransfer.files[0];if(f){cctpFile=f;$('cctpname').textContent='Fichier : '+f.name;if(/\.txt$/i.test(f.name))f.text().then(t=>$('cctp_text').value=t);}};
+cfile.onchange=e=>{const f=e.target.files[0];if(f){cctpFile=f;$('cctpname').textContent='Fichier : '+f.name;if(/\.txt$/i.test(f.name))f.text().then(t=>$('cctp_text').value=t);}};
+let points=[],clars=[],verif=[];
+$('goAnalyse').onclick=async()=>{
+  const fd=new FormData();const txt=$('cctp_text').value.trim();
+  if(cctpFile)fd.append('file',cctpFile); else if(txt)fd.append('text',txt); else{alert('Fournissez un CCTP (fichier ou texte).');return;}
+  fd.append('solution',JSON.stringify(buildData()));const _ai=aiSel();fd.append('provider',_ai.provider);fd.append('model',_ai.model);
+  $('cstatus').innerHTML='<span class="spin"></span> Analyse + vérification en cours…';$('goAnalyse').disabled=true;
+  try{
+    const r=await fetch('/api/analyse-cctp',{method:'POST',body:fd});
+    if(!r.ok){throw new Error((await r.json()).detail||r.statusText);}
+    const d=await r.json();
+    $('resCard').style.display='block';
+    $('aff_contexte').value=(d.contexte||'').trim();
+    if(!txt&&d.cctp_text)$('cctp_text').value=d.cctp_text;
+    points=(d.points||[]).map(p=>({label:typeof p==='string'?p:(p.label||''),checked:false}));
+    clars=d.clarifications||[];verif=(d.verification||[]).filter(v=>v&&(v.exigence||v.suggestion||v.theme));
+    renderPA();renderClars();renderVerif();
+    $('cstatus').textContent='✔ Analyse terminée — récapitulatif CCTP en cours de génération (onglet 2).';save();
+    if(!RECAP_TABLES.some(t=>recap[t.key].length)||confirm('Régénérer aussi le récapitulatif CCTP (onglet 2) ? Les modifications manuelles seront remplacées.'))genRecap(true);
+    else $('cstatus').textContent='✔ Analyse terminée.';
+  }catch(err){$('cstatus').textContent='Erreur : '+(err.message||err);}
+  $('goAnalyse').disabled=false;
+};
+function renderPA(){const c=$('points');c.innerHTML='';points.forEach((it,i)=>{const d=document.createElement('div');d.className='pa';const cb=document.createElement('input');cb.type='checkbox';cb.checked=it.checked;cb.onchange=()=>{it.checked=cb.checked;pac();save();};const s=document.createElement('span');s.textContent=it.label;const x=document.createElement('button');x.className='btn btn-del';x.textContent='×';x.onclick=()=>{points.splice(i,1);renderPA();save();};d.appendChild(cb);d.appendChild(s);d.appendChild(x);c.appendChild(d);});pac();renderKanban();}
+function renderClars(){const cw=$('clarwrap');if(!cw)return;if(clars&&clars.length){cw.style.display='block';$('clars').innerHTML='';clars.forEach(c=>{const x=document.createElement('div');x.className='clar';x.textContent='⚠ '+(typeof c==='string'?c:JSON.stringify(c));$('clars').appendChild(x);});}else{cw.style.display='none';}}
+function renderVerif(showEmpty){const w=$('verifwrap');if(!w)return;const c=$('verif');
+  if(!verif||!verif.length){if(showEmpty){w.style.display='block';c.innerHTML='<div class="small" style="color:#1e7e34">✅ Aucun écart détecté entre le CCTP et la solution configurée.</div>';}else{w.style.display='none';c.innerHTML='';}return;}
+  w.style.display='block';c.innerHTML='';
+  const ICON={couvert:'✅',ecart:'⚠️',a_preciser:'❔'};const COL={couvert:'#1e7e34',ecart:'#c0392b',a_preciser:'#b8860b'};
+  verif.forEach(v=>{const st=(v.statut||'a_preciser');const d=document.createElement('div');d.style.cssText='border-left:4px solid '+(COL[st]||'#888')+';padding:6px 10px;margin:6px 0;background:#fafafa;border-radius:4px';
+    const head=document.createElement('div');head.innerHTML='<b>'+(ICON[st]||'•')+' '+esch(v.theme||'')+'</b>';d.appendChild(head);
+    if(v.exigence){const e=document.createElement('div');e.className='small';e.textContent='Exigence : '+v.exigence;d.appendChild(e);}
+    if(v.suggestion){const s=document.createElement('div');s.style.color=(COL[st]||'#555');s.textContent=(st==='couvert'?'✔ ':'➕ ')+v.suggestion;d.appendChild(s);}
+    c.appendChild(d);});}
+/* Récapitulatif CCTP — Focus technique (étape 2). Colonnes = contrat de app/recap_cctp.py (TABLES). */
+const RECAP_TABLES=[
+  {key:'matrice',titre:'Matrice de couverture technique',cols:[['domaine','Domaine'],['exigences','Exigences principales'],['preuves',"Attendus de preuve dans l'offre"],['capacite_oneid','Capacité ONEID à confirmer'],['risque','Risque'],['action','Action de réponse'],['ref','Réf.'],['statut','Statut']]},
+  {key:'plan',titre:'Plan de prise en charge recommandé',cols:[['periode','Période'],['objectifs','Objectifs'],['actions','Actions / livrables'],['criteres','Critères de réussite'],['contribution_note','Contribution à la note'],['pilote','Pilote'],['risque','Risque à maîtriser'],['statut','Statut']]},
+  {key:'ressources',titre:'Ressources minimales à proposer',cols:[['role','Rôle'],['responsabilite','Responsabilité'],['competences','Compétences attendues'],['presence','Exigence de présence'],['preuve','Preuve à joindre'],['backup','Back-up'],['go_nogo','Go / No Go'],['statut','Statut']]}];
+const RECAP_STATUTS=[['a_confirmer','À confirmer'],['a_preparer','À préparer'],['a_qualifier','À qualifier'],['valide','Validé']];
+const RECAP_GO=['Go','No Go','À arbitrer'];
+let recap={matrice:[],plan:[],ressources:[]};
+function recapNorm(r){const o={};RECAP_TABLES.forEach(t=>{o[t.key]=Array.isArray(r&&r[t.key])?r[t.key].filter(x=>x&&typeof x==='object').map(x=>{const y={};t.cols.forEach(c=>y[c[0]]=x[c[0]]==null?'':String(x[c[0]]));if(!RECAP_STATUTS.some(s=>s[0]===y.statut))y.statut='a_confirmer';return y;}):[];});return o;}
+function recapSet(k,i,c,v){if(recap[k]&&recap[k][i]){recap[k][i][c]=v;save();}}
+function recapAdd(k){const t=RECAP_TABLES.find(x=>x.key===k);const y={};t.cols.forEach(c=>y[c[0]]='');y.statut='a_qualifier';if('go_nogo' in y)y.go_nogo='À arbitrer';recap[k].push(y);renderRecap();save();}
+function recapDel(k,i){recap[k].splice(i,1);renderRecap();save();}
+const RECAP_WIDE=['exigences','preuves','capacite_oneid','risque','action','objectifs','actions','criteres','responsabilite','competences','preuve'];
+function recapCls(k){return RECAP_WIDE.includes(k)?'rw':(['ref','statut','go_nogo'].includes(k)?'rs':'rn');}
+function recapRow(ta){const tr=ta.closest('tr');if(!tr)return;const tas=[...tr.querySelectorAll('textarea')];tas.forEach(t=>{if(t!==ta){t.style.height='auto';t.style.height=Math.max(150,t.scrollHeight+2)+'px';}});const h=Math.max(...tas.map(t=>t.offsetHeight));tas.forEach(t=>t.style.height=h+'px');}
+function recapGrow(ta){ta.style.height='auto';ta.style.height=Math.max(150,ta.scrollHeight+2)+'px';}
+function renderRecap(){const w=$('recapTables');if(!w)return;w.innerHTML='';
+  RECAP_TABLES.forEach(t=>{const card=document.createElement('div');card.className='card';
+    let h='<h2>'+esch(t.titre)+' <span class="badge">'+recap[t.key].length+'</span></h2><div style="overflow-x:auto"><table class="ptab rtab"><thead><tr>'+t.cols.map(c=>'<th class="'+recapCls(c[0])+'">'+esch(c[1])+'</th>').join('')+'<th class="rx"></th></tr></thead><tbody>';
+    recap[t.key].forEach((r,i)=>{h+='<tr>'+t.cols.map(c=>{const k=c[0],v=r[k]||'',cl=recapCls(k);
+      if(k==='statut'){const col=v==='valide'?'#1e7e34':'#c0392b';return '<td class="'+cl+'"><select style="color:'+col+';font-weight:600" onchange="recapSet(\''+t.key+'\','+i+',\'statut\',this.value);renderRecap()">'+RECAP_STATUTS.map(s=>'<option value="'+s[0]+'"'+(s[0]===v?' selected':'')+'>'+s[1]+'</option>').join('')+'</select></td>';}
+      if(k==='go_nogo')return '<td class="'+cl+'"><select onchange="recapSet(\''+t.key+'\','+i+',\'go_nogo\',this.value)">'+RECAP_GO.map(g=>'<option'+(g===v?' selected':'')+'>'+g+'</option>').join('')+'</select></td>';
+      return '<td class="'+cl+'"><textarea oninput="recapGrow(this);recapRow(this);recapSet(\''+t.key+'\','+i+',\''+k+'\',this.value)">'+esch(v)+'</textarea></td>';}).join('')+
+      '<td class="rowact rx"><button title="Supprimer la ligne" onclick="recapDel(\''+t.key+'\','+i+')">🗑</button></td></tr>';});
+    h+='</tbody></table></div><button class="btn btn-ghost" style="margin-top:6px" onclick="recapAdd(\''+t.key+'\')">+ Ajouter une ligne</button>';
+    card.innerHTML=h;w.appendChild(card);});
+  recapFit();}
+/* Ajuste la hauteur des cellules au texte (l'onglet doit être visible pour mesurer scrollHeight). */
+function recapFit(){requestAnimationFrame(()=>{document.querySelectorAll('.rtab textarea').forEach(recapGrow);
+  /* même hauteur pour toutes les cellules d'une ligne (lecture en grille) */
+  document.querySelectorAll('.rtab tbody tr').forEach(tr=>{const tas=[...tr.querySelectorAll('textarea')];const h=Math.max(...tas.map(t=>t.offsetHeight));tas.forEach(t=>t.style.height=h+'px');});});}
+window.addEventListener('resize',()=>{const a=document.querySelector('.panel.active');if(a&&(a.id==='p-recap'||a.id==='p-admin'))recapFit();});
+async function genRecap(auto){
+  const cctp=$('cctp_text').value.trim();
+  if(!cctp){if(!auto)alert("Aucun CCTP : collez ou analysez d'abord le CCTP dans l'onglet « CCTP & contexte ».");return;}
+  const has=RECAP_TABLES.some(t=>recap[t.key].length);
+  if(!auto&&has&&!confirm('Régénérer le récapitulatif ? Les modifications manuelles des 3 tableaux seront remplacées.'))return;
+  const btn=$('goRecap');if(btn)btn.disabled=true;
+  $('recapstatus').innerHTML='<span class="spin"></span> Génération du récapitulatif par l\'IA (peut prendre plusieurs minutes)…';
+  try{
+    const r=await fetch('/api/recap-cctp',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(Object.assign({cctp_text:cctp,points:points.map(p=>p.label),clarifications:clars||[],solution:buildData()},aiSel()))});
+    if(!r.ok)throw new Error((await r.json()).detail||r.statusText);
+    const d=await r.json();
+    if(!d.ok){$('recapstatus').textContent='⚠ Réponse IA non exploitable — relancez la génération.';console.warn('recap raw',d.raw);}
+    else{recap=recapNorm(d);renderRecap();save();$('recapstatus').textContent='✔ Récapitulatif généré ('+recap.matrice.length+' / '+recap.plan.length+' / '+recap.ressources.length+' lignes) — à relire et valider.';}
+  }catch(err){$('recapstatus').textContent='Erreur : '+(err.message||err);}
+  if(btn)btn.disabled=false;
+}
+/* Focus administratif et contractuel (étape 3). Colonnes = contrat de app/recap_admin.py (TABLES). */
+const ADMIN_TABLES=[
+  {key:'checklist',titre:'Checklist de remise',cols:[['piece','Pièce / exigence'],['attendu_dce','Attendu DCE'],['controle_oneid','Point de contrôle ONEID'],['criticite','Criticité'],['responsable','Responsable'],['echeance','Échéance'],['statut','Statut']]},
+  {key:'contractuel',titre:'Points contractuels et financiers',cols:[['theme','Thème'],['clause','Clause / exigence'],['impact_oneid','Impact ONEID'],['position','Position recommandée'],['niveau','Niveau'],['source','Source'],['statut','Statut']]},
+  {key:'questions',titre:'Questions à déposer sur PLACE avant le',cols:[['num','N°'],['question','Question proposée'],['enjeu','Enjeu'],['priorite','Priorité'],['owner','Owner'],['reponse_attendue','Réponse attendue'],['statut','Statut']]}];
+const ADMIN_WIDE=['attendu_dce','controle_oneid','clause','impact_oneid','position','question','enjeu','reponse_attendue'];
+const ADMIN_NIVEAUX=['Élevée','Moyenne','Faible','À évaluer'];
+const ADMIN_NIV_COLS=['criticite','niveau','priorite'];
+const ADMIN_META=['reference_marche','date_limite_questions','date_limite_offres'];
+let adminRec=null,adminDocs=[];
+let ADMIN_BUDGET=240000;  /* caractères analysés au total par /api/recap-admin (recap_admin.MAX_INPUT) ; mis à jour par /api/admin-docs/extract */
+function adminEmpty(){const o={reference_marche:'à préciser',date_limite_questions:'à préciser',date_limite_offres:'à préciser'};ADMIN_TABLES.forEach(t=>o[t.key]=[]);return o;}
+function adminNorm(r){const o=adminEmpty();if(!r||typeof r!=='object')return o;ADMIN_META.forEach(k=>{if(r[k])o[k]=String(r[k]);});
+  ADMIN_TABLES.forEach(t=>{o[t.key]=Array.isArray(r[t.key])?r[t.key].filter(x=>x&&typeof x==='object').map(x=>{const y={};t.cols.forEach(c=>y[c[0]]=x[c[0]]==null?'':String(x[c[0]]));if(!RECAP_STATUTS.some(s=>s[0]===y.statut))y.statut='a_confirmer';ADMIN_NIV_COLS.forEach(c=>{if(c in y&&!ADMIN_NIVEAUX.includes(y[c]))y[c]='À évaluer';});return y;}):[];});
+  o.questions.forEach((q,i)=>q.num='Q'+(i+1));return o;}
+adminRec=adminEmpty();
+function adminHasRows(){return ADMIN_TABLES.some(t=>adminRec[t.key].length);}
+function adminMeta(k,v){adminRec[k]=v;adminTitles();save();}
+/* « 05/10/2026 à 12h00 (commentaire) » → « 05/10/2026 à 12h00 » pour le titre (même règle que recap_admin.date_courte). */
+function adminDateCourte(v){const m=String(v||'').match(/\d{1,2}\/\d{1,2}\/\d{2,4}(?:\s*(?:à|a|-)?\s*\d{1,2}\s*[hH:]\s*\d{0,2})?/);return m?m[0].trim():(v||'à préciser');}
+function adminTitles(){const ref=(adminRec.reference_marche||'').trim();$('adminTitle').textContent='Focus administratif et contractuel'+(ref&&ref!=='à préciser'?' – '+ref:'');
+  const q=document.getElementById('adminQTitle');if(q){q.textContent='Questions à déposer sur PLACE avant le '+adminDateCourte(adminRec.date_limite_questions);q.style.color=(adminRec.date_limite_questions||'à préciser')==='à préciser'?'#ffc7ce':'';}}
+function adminSet(k,i,c,v){if(adminRec[k]&&adminRec[k][i]){adminRec[k][i][c]=v;save();}}
+function adminAdd(k){const t=ADMIN_TABLES.find(x=>x.key===k);const y={};t.cols.forEach(c=>y[c[0]]='');y.statut='a_qualifier';ADMIN_NIV_COLS.forEach(c=>{if(c in y)y[c]='À évaluer';});adminRec[k].push(y);if(k==='questions')adminRec.questions.forEach((q,i)=>q.num='Q'+(i+1));renderAdmin();save();}
+function adminDel(k,i){adminRec[k].splice(i,1);if(k==='questions')adminRec.questions.forEach((q,j)=>q.num='Q'+(j+1));renderAdmin();save();}
+function adminCls(k){return ADMIN_WIDE.includes(k)?'rw':(['statut','num'].concat(ADMIN_NIV_COLS).includes(k)?'rs':'rn');}
+function renderAdmin(){const w=$('adminTables');if(!w)return;w.innerHTML='';
+  $('adminHead').style.display=(adminHasRows()||adminDocs.length)?'block':'none';
+  $('adm_ref').value=adminRec.reference_marche||'';$('adm_dq').value=adminRec.date_limite_questions||'';$('adm_do').value=adminRec.date_limite_offres||'';
+  ADMIN_TABLES.forEach(t=>{const card=document.createElement('div');card.className='card';
+    let h='<div class="abar"'+(t.key==='questions'?' id="adminQTitle"':'')+'>'+esch(t.titre)+'</div><div style="overflow-x:auto"><table class="ptab rtab atab"><thead><tr>'+t.cols.map(c=>'<th class="'+adminCls(c[0])+'">'+esch(c[1])+'</th>').join('')+'<th class="rx"></th></tr></thead><tbody>';
+    adminRec[t.key].forEach((r,i)=>{h+='<tr>'+t.cols.map(c=>{const k=c[0],v=r[k]||'',cl=adminCls(k);
+      if(k==='num')return '<td class="'+cl+'" style="font-weight:700;text-align:center;padding-top:12px">'+esch(v)+'</td>';
+      if(k==='statut'){const col=v==='valide'?'#1e7e34':'#c0392b';return '<td class="'+cl+'"><select style="color:'+col+';font-weight:600" onchange="adminSet(\''+t.key+'\','+i+',\'statut\',this.value);renderAdmin()">'+RECAP_STATUTS.map(s=>'<option value="'+s[0]+'"'+(s[0]===v?' selected':'')+'>'+s[1]+'</option>').join('')+'</select></td>';}
+      if(ADMIN_NIV_COLS.includes(k)){const col=v==='Élevée'?'#c0392b':(v==='Moyenne'?'#b8860b':(v==='Faible'?'#1e7e34':'#555'));return '<td class="'+cl+'"><select style="color:'+col+';font-weight:600" onchange="adminSet(\''+t.key+'\','+i+',\''+k+'\',this.value);renderAdmin()">'+ADMIN_NIVEAUX.map(n=>'<option'+(n===v?' selected':'')+'>'+n+'</option>').join('')+'</select></td>';}
+      return '<td class="'+cl+'"><textarea oninput="recapGrow(this);recapRow(this);adminSet(\''+t.key+'\','+i+',\''+k+'\',this.value)">'+esch(v)+'</textarea></td>';}).join('')+
+      '<td class="rowact rx"><button title="Supprimer la ligne" onclick="adminDel(\''+t.key+'\','+i+')">🗑</button></td></tr>';});
+    h+='</tbody></table></div><button class="btn btn-ghost" style="margin-top:6px" onclick="adminAdd(\''+t.key+'\')">+ Ajouter une ligne</button>';
+    card.innerHTML=h;w.appendChild(card);});
+  adminTitles();recapFit();}
+/* Texte binaire = document lu avant le support .xlsx (contenu ZIP décodé tel quel) : à recharger. */
+function adminDocBroken(d){const t=String(d.text||'');return /^PK/.test(t)||(t.length>200&&(t.slice(0,2000).match(/\uFFFD/g)||[]).length>50);}
+function renderAdminDocs(){const c=$('adminDocs');if(!c)return;c.innerHTML='';
+  adminDocs.forEach((d,i)=>{const x=document.createElement('div');x.className='adoc';const bad=adminDocBroken(d);
+    x.innerHTML='📄 <b>'+esch(d.name)+'</b> <span class="small">'+(d.chars||(d.text||'').length).toLocaleString('fr-FR')+' caractères'+(d.truncated?' — tronqué':'')+'</span>'+(bad?' <span style="color:#c0392b;font-weight:600">⚠ contenu illisible (ancienne lecture) : retirez puis rechargez ce fichier</span>':'')+'<span style="flex:1"></span><button class="btn btn-del" title="Retirer ce document">×</button>';
+    x.querySelector('button').onclick=()=>{adminDocs.splice(i,1);renderAdminDocs();save();};c.appendChild(x);});
+  if(adminDocs.length){const tot=adminDocs.reduce((a,d)=>a+(d.text||'').length,0);const ok=tot<=ADMIN_BUDGET;const t=document.createElement('div');t.className='small';t.style.cssText='margin-top:6px;font-weight:600;color:'+(ok?'#1e7e34':'#b8860b');
+    t.textContent=(ok?'✔ ':'⚠ ')+'Total : '+tot.toLocaleString('fr-FR')+' / '+ADMIN_BUDGET.toLocaleString('fr-FR')+' caractères analysés'+(ok?' — tous les documents sont lus en entier.':' — au-delà, chaque document est réduit à une part équitable : retirez les pièces inutiles.');c.appendChild(t);}
+  if($('adminHead'))$('adminHead').style.display=(adminHasRows()||adminDocs.length)?'block':'none';}
+async function adminUpload(files){if(!files||!files.length)return;
+  const fd=new FormData();[...files].forEach(f=>fd.append('files',f));
+  $('adminstatus').innerHTML='<span class="spin"></span> Lecture de '+files.length+' document(s)…';
+  try{const r=await fetch('/api/admin-docs/extract',{method:'POST',body:fd});if(!r.ok)throw new Error((await r.json()).detail||r.statusText);
+    const d=await r.json();if(d.budget)ADMIN_BUDGET=d.budget;(d.docs||[]).forEach(nd=>{const j=adminDocs.findIndex(x=>x.name===nd.name);if(j>=0)adminDocs[j]=nd;else adminDocs.push(nd);});
+    renderAdminDocs();save();const empty=(d.docs||[]).filter(x=>!x.text).map(x=>x.name);
+    $('adminstatus').textContent='✔ '+(d.docs||[]).length+' document(s) chargé(s)'+(empty.length?' — sans texte lisible : '+empty.join(', '):'')+'. Cliquez « Générer ».';
+  }catch(err){$('adminstatus').textContent='Erreur : '+(err.message||err);}}
+(function(){const dz=$('admindz'),f=$('adminfile');if(!dz||!f)return;dz.onclick=()=>f.click();
+  dz.ondragover=e=>{e.preventDefault();dz.classList.add('over');};dz.ondragleave=()=>dz.classList.remove('over');
+  dz.ondrop=e=>{e.preventDefault();dz.classList.remove('over');adminUpload(e.dataTransfer.files);};
+  f.onchange=e=>{adminUpload(e.target.files);e.target.value='';};})();
+async function genAdmin(){
+  const cctp=$('cctp_text').value.trim();
+  if(!adminDocs.length&&!cctp){alert("Chargez d'abord les documents administratifs (RC, CCAP, AE…).");return;}
+  const bad=adminDocs.filter(adminDocBroken).map(d=>d.name);if(bad.length){alert('Contenu illisible, à recharger avant génération : '+bad.join(', '));return;}
+  if(!adminDocs.length&&!confirm("Aucun document administratif chargé : générer à partir du CCTP seul ? (résultat limité)"))return;
+  if(adminHasRows()&&!confirm('Régénérer le focus administratif ? Les modifications manuelles seront remplacées.'))return;
+  const btn=$('goAdmin');btn.disabled=true;$('adminstatus').innerHTML='<span class="spin"></span> Analyse administrative par l\'IA (peut prendre plusieurs minutes)…';
+  try{const r=await fetch('/api/recap-admin',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(Object.assign({docs:adminDocs.map(d=>({name:d.name,text:d.text})),cctp_text:cctp},aiSel()))});
+    if(!r.ok)throw new Error((await r.json()).detail||r.statusText);
+    const d=await r.json();
+    if(!d.ok){$('adminstatus').textContent='⚠ Réponse IA non exploitable — relancez la génération.';console.warn('admin raw',d.raw);}
+    else{adminRec=adminNorm(d);renderAdmin();save();$('adminstatus').textContent='✔ Focus administratif généré ('+adminRec.checklist.length+' / '+adminRec.contractuel.length+' / '+adminRec.questions.length+' lignes) — à relire et valider.';}
+  }catch(err){$('adminstatus').textContent='Erreur : '+(err.message||err);}
+  btn.disabled=false;}
+function pac(){$('pac').textContent=points.filter(p=>p.checked).length+' / '+points.length;}
+function addPA(){const v=$('panew').value.trim();if(!v)return;points.push({label:v,checked:true});$('panew').value='';renderPA();save();}
+async function verifierConformite(){
+  const cctp=$('cctp_text').value.trim();
+  if(!cctp){alert("Aucun CCTP : collez ou analysez d'abord le CCTP dans l'onglet « CCTP & Contexte ».");return;}
+  const btn=$('goVerif');if(btn)btn.disabled=true;
+  $('verifModal').style.display='flex';$('verifModalBody').innerHTML='';
+  const gen=window._lastGen||'';
+  $('verifModalStatus').innerHTML='<span class="spin"></span> '+(gen?'Lecture du Word généré et comparaison au CCTP…':'Comparaison CCTP ↔ solution configurée (générez le Word pour comparer le document réel)…');
+  try{
+    const r=await fetch('/api/verifier',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(Object.assign({cctp_text:cctp,solution:buildData(),generated_file:gen},aiSel()))});
+    if(!r.ok)throw new Error((await r.json()).detail||r.statusText);
+    const d=await r.json();
+    verif=(d.verification||[]).filter(v=>v&&(v.exigence||v.suggestion||v.theme));
+    renderVerif();save();renderVerifModal();
+  }catch(err){$('verifModalStatus').textContent='Erreur : '+(err.message||err);}
+  if(btn)btn.disabled=false;
+}
+function closeVerifModal(){$('verifModal').style.display='none';}
+function renderVerifModal(){
+  const body=$('verifModalBody');const ICON={couvert:'✅',ecart:'⚠️',a_preciser:'❔'};const COL={couvert:'#1e7e34',ecart:'#c0392b',a_preciser:'#b8860b'};
+  const g={ecart:[],a_preciser:[],couvert:[]};verif.forEach(v=>{(g[v.statut||'a_preciser']||g.a_preciser).push(v);});
+  const nb=g.ecart.length+g.a_preciser.length;
+  $('verifModalStatus').innerHTML='<b style="color:'+(nb?'#c0392b':'#1e7e34')+'">'+(nb?('⚠️ '+nb+' point(s) à résoudre pour rendre l\'AO conforme'):'✅ Aucun écart : conforme à la demande du CCTP')+'</b>';
+  body.innerHTML='';
+  const sec=(title,st)=>{const arr=g[st];if(!arr.length)return;const h=document.createElement('h3');h.style.cssText='margin:12px 0 4px;color:'+COL[st];h.textContent=ICON[st]+' '+title+' ('+arr.length+')';body.appendChild(h);
+    arr.forEach(v=>{const d=document.createElement('div');d.style.cssText='border-left:4px solid '+COL[st]+';padding:6px 10px;margin:6px 0;background:#fafafa;border-radius:4px';
+      d.innerHTML='<b>'+esch(v.theme||'')+'</b>'+(v.exigence?'<div class="small">Exigence : '+esch(v.exigence)+'</div>':'')+(v.suggestion?'<div style="color:'+COL[st]+'">'+((st==='couvert')?'✔ ':'➕ ')+esch(v.suggestion)+'</div>':'');
+      body.appendChild(d);});};
+  sec('Éléments manquants / écarts','ecart');
+  sec('À préciser','a_preciser');
+  sec('Points déjà couverts','couvert');
+  if(!verif.length)body.innerHTML='<div class="small">Aucun élément retourné par l\'analyse.</div>';
+}
+/* Dictée vocale (Web Speech API, fr-FR) — sans dépendance ni coût serveur */
+let _rec=null,_recTarget=null,_recBtn=null;
+function stopDicter(){if(_recBtn){_recBtn.textContent='🎤';_recBtn.style.background='';_recBtn.style.color='';}_rec=null;_recTarget=null;_recBtn=null;}
+function dicter(targetId,btn){
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){alert("La dictée vocale n'est pas prise en charge par ce navigateur. Utilisez Chrome ou Edge.");return;}
+  if(_rec){_rec.stop();return;}            // 2e clic = arrêt
+  const ta=$(targetId);if(!ta)return;_recTarget=ta;_recBtn=btn;
+  _rec=new SR();_rec.lang='fr-FR';_rec.interimResults=true;_rec.continuous=true;
+  let base=ta.value;if(base&&!/\s$/.test(base))base+=' ';
+  btn.textContent='⏺ Dictée…';btn.style.background='#c00';btn.style.color='#fff';
+  _rec.onresult=e=>{let fin='',interim='';for(let i=e.resultIndex;i<e.results.length;i++){const t=e.results[i][0].transcript;if(e.results[i].isFinal)fin+=t+' ';else interim+=t;}if(fin)base+=fin;ta.value=base+interim;};
+  _rec.onerror=ev=>{$('msg')&&($('msg').textContent='Dictée : '+(ev.error||''));};
+  _rec.onend=()=>{if(_recTarget){_recTarget.value=_recTarget.value.trim();try{save();}catch(e){}}stopDicter();};
+  try{_rec.start();}catch(e){stopDicter();}
+}
+async function ameliorerSolution(){
+  const ta=$('aff_solution');const txt=ta.value.trim();
+  if(!txt){alert('Saisissez d\'abord une description (même brute) de la solution.');return;}
+  const btn=$('goSolution');btn.disabled=true;
+  $('solstatus').innerHTML='<span class="spin"></span> Reformulation par l\'IA…';
+  try{
+    const r=await fetch('/api/ameliorer-solution',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(Object.assign({text:txt,client:val('aff_client'),projet:val('aff_projet')},aiSel()))});
+    if(!r.ok)throw new Error((await r.json()).detail||r.statusText);
+    const d=await r.json();
+    if(d.text){ta.value=d.text;save();}
+    $('solstatus').textContent='✔ Texte reformulé — à relire avant génération.';
+  }catch(err){$('solstatus').textContent='Erreur : '+(err.message||err);}
+  btn.disabled=false;
+}
+
+/* Import Excel via backend */
+$('xlsx').onchange=async e=>{const f=e.target.files[0];if(!f)return;$('xlsxmsg').innerHTML='<span class="spin"></span> Import…';
+  const fd=new FormData();fd.append('file',f);
+  try{const r=await fetch('/api/import-excel',{method:'POST',body:fd});if(!r.ok)throw new Error((await r.json()).detail||r.statusText);
+    const d=await r.json();
+    const a=d.affaire||{};['aff_projet','aff_ref'].forEach(()=>{});if(a.projet)$('aff_projet').value=a.projet;if(a.reference)$('aff_ref').value=a.reference;
+    clearAll();CATS.forEach(c=>(d[c.key]||[]).forEach(it=>addItem(c.key,it)));recount();
+    const n=CATS.reduce((s,c)=>s+(d[c.key]||[]).length,0);$('xlsxmsg').textContent='✔ '+n+' équipements importés.';save();
+  }catch(err){$('xlsxmsg').textContent='Erreur import : '+(err.message||err);}
+  e.target.value='';};
+
+/* Contacts (page de garde du template) */
+let contacts=[];
+function addContact(){contacts.push({nom:'',prenom:'',fonction:'',telephone:'',email:''});renderContacts();save();}
+function delContact(i){contacts.splice(i,1);renderContacts();save();}
+function renderContacts(){
+  const el=$('contactsTable');if(!el)return;
+  const F=[['nom','Nom'],['prenom','Prénom'],['fonction','Fonction'],['telephone','Téléphone'],['email','E-mail']];
+  let h='<thead><tr>'+F.map(f=>'<th>'+f[1]+'</th>').join('')+'<th style="width:36px"></th></tr></thead><tbody>';
+  contacts.forEach((c,i)=>{
+    h+='<tr>'+F.map(f=>'<td><input type="text" style="width:100%" value="'+esch(c[f[0]]||'')+'" oninput="contacts['+i+'].'+f[0]+'=this.value;save()"></td>').join('')+
+      '<td class="rowact"><button title="Supprimer" onclick="delContact('+i+')">🗑</button></td></tr>';
+  });
+  el.innerHTML=h+'</tbody>';
+}
+
+/* Fiche : build / export / load / generate / autosave */
+function val(id){return $(id).value.trim();}
+function buildData(){return{_type:'fiche_specs_oneid',_version:3,genere_le:new Date().toISOString(),
+  affaire:{client:val('aff_client'),projet:val('aff_projet'),reference:val('aff_ref'),version:val('aff_version'),auteur:val('aff_auteur'),date:val('aff_date'),
+    contexte:val('aff_contexte'),solution_proposee:val('aff_solution'),
+    contacts:contacts.map(c=>({nom:c.nom||'',prenom:c.prenom||'',fonction:c.fonction||'',telephone:c.telephone||'',email:c.email||''})),
+    points_attention:points.map(p=>({label:p.label,checked:p.checked})),points_notes:val('pa_notes'),
+    clarifications:clars||[],verification:verif||[],recap_cctp:recap,recap_admin:adminRec,admin_docs:adminDocs.map(d=>({name:d.name,text:d.text,chars:d.chars||0,truncated:!!d.truncated})),cctp_text:$('cctp_text').value,images_architecture:imgStore.arch||[],
+    sauv_veeam:$('sauv_veeam').checked,sauv_datadomain:$('sauv_datadomain').checked,
+    pra_pca:{mode:$('pra_mode').value,actif:$('pra_mode').value!=='aucun',rto:val('pra_rto'),rpo:val('pra_rpo'),cible:$('pra_cible').value,methode:$('pra_methode').value,texte:$('pra_text').value}},
+  serveurs:items('serveurs'),stockages:items('stockages'),switches:items('switches'),sauvegardes:items('sauvegardes'),logiciels_services:items('logiciels_services'),
+  planning:planTasks.map(t=>({nom:t.nom,debut:t.debut,fin:t.fin,duree:t.duree,linkPrev:!!t.linkPrev,equipes:t.equipes,teletravail:t.teletravail,conge:!!t.conge})),
+  chapitres:chapitres.map(c=>({titre:c.titre||'',argumentaire:c.argumentaire||'',complement:c.complement||c.texte||'',duree:c.duree||'',images:c.images||[],cartes:(c.cartes||[]).map(x=>({l:x.l,ok:!!x.ok}))})),
+  sauvegarde:{logiciel:$('sauv_logiciel').value,licence:$('sauv_licence').value,cible:$('sauv_cible').value,cloud:$('sauv_cloud').checked,sites:sauvSites.map(s=>({nom:s.nom||'',cells:s.cells||{}}))},
+  ai:{engine:'gb10',modelGb10:($('aiModelGb10')||{}).value||''},
+  prestations:prestations.map(p=>({intitule:p.intitule||'',duree:p.duree||'',argumentaire:p.argumentaire||'',complement:p.complement||p.methodo||''}))};}
+function items(key){return [...document.querySelectorAll('#list-'+key+' .item')].map(readItem);}
+function clearAll(){CATS.forEach(c=>{$('list-'+c.key).innerHTML='';idx[c.key]=0;});}
+function loadData(d){const a=d.affaire||{};
+  [['aff_client','client'],['aff_projet','projet'],['aff_ref','reference'],['aff_version','version'],['aff_auteur','auteur'],['aff_date','date'],['aff_contexte','contexte'],['aff_solution','solution_proposee']].forEach(p=>{if(a[p[1]]!==undefined)$(p[0]).value=a[p[1]];});
+  contacts=(a.contacts||[]).map(c=>({nom:c.nom||'',prenom:c.prenom||'',fonction:c.fonction||'',telephone:c.telephone||'',email:c.email||''}));renderContacts();
+  imgStore.arch=a.images_architecture||[];renderThumbs('arch');
+  if(a.points_notes!==undefined)$('pa_notes').value=a.points_notes;
+  if(a.cctp_text!==undefined)$('cctp_text').value=a.cctp_text;
+  points=(a.points_attention||[]).map(p=>({label:p.label,checked:!!p.checked}));renderPA();
+  clars=a.clarifications||[];renderClars();
+  verif=a.verification||[];renderVerif();
+  recap=recapNorm(a.recap_cctp);renderRecap();
+  adminRec=adminNorm(a.recap_admin);adminDocs=Array.isArray(a.admin_docs)?a.admin_docs.filter(d=>d&&d.name):[];renderAdminDocs();renderAdmin();
+  $('sauv_veeam').checked=!!a.sauv_veeam;$('sauv_datadomain').checked=!!a.sauv_datadomain;
+  const sv=d.sauvegarde||{};$('sauv_logiciel').value=sv.logiciel||'';$('sauv_licence').value=sv.licence||'acheter';$('sauv_cible').value=sv.cible||'';$('sauv_cloud').checked=!!sv.cloud;sauvSites=(sv.sites||[]).map(s=>({nom:s.nom||'',cells:s.cells||{}}));renderSauv();
+  const ai=d.ai||{};if(ai.modelGb10!==undefined)$('aiModelGb10').value=ai.modelGb10;aiToggle();
+  prestations=(d.prestations||[]).map(p=>({intitule:p.intitule||'',duree:p.duree||'',argumentaire:p.argumentaire||'',complement:p.complement||p.methodo||''}));renderPrest();
+  const pp=a.pra_pca||{};if(pp.mode)$('pra_mode').value=pp.mode;$('pra_rto').value=pp.rto||'';$('pra_rpo').value=pp.rpo||'';if(pp.cible)$('pra_cible').value=pp.cible;if(pp.methode)$('pra_methode').value=pp.methode;$('pra_text').value=pp.texte||'';praToggle();
+  if(points.length||a.contexte||clars.length||verif.length)$('resCard').style.display='block';
+  planTasks=(d.planning||[]).map(t=>Object.assign({nom:'',debut:'',fin:'',duree:'',linkPrev:false,equipes:'',teletravail:'',conge:false},t));renderPlan();
+  chapitres=(d.chapitres||[]).map(c=>({titre:c.titre||'',argumentaire:c.argumentaire||'',complement:c.complement||c.texte||'',duree:c.duree||'',images:c.images||[],cartes:(c.cartes||[]).map(x=>typeof x==='string'?{l:x,ok:false}:{l:x.l||x.label||'',ok:!!x.ok}).filter(x=>x.l)}));renderKanban();
+  clearAll();CATS.forEach(c=>(d[c.key]||[]).forEach(it=>addItem(c.key,it)));recount();}
+$('loadf').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{loadData(JSON.parse(r.result));$('msg').textContent='✔ Fiche chargée.';save();}catch(err){alert('JSON invalide : '+err.message);}};r.readAsText(f);e.target.value='';};
+function expFiche(){const d=buildData();const name='fiche_specs_'+((d.affaire.client||d.affaire.projet||'client').replace(/[^a-z0-9]/gi,'_').slice(0,40))+'.json';const b=new Blob([JSON.stringify(d,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=name;a.click();}
+async function generer(mode){mode=mode||'standard';
+  $('msg').innerHTML='<span class="spin"></span> '+(mode==='design'?'Génération Design (réécriture par l\'IA)…':'Génération du Word…');
+  try{const r=await fetch('/api/generer',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(Object.assign({mode:mode,ai_provider:aiSel().provider,ai_model:aiSel().model},buildData()))});
+    if(!r.ok)throw new Error((await r.json()).detail||r.statusText);
+    const blob=await r.blob();const cd=r.headers.get('Content-Disposition')||'';const m=cd.match(/filename="?([^"]+)"?/);const name=m?m[1]:'AO_ONEID.docx';
+    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();
+    window._lastGen=name;
+    $('msg').textContent='✔ Word généré : '+name+' — vous pouvez lancer « 🔍 Vérifier la conformité ».';
+  }catch(err){$('msg').textContent='Erreur génération : '+(err.message||err);}}
+async function genChiffrage(){
+  $('msg').innerHTML='<span class="spin"></span> Génération du chiffrage Excel…';
+  try{const r=await fetch('/api/chiffrage',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(buildData())});
+    if(!r.ok)throw new Error((await r.json()).detail||r.statusText);
+    const blob=await r.blob();const cd=r.headers.get('Content-Disposition')||'';const m=cd.match(/filename="?([^"]+)"?/);const name=m?m[1]:'Chiffrage.xlsx';
+    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();
+    $('msg').textContent='✔ Chiffrage généré : '+name+' (aussi dans Documents_Generes).';
+  }catch(err){$('msg').textContent='Erreur chiffrage : '+(err.message||err);}}
+let cadreFile=null;
+function bindCadre(){const dz=$('cadredz'),f=$('cadrefile');if(!dz||!f)return;
+  dz.onclick=()=>f.click();
+  dz.ondragover=e=>{e.preventDefault();dz.classList.add('over');};dz.ondragleave=()=>dz.classList.remove('over');
+  dz.ondrop=e=>{e.preventDefault();dz.classList.remove('over');const x=e.dataTransfer.files[0];if(x){cadreFile=x;$('cadrename').textContent='Trame : '+x.name;}};
+  f.onchange=e=>{const x=e.target.files[0];if(x){cadreFile=x;$('cadrename').textContent='Trame : '+x.name;}};}
+async function genMemoire(){
+  if(!cadreFile){alert("Chargez d'abord la trame du cadre de mémoire technique.");return;}
+  const btn=$('goMem');if(btn)btn.disabled=true;$('memstatus').innerHTML='<span class="spin"></span> Remplissage par IA…';
+  try{
+    const fd=new FormData();fd.append('file',cadreFile);fd.append('cctp',$('cctp_text').value||'');fd.append('solution',JSON.stringify(buildData()));fd.append('generated_file',window._lastGen||'');fd.append('client',val('aff_client'));const ai=aiSel();fd.append('provider',ai.provider);fd.append('model',ai.model);
+    const r=await fetch('/api/memoire',{method:'POST',body:fd});
+    if(!r.ok)throw new Error((await r.json()).detail||r.statusText);
+    const blob=await r.blob();const cd=r.headers.get('Content-Disposition')||'';const m=cd.match(/filename="?([^"]+)"?/);const name=m?m[1]:'Memoire_technique.docx';
+    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();
+    $('memstatus').textContent='✔ Mémoire rempli : '+name+' — à relire avant envoi.';
+  }catch(err){$('memstatus').textContent='Erreur : '+(err.message||err);}
+  if(btn)btn.disabled=false;
+}
+function saveFicheFromGen(){const nm=($('ficheNameGen')||{}).value?$('ficheNameGen').value.trim():'';if(nm)$('ficheName').value=nm;saveFiche();$('histstatus').textContent='→ Enregistré, voir « Mes fiches » à gauche.';}
+/* Fonctionnalité : PRA / PCA */
+function praToggle(){const e=$('pra_mode');if(!e)return;$('praFields').style.display=(e.value==='aucun')?'none':'block';}
+function buildPraText(){
+  const m=$('pra_mode').value;if(m==='aucun')return '';
+  const rto=val('pra_rto')||'à préciser',rpo=val('pra_rpo')||'à préciser';
+  const cible=$('pra_cible').value,meth=$('pra_methode').value;const P=[];
+  if(m==='pra')P.push("Dans le cadre de ce projet, nous proposons à {client} un Plan de Reprise d'Activité (PRA) destiné à redémarrer le système d'information dans les meilleurs délais en cas de sinistre majeur. Les objectifs retenus sont un RTO (délai de reprise visé) de "+rto+" et un RPO (perte de données maximale admissible) de "+rpo+".");
+  else P.push("Dans le cadre de ce projet, nous proposons à {client} un Plan de Continuité d'Activité (PCA) visant à maintenir les services critiques disponibles sans interruption perceptible pour les utilisateurs, y compris en cas de défaillance d'un site. Les objectifs retenus sont un RTO de "+rto+" et un RPO de "+rpo+", au plus près d'une continuité de service.");
+  const CIB={ancien:"La réplication s'appuiera sur le matériel existant de {client}, reconditionné en site de repli. Cette approche optimise l'investissement en réutilisant une infrastructure déjà amortie pour héberger les données répliquées.",
+    nouveau:"La réplication sera assurée vers un nouvel équipement dédié au site de repli, garantissant des performances homogènes avec la production et une capacité dimensionnée pour la reprise.",
+    cloud:"La réplication sera hébergée sur le Cloud de ONE ID, assurant une externalisation des données hors site, sans investissement matériel supplémentaire, avec un modèle de coûts maîtrisé (OPEX) et une exploitation assurée par nos équipes."};
+  P.push(CIB[cible]||'');
+  let METH;
+  if(meth==='veeam')METH="La réplication sera mise en œuvre avec Veeam, solution logicielle indépendante du matériel : elle réplique les machines virtuelles vers une infrastructure même hétérogène, orchestre les bascules et permet une restauration granulaire (jusqu'au fichier ou à l'application).";
+  else METH=(m==='pca')?"La réplication s'appuiera sur les fonctions natives de la baie de stockage, avec une réplication synchrone (de type Metro) au niveau bloc, adaptée aux RPO les plus exigeants recherchés dans un PCA.":"La réplication s'appuiera sur les fonctions natives de la baie de stockage : une réplication au niveau bloc, cohérente et performante, pilotée directement par la baie (mode asynchrone, ou synchrone selon le besoin).";
+  P.push(METH);
+  P.push("Cette architecture permet à {client} de sécuriser durablement ses données et la continuité de ses services, avec un dispositif éprouvé et l'accompagnement des équipes ONE ID sur l'ensemble du cycle de vie.");
+  return P.join("\n\n");
+}
+function genPra(){if($('pra_mode').value==='aucun'){alert('Sélectionnez PRA ou PCA.');return;}$('pra_text').value=buildPraText();save();$('prastatus').textContent='✔ Argumentaire généré — à relire / reformuler.';}
+async function reformulerPra(){
+  const txt=$('pra_text').value.trim();if(!txt){alert("Générez d'abord l'argumentaire (bouton « Générer »).");return;}
+  const btn=$('goPra');if(btn)btn.disabled=true;$('prastatus').innerHTML='<span class="spin"></span> Reformulation…';
+  try{const r=await fetch('/api/ameliorer-solution',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(Object.assign({text:txt,client:val('aff_client'),projet:val('aff_projet')},aiSel()))});
+    if(!r.ok)throw new Error((await r.json()).detail||r.statusText);const d=await r.json();if(d.text){$('pra_text').value=d.text;save();}
+    $('prastatus').textContent='✔ Reformulé — à relire avant génération.';
+  }catch(err){$('prastatus').textContent='Erreur : '+(err.message||err);}
+  if(btn)btn.disabled=false;
+}
+/* Sauvegarde : volumétrie multi-sites */
+const SAUV_COLS=["VM Fichiers","VM Database","VM","NAS Fichiers","Physique Database"];
+const SAUV_ROWS=["TB","Daily Change","Rétentions","Croissance estimée","NB de Serveurs"];
+const SAUV_SUM=["TB","NB de Serveurs"];
+let sauvSites=[];
+function addSauvSite(){sauvSites.push({nom:'SITE '+(sauvSites.length+1),cells:{}});renderSauv();save();}
+function delSauvSite(i){sauvSites.splice(i,1);renderSauv();save();}
+function sauvTotal(site,row){if(SAUV_SUM.indexOf(row)<0)return'';let t=0,has=false;SAUV_COLS.forEach(c=>{const v=((site.cells[row]||{})[c]||'').toString().replace(',','.').trim();const n=parseFloat(v);if(!isNaN(n)){t+=n;has=true;}});return has?String(t):'';}
+function renderSauv(){
+  const host=$('sauvSites');if(!host)return;host.innerHTML='';
+  sauvSites.forEach((site,si)=>{
+    const wrap=document.createElement('div');wrap.style.cssText='margin-bottom:14px';
+    const top=document.createElement('div');top.style.cssText='display:flex;gap:8px;align-items:center;margin-bottom:4px';
+    const nm=document.createElement('input');nm.value=site.nom||'';nm.style.cssText='max-width:170px;font-weight:600';nm.oninput=()=>{site.nom=nm.value;save();};
+    const del=document.createElement('button');del.className='btn btn-del';del.textContent='Supprimer';del.onclick=()=>delSauvSite(si);
+    top.appendChild(nm);top.appendChild(del);wrap.appendChild(top);
+    const tb=document.createElement('table');tb.className='ptab';tb.style.minWidth='780px';
+    tb.innerHTML='<thead><tr><th>Typologie des Données</th>'+SAUV_COLS.map(c=>'<th>'+c+'</th>').join('')+'<th>Total</th></tr></thead><tbody></tbody>';
+    const body=tb.querySelector('tbody');
+    SAUV_ROWS.forEach(row=>{
+      const tr=document.createElement('tr');
+      const th=document.createElement('td');th.textContent=row;th.style.fontWeight='600';tr.appendChild(th);
+      SAUV_COLS.forEach(c=>{
+        const td=document.createElement('td');const inp=document.createElement('input');inp.type='text';inp.value=(site.cells[row]||{})[c]||'';
+        inp.oninput=()=>{site.cells[row]=site.cells[row]||{};site.cells[row][c]=inp.value;const tc=tr.querySelector('.tot');if(tc)tc.textContent=sauvTotal(site,row);save();};
+        td.appendChild(inp);tr.appendChild(td);
+      });
+      const tot=document.createElement('td');tot.className='tot';tot.style.fontWeight='600';tot.textContent=sauvTotal(site,row);tr.appendChild(tot);
+      body.appendChild(tr);
+    });
+    wrap.appendChild(tb);host.appendChild(wrap);
+  });
+}
+/* Kanban : points d'attention -> chapitres */
+let chapitres=[];let _drag=null;
+function kpool(){const used=new Set();chapitres.forEach(c=>(c.cartes||[]).forEach(x=>used.add(x.l)));return points.map(p=>p.label).filter(l=>!used.has(l));}
+function addChap(){chapitres.push({titre:'Nouveau chapitre',argumentaire:'',complement:'',duree:'',cartes:[]});renderKanban();save();}
+let _chapModalIdx=null;
+function fillChapArg(ch){const sel=$('chapModalArg');if(sel)sel.innerHTML=prestArgOptions((ch&&ch.argumentaire)||'');}
+async function openChapModal(i){const ch=chapitres[i];if(!ch)return;_chapModalIdx=i;
+  $('chapModalTitle').textContent='Description de l’offre — '+(ch.titre||'Chapitre');
+  fillChapArg(ch);
+  if(!(argItems&&argItems.length)){try{await argRefresh();}catch(e){}fillChapArg(ch);}
+  $('chapModalText').value=ch.complement||ch.texte||'';
+  $('chapModalDuree').value=ch.duree||'';
+  $('chapModalStatus').textContent='';imgStore.chap=(ch.images||[]).slice();renderThumbs('chap');activeZone='chap';$('chapModal').style.display='flex';}
+function closeChapModal(){_chapModalIdx=null;activeZone=null;$('chapModal').style.display='none';}
+function saveChapModal(){if(_chapModalIdx!=null&&chapitres[_chapModalIdx]){const ch=chapitres[_chapModalIdx];
+  ch.argumentaire=($('chapModalArg')||{}).value||'';
+  ch.complement=$('chapModalText').value;delete ch.texte;
+  ch.duree=($('chapModalDuree').value||'').trim();
+  ch.images=imgStore.chap||[];
+  if(ch.argumentaire&&(!ch.titre||ch.titre==='Nouveau chapitre')){const it=(argItems||[]).find(x=>x.folder===ch.argumentaire);if(it)ch.titre=it.titre||ch.titre;}
+  save();renderKanban();}closeChapModal();}
+async function reformulerChapModal(){
+  const ta=$('chapModalText');const txt=ta.value.trim();if(!txt){alert('Saisissez ou dictez une description.');return;}
+  const btn=$('goChapRef');if(btn)btn.disabled=true;$('chapModalStatus').innerHTML='<span class="spin"></span> Reformulation…';
+  try{const r=await fetch('/api/ameliorer-solution',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(Object.assign({text:txt,client:val('aff_client'),projet:val('aff_projet')},aiSel()))});
+    if(!r.ok)throw new Error((await r.json()).detail||r.statusText);const d=await r.json();if(d.text)ta.value=d.text;
+    $('chapModalStatus').textContent='✔ Reformulé — relisez puis Enregistrer.';
+  }catch(err){$('chapModalStatus').textContent='Erreur : '+(err.message||err);}
+  if(btn)btn.disabled=false;
+}
+async function proposerChapitres(){
+  const labels=points.map(p=>p.label).filter(Boolean);
+  if(!labels.length){alert("Aucun point d'attention. Analysez d'abord le CCTP.");return;}
+  if(chapitres.length && !confirm('Remplacer les chapitres actuels par la proposition de l\'IA ?'))return;
+  const btn=$('goChap');if(btn)btn.disabled=true;$('chapstatus').innerHTML='<span class="spin"></span> Regroupement…';
+  try{
+    const r=await fetch('/api/proposer-chapitres',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(Object.assign({points:labels},aiSel()))});
+    if(!r.ok)throw new Error((await r.json()).detail||r.statusText);
+    const d=await r.json();const valid=new Set(labels);
+    chapitres=(d.chapitres||[]).map(c=>({titre:(c.titre||'Chapitre').trim(),texte:'',cartes:(c.cartes||[]).filter(l=>valid.has(l)).map(l=>({l:l,ok:false}))})).filter(c=>c.titre);
+    renderKanban();save();
+    $('chapstatus').textContent='✔ '+chapitres.length+' chapitre(s) proposé(s) — ajustez si besoin.';
+  }catch(err){$('chapstatus').textContent='Erreur : '+(err.message||err);}
+  if(btn)btn.disabled=false;
+}
+function delChap(i){if(!confirm('Supprimer ce chapitre ? Ses points reviennent dans « Non classés ».'))return;chapitres.splice(i,1);renderKanban();save();}
+function moveChap(i,d){const j=i+d;if(j<0||j>=chapitres.length)return;const x=chapitres[i];chapitres[i]=chapitres[j];chapitres[j]=x;renderKanban();save();}
+function kdrop(target){if(!_drag)return;chapitres.forEach(c=>{c.cartes=(c.cartes||[]).filter(x=>x.l!==_drag.label);});if(target!=='pool'&&chapitres[target])chapitres[target].cartes.push({l:_drag.label,ok:!!_drag.ok});_drag=null;renderKanban();save();}
+function kcardPool(label){const c=document.createElement('div');c.textContent=label;c.draggable=true;c.style.cssText='background:#fff;border:1px solid #d8dee6;border-radius:6px;padding:4px 7px;margin:5px 0;font-size:11px;line-height:1.25;cursor:grab';c.ondragstart=()=>{_drag={label:label,ok:false};};return c;}
+function kcardChap(ca){const c=document.createElement('div');c.draggable=true;c.style.cssText='background:'+(ca.ok?'#eaf7ee':'#fff')+';border:1px solid '+(ca.ok?'#86c79a':'#d8dee6')+';border-left:4px solid '+(ca.ok?'#1e7e34':'#c0392b')+';border-radius:6px;padding:4px 7px;margin:5px 0;font-size:11px;line-height:1.25;cursor:grab';
+  const lab=document.createElement('label');lab.style.cssText='display:flex;gap:6px;align-items:flex-start;cursor:pointer';
+  const cb=document.createElement('input');cb.type='checkbox';cb.checked=!!ca.ok;cb.title='Validé ?';cb.onclick=e=>e.stopPropagation();cb.onchange=()=>{ca.ok=cb.checked;renderKanban();save();};
+  const sp=document.createElement('span');sp.textContent=ca.l;
+  lab.appendChild(cb);lab.appendChild(sp);c.appendChild(lab);
+  c.ondragstart=()=>{_drag={label:ca.l,ok:ca.ok};};return c;}
+function kcol(idx,head){const col=document.createElement('div');col.style.cssText='min-width:170px;max-width:190px;background:#eef2f7;border-radius:8px;padding:6px;flex:0 0 auto';col.ondragover=e=>e.preventDefault();col.ondrop=e=>{e.preventDefault();kdrop(idx);};col.appendChild(head);return col;}
+function renderKanban(){
+  const b=$('kanboard');if(!b)return;b.innerHTML='';
+  const ph=document.createElement('div');ph.innerHTML='<b>Points non classés</b>';ph.style.marginBottom='4px';
+  const pcol=kcol('pool',ph);const pool=kpool();
+  pool.forEach(l=>pcol.appendChild(kcardPool(l)));
+  if(!pool.length){const e=document.createElement('div');e.className='small';e.textContent='(tous les points sont classés)';pcol.appendChild(e);}
+  b.appendChild(pcol);
+  chapitres.forEach((ch,i)=>{
+    const head=document.createElement('div');
+    const ti=document.createElement('input');ti.value=ch.titre||'';ti.placeholder='Titre du chapitre';ti.style.cssText='width:100%;font-weight:600;font-size:12px;padding:5px 7px';ti.oninput=()=>{ch.titre=ti.value;save();};
+    const tools=document.createElement('div');tools.style.cssText='display:flex;gap:4px;margin:4px 0';
+    const mk=(t,fn,title)=>{const x=document.createElement('button');x.className='btn btn-ghost';x.style.cssText='padding:1px 7px;font-size:12px';x.textContent=t;x.title=title;x.onclick=fn;return x;};
+    tools.appendChild(mk('◀',()=>moveChap(i,-1),'Déplacer à gauche'));
+    tools.appendChild(mk('▶',()=>moveChap(i,1),'Déplacer à droite'));
+    tools.appendChild(mk('🗑',()=>delChap(i),'Supprimer'));
+    const filled=(ch.argumentaire&&ch.argumentaire.trim())||(ch.complement&&ch.complement.trim())||(ch.texte&&ch.texte.trim());
+    const desc=document.createElement('button');desc.className='btn btn-ghost';desc.style.cssText='width:100%;font-size:11px;padding:5px;margin-bottom:4px';
+    desc.textContent=filled?'✏️ Offre ✓':'✏️ Décrire l’offre';desc.title='Argumentaire, complément/prérequis, jours d’installation';desc.onclick=()=>openChapModal(i);
+    head.appendChild(ti);head.appendChild(tools);head.appendChild(desc);
+    if((ch.argumentaire&&ch.argumentaire.trim())||(ch.duree&&ch.duree.trim())){
+      const meta=document.createElement('div');meta.className='small';meta.style.cssText='font-size:10px;color:#5a6b7b;margin:-2px 0 4px;line-height:1.3';
+      const an=ch.argumentaire?((argItems||[]).find(x=>x.folder===ch.argumentaire)||{}).titre||ch.argumentaire:'';
+      meta.textContent=[an?('📄 '+an):'',ch.duree?('⏱ '+ch.duree):''].filter(Boolean).join(' · ');
+      head.appendChild(meta);
+    }
+    const col=kcol(i,head);
+    (ch.cartes||[]).forEach(ca=>col.appendChild(kcardChap(ca)));
+    b.appendChild(col);
+  });
+}
+/* Prestations & méthodologie */
+let prestations=[];
+function addPrest(){prestations.push({intitule:'',duree:'',argumentaire:'',complement:''});renderPrest();save();}
+function delPrest(i){prestations.splice(i,1);renderPrest();save();}
+function movePrest(i,d){const j=i+d;if(j<0||j>=prestations.length)return;const x=prestations[i];prestations[i]=prestations[j];prestations[j]=x;renderPrest();save();}
+function prestArgOptions(sel){let o='<option value="">— aucun —</option>';(argItems||[]).forEach(it=>{o+='<option value="'+esch(it.folder)+'"'+(it.folder===sel?' selected':'')+'>'+esch(it.titre||it.folder)+'</option>';});return o;}
+function prestArgChange(i,folder){prestations[i].argumentaire=folder;if(folder&&!(prestations[i].intitule||'').trim()){const it=(argItems||[]).find(x=>x.folder===folder);if(it)prestations[i].intitule=it.titre||folder;}renderPrest();save();}
+function renderPrest(){
+  const el=$('prestTable');if(!el)return;
+  let h='<thead><tr><th style="width:26px">#</th><th style="width:19%">Intitulé</th><th style="width:19%">Argumentaire</th><th>Complément / options</th><th style="width:92px">Durée (jours)</th><th style="width:76px"></th></tr></thead><tbody>';
+  prestations.forEach((p,i)=>{
+    h+='<tr><td>'+(i+1)+'</td>'+
+      '<td><input type="text" style="width:100%" value="'+esch(p.intitule)+'" oninput="prestations['+i+'].intitule=this.value;save()"></td>'+
+      '<td><select style="width:100%" onchange="prestArgChange('+i+',this.value)">'+prestArgOptions(p.argumentaire)+'</select></td>'+
+      '<td><textarea rows="6" style="width:100%" placeholder="options, précisions…" oninput="prestations['+i+'].complement=this.value;save()">'+esch(p.complement||p.methodo||'')+'</textarea></td>'+
+      '<td><input type="text" style="width:80px" placeholder="ex : 3 j" value="'+esch(p.duree)+'" oninput="prestations['+i+'].duree=this.value;save()"></td>'+
+      '<td class="rowact" style="white-space:nowrap"><button title="Monter" onclick="movePrest('+i+',-1)">▲</button><button title="Descendre" onclick="movePrest('+i+',1)">▼</button><button title="Supprimer" onclick="delPrest('+i+')">🗑</button></td></tr>';
+  });
+  el.innerHTML=h+'</tbody>';
+}
+function prestToPlan(){
+  const src=chapitres.filter(c=>(c.titre||'').trim()&&(c.duree||'').trim());
+  if(!src.length){alert("Aucun chapitre avec une durée. Renseignez le nombre de jours dans « Décrire l'offre » à l'étape 4.");return;}
+  if(planTasks.length && !confirm('Remplacer le planning actuel par les tâches issues des chapitres ?'))return;
+  let base=new Date();base.setMonth(base.getMonth()+1);let cur=startMonday(base);
+  const iso=d=>d.toISOString().slice(0,10);
+  planTasks=src.map(c=>{const dur=parseDureeJours(c.duree)||1;const s=nextWorkday(cur);const e=addWorkdays(s,dur-1);cur=addWorkdays(e,1);
+    return {nom:c.titre,debut:iso(s),fin:iso(e),duree:dureeFromDates(iso(s),iso(e)),linkPrev:false,equipes:'',teletravail:'',conge:false};});
+  renderPlan();save();$('msg').textContent='Planning généré depuis les chapitres ('+src.length+' tâches).';
+}
+/* Planning / Gantt */
+let planTasks=[];
+function esch(s){return (s==null?'':String(s)).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');}
+function pdate(s){if(!s)return null;const d=new Date(s+'T00:00:00');return isNaN(d)?null:d;}
+function startMonday(d){const x=new Date(d);const wd=(x.getDay()+6)%7;x.setDate(x.getDate()-wd);return x;}
+function fmtjm(d){return ('0'+d.getDate()).slice(-2)+'/'+('0'+(d.getMonth()+1)).slice(-2);}
+function dureeFromDates(deb,fin){
+  const a=pdate(deb),b=pdate(fin); if(!a||!b||b<a) return '';
+  let n=0; const cur=new Date(a);
+  while(cur<=b){const wd=cur.getDay(); if(wd!==0&&wd!==6)n++; cur.setDate(cur.getDate()+1);}
+  if(n<=0) return '0j';
+  const w=Math.floor(n/5), d=n%5;
+  if(w>0&&d>0) return w+'s '+d+'j';
+  if(w>0) return w+'s';
+  return d+'j';
+}
+function updDuree(i,el){const t=planTasks[i];const d=dureeFromDates(t.debut,t.fin);if(!d)return;t.duree=d;const row=el&&el.closest('tr');const di=row&&row.querySelector('input.dur');if(di)di.value=d;}
+function isod(d){return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2);}
+function nextWorkday(d){const x=new Date(d);while(x.getDay()===0||x.getDay()===6)x.setDate(x.getDate()+1);return x;}
+function addWorkdays(d,k){const x=new Date(d);let c=0;while(c<k){x.setDate(x.getDate()+1);if(x.getDay()!==0&&x.getDay()!==6)c++;}return x;}
+function parseDureeJours(s){if(!s)return 0;s=String(s).toLowerCase().replace(',', '.');const sm=s.match(/([\d.]+)\s*s/);const jm=s.match(/([\d.]+)\s*j/);let n=0;if(sm)n+=Math.round(parseFloat(sm[1])*5);if(jm)n+=Math.ceil(parseFloat(jm[1]));if(!sm&&!jm){const f=parseFloat(s);if(!isNaN(f))n=Math.ceil(f);}return n;}
+/* Lien Fin->Début avec la tâche du dessus : la tâche démarre après la fin de la précédente. */
+function applyLinks(){
+  for(let pass=0;pass<planTasks.length+1;pass++){
+    planTasks.forEach((t,i)=>{
+      if(!t.linkPrev||i===0)return;
+      const latest=pdate(planTasks[i-1].fin); if(!latest)return;
+      let dur=parseDureeJours(t.duree);
+      if(!dur){const a=pdate(t.debut),b=pdate(t.fin);if(a&&b){let n=0;const c=new Date(a);while(c<=b){if(c.getDay()!==0&&c.getDay()!==6)n++;c.setDate(c.getDate()+1);}dur=n;}}
+      if(!dur)dur=1;
+      const start=addWorkdays(latest,1);          // 1er jour ouvré après la fin de la tâche précédente
+      const end=addWorkdays(start,dur-1);          // fin = début + durée (jours ouvrés)
+      t.debut=isod(start);t.fin=isod(end);t.duree=dureeFromDates(t.debut,t.fin);
+    });
+  }
+}
+function toggleLink(i){if(i<=0)return;planTasks[i].linkPrev=!planTasks[i].linkPrev;applyLinks();renderPlan();save();}
+function recalcPlan(){applyLinks();renderPlan();save();$('msg').textContent='Planning recalculé selon les liens entre tâches.';}
+function addTask(d){planTasks.push(Object.assign({nom:'',debut:'',fin:'',duree:'',linkPrev:false,equipes:'',teletravail:'',conge:false},d||{}));renderPlan();save();}
+function delTask(i){planTasks.splice(i,1);renderPlan();save();}
+function moveTask(i,dir){const j=i+dir;if(j<0||j>=planTasks.length)return;const x=planTasks[i];planTasks[i]=planTasks[j];planTasks[j]=x;renderPlan();save();}
+function renderPlan(){
+  const head=['ID','Nom de tâche','Début','Fin','Durée','Équipes','Tél.','Congé',''];
+  let h='<thead><tr>'+head.map(x=>'<th>'+x+'</th>').join('')+'</tr></thead><tbody>';
+  planTasks.forEach((t,i)=>{
+    h+='<tr><td>'+(i+1)+'</td>'+
+      '<td><input type="text" value="'+esch(t.nom)+'" oninput="planTasks['+i+'].nom=this.value;save()"></td>'+
+      '<td><input type="date" value="'+esch(t.debut)+'" oninput="planTasks['+i+'].debut=this.value;updDuree('+i+',this);save()"></td>'+
+      '<td><input type="date" value="'+esch(t.fin)+'" oninput="planTasks['+i+'].fin=this.value;updDuree('+i+',this);save()"></td>'+
+      '<td><input type="text" class="dur" style="width:55px" value="'+esch(t.duree)+'" oninput="planTasks['+i+'].duree=this.value;save()"></td>'+
+      '<td><input type="text" value="'+esch(t.equipes)+'" oninput="planTasks['+i+'].equipes=this.value;save()"></td>'+
+      '<td style="text-align:center"><input type="checkbox" '+(t.teletravail?'checked':'')+' onchange="planTasks['+i+'].teletravail=this.checked?\'X\':\'\';save()"></td>'+
+      '<td style="text-align:center"><input type="checkbox" '+(t.conge?'checked':'')+' onchange="planTasks['+i+'].conge=this.checked;save()"></td>'+
+      '<td class="rowact" style="white-space:nowrap"><button title="Lier à la tâche du dessus (démarre après sa fin)" '+(i===0?'disabled':'')+' onclick="toggleLink('+i+')" style="'+((t.linkPrev&&i>0)?'background:#0a3d62;color:#fff':'')+'">🔗</button><button title="Monter" onclick="moveTask('+i+',-1)">▲</button><button title="Descendre" onclick="moveTask('+i+',1)">▼</button><button title="Supprimer" onclick="delTask('+i+')">🗑</button></td></tr>';
+  });
+  h+='</tbody>';
+  $('planTable').innerHTML=h; $('planCount').textContent=planTasks.length; ganttPreview();
+}
+function ganttPreview(){
+  const c=$('ganttPrev'); if(!c)return; const ds=[];
+  planTasks.forEach(t=>{const a=pdate(t.debut),b=pdate(t.fin);if(a)ds.push(+a);if(b)ds.push(+b);});
+  if(!planTasks.length||!ds.length){c.innerHTML='<div class="small">Renseignez des tâches avec dates pour afficher le Gantt.</div>';return;}
+  let mn=startMonday(new Date(Math.min(...ds))); const mx=new Date(Math.max(...ds)); const weeks=[]; let cur=new Date(mn);
+  while(cur<=mx&&weeks.length<60){weeks.push(new Date(cur));cur.setDate(cur.getDate()+7);}
+  let h='<table class="gtt"><thead><tr><th class="info">ID</th><th class="info">Tâche</th>';
+  weeks.forEach(w=>h+='<th>'+fmtjm(w)+'</th>'); h+='</tr></thead><tbody>';
+  const tcls=t=>t.conge?'conge':(/r[ée]ception/i.test(t.nom||'')?'recep':(t.teletravail?'tele':'bar'));
+  planTasks.forEach((t,i)=>{const a=pdate(t.debut),b=pdate(t.fin);const kl=tcls(t);
+    h+='<tr><td class="info">'+(i+1)+'</td><td class="info">'+esch(t.nom)+'</td>';
+    weeks.forEach(w=>{const we=new Date(w);we.setDate(we.getDate()+6);let cls='';if(a&&b&&a<=we&&b>=w)cls=kl;h+='<td class="'+cls+'"></td>';});
+    h+='</tr>';});
+  h+='</tbody></table>';
+  h+='<div class="small" style="margin-top:6px">Légende : <span style="background:#f4b183;padding:1px 8px">tâche</span> · <span style="background:#8bc98b;padding:1px 8px">réception matériel</span> · <span style="background:#6aaed6;padding:1px 8px;color:#fff">télétravail</span> · <span style="background:#c9b8e8;padding:1px 8px">congé</span></div>';
+  c.innerHTML=h;
+}
+function defaultPlan(){
+  const base=new Date(); base.setMonth(base.getMonth()+1); const s=startMonday(base);
+  const iso=off=>{const x=new Date(s);x.setDate(x.getDate()+off);return x.toISOString().slice(0,10);};
+  const T=[
+   ["Réception du matériel",0,25,"4s","",false,false],
+   ["Réunion d'init",25,25,",5j","ONE-ID / Client",false,false],
+   ["Réunion de validation",25,25,",5j","ONE ID / Client",true,false],
+   ["Configuration du système de virtualisation",28,28,"1j","ONE ID",false,false],
+   ["Intégration des équipements salle Prod",38,38,"1j","ONE ID / Client",false,false],
+   ["Migration des VM VMware (23 VM) multi OS (Linux, VMware)",39,43,"3j","ONE ID",true,false],
+   ["Reconditionnement de l'ancienne infra en PRA",35,36,"2j","ONE ID",false,false],
+   ["Administratifs (Garantie, ESRS, CloudIQ…)",37,37,"1j","ONE ID / Client",true,false],
+   ["Configuration du backup",38,38,"1j","ONE ID",true,false],
+   ["Validations des tests PRA / BACKUP",39,39,"1j","ONE ID / Client",true,false],
+   ["Réunion init supervision",42,42,",5j","ONE ID / Client",true,false],
+   ["Mise en place supervision",42,43,"1j","ONE ID",true,false],
+   ["Congé ONE ID",0,8,"1s 2j","",false,true],
+   ["Congé Client",-38,-38,"0s","",false,true],
+   ["Livrable fin de projet",60,60,"1j","ONE ID / Client",false,false]
+  ];
+  return T.map(r=>({nom:r[0],debut:iso(r[1]),fin:iso(r[2]),duree:r[3],equipes:r[4],teletravail:r[5]?'X':'',conge:r[6]}));
+}
+function loadDefaultPlan(){
+  if(planTasks.length && !confirm("Remplacer le planning actuel par le planning type ONE ID (dates calées à aujourd'hui + 1 mois) ?"))return;
+  planTasks=defaultPlan(); renderPlan(); save(); $('msg').textContent='Planning type chargé (démarrage à J+1 mois).';
+}
+function save(){let d;try{d=buildData();localStorage.setItem('ao_oneid_app',JSON.stringify(d));}catch(e){
+  /* Quota localStorage (~5 Mo) dépassé, typiquement par le texte des documents administratifs :
+     sauvegarde locale sans ces textes (les noms restent) ; la fiche serveur (💾) garde tout. */
+  try{if(d&&d.affaire&&Array.isArray(d.affaire.admin_docs)){d.affaire.admin_docs=d.affaire.admin_docs.map(x=>({name:x.name,text:'',chars:x.chars,truncated:x.truncated}));
+    localStorage.setItem('ao_oneid_app',JSON.stringify(d));
+    if(!window._quotaWarned){window._quotaWarned=true;const m=$('adminstatus');if(m)m.textContent="⚠ Documents volumineux : leur texte n'est pas conservé dans la sauvegarde automatique du navigateur. Enregistrez la fiche (💾) pour le garder.";}}}catch(e2){}}}
+
+/* Barre latérale : bibliothèque de fiches (persistées côté serveur) */
+async function loadFichesList(){
+  const c=$('fichesList'); if(!c)return;
+  try{
+    const r=await fetch('/api/fiche/list'); if(!r.ok)throw new Error('http '+r.status); const d=await r.json(); c.innerHTML='';
+    const arr=(d.fiches||[]).map(f=>typeof f==='string'?{name:f}:f);
+    arr.forEach(f=>{
+      const row=document.createElement('div'); row.className='fiche';
+      const nm=document.createElement('span'); nm.className='nm'; nm.textContent=f.name.replace(/\.json$/i,''); nm.title='Ouvrir'; nm.onclick=()=>openFiche(f.name);
+      const re=document.createElement('button'); re.className='ic'; re.textContent='✎'; re.title='Renommer'; re.onclick=ev=>{ev.stopPropagation();renameFiche(f.name);};
+      const de=document.createElement('button'); de.className='ic'; de.textContent='🗑'; de.title='Supprimer'; de.onclick=ev=>{ev.stopPropagation();delFiche(f.name);};
+      row.appendChild(nm); row.appendChild(re); row.appendChild(de); c.appendChild(row);
+    });
+    if(!(d.fiches||[]).length) c.innerHTML='<div class="small">Aucune fiche enregistrée.</div>';
+  }catch(e){ c.innerHTML='<div class="small">Bibliothèque indisponible (serveur).</div>'; }
+}
+async function saveFiche(){
+  const nm=$('ficheName').value.trim()||val('aff_client')||val('aff_projet');
+  if(!nm){alert('Donnez un nom à la fiche.');return;}
+  try{const r=await fetch('/api/fiche/save',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:nm,spec:buildData()})});
+    if(!r.ok)throw new Error();const d=await r.json();$('ficheName').value=d.name.replace(/\.json$/i,'');$('msg').textContent='✔ Fiche enregistrée : '+d.name;loadFichesList();
+  }catch(e){$('msg').textContent='Erreur d\'enregistrement de la fiche.';}
+}
+async function openFiche(name){
+  try{const r=await fetch('/api/fiche/get?name='+encodeURIComponent(name));if(!r.ok)throw new Error();
+    loadData(await r.json());$('ficheName').value=name.replace(/\.json$/i,'');$('msg').textContent='✔ Fiche ouverte : '+name;save();
+  }catch(e){alert('Impossible d\'ouvrir la fiche.');}
+}
+async function renameFiche(name){
+  const cur=name.replace(/\.json$/i,''); const nv=prompt('Nouveau nom de la fiche :',cur); if(!nv||nv===cur)return;
+  const r=await fetch('/api/fiche/rename',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({old:name,new:nv})});
+  if(r.ok){loadFichesList();if($('ficheName').value===cur)$('ficheName').value=nv;}else{let m='';try{m=(await r.json()).detail;}catch(e){}alert('Renommage impossible. '+(m||''));}
+}
+async function delFiche(name){
+  if(!confirm('Supprimer la fiche « '+name.replace(/\.json$/i,'')+' » ?'))return;
+  await fetch('/api/fiche/delete',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name})});loadFichesList();
+}
+function newFiche(){
+  if(!confirm('Démarrer une nouvelle fiche vide ?'))return;
+  clearAll();['aff_client','aff_projet','aff_ref','aff_auteur','aff_contexte','aff_solution','pa_notes','ficheName','cctp_text','cctpname'].forEach(id=>{const e=$(id);if(e)e.value='';});
+  $('aff_version').value='1.0';points=[];clars=[];verif=[];recap=recapNorm(null);adminRec=adminEmpty();adminDocs=[];renderPA();renderClars();renderVerif();renderRecap();renderAdminDocs();renderAdmin();imgStore.arch=[];renderThumbs('arch');$('resCard').style.display='none';
+  ['pra_rto','pra_rpo','pra_text'].forEach(id=>{const e=$(id);if(e)e.value='';});$('pra_mode').value='aucun';$('sauv_veeam').checked=false;$('sauv_datadomain').checked=false;praToggle();
+  chapitres=[];renderKanban();prestations=[];renderPrest();contacts=[];renderContacts();
+  $('sauv_logiciel').value='';$('sauv_licence').value='acheter';$('sauv_cible').value='';$('sauv_cloud').checked=false;sauvSites=[];renderSauv();
+  addItem('serveurs');addItem('stockages');save();$('msg').textContent='Nouvelle fiche.';
+}
+
+/* Éditeur d'argumentaires */
+let argItems=[],argCurrent=null,argImgTarget=null,argDragIdx=null;
+async function argRefresh(){try{const r=await fetch('/api/argumentaires');const d=await r.json();argItems=d.items||[];renderArgList();renderPrest();}catch(e){const c=$('argList');if(c)c.innerHTML='<div class="small">Indisponible (serveur).</div>';}}
+function renderArgList(){const c=$('argList');if(!c)return;c.innerHTML='';argItems.forEach(it=>{const d=document.createElement('div');d.className='fiche';const nm=document.createElement('span');nm.className='nm';nm.textContent=it.folder;nm.title=(it.titre||'')+' — '+it.blocs+' blocs';nm.onclick=()=>openArg(it.folder);d.appendChild(nm);c.appendChild(d);});if(!argItems.length)c.innerHTML='<div class="small">Aucun argumentaire.</div>';}
+async function openArg(folder){try{const r=await fetch('/api/argumentaire?folder='+encodeURIComponent(folder));if(!r.ok)throw 0;const data=await r.json();let imgs=[];try{const ri=await fetch('/api/argumentaire/images?folder='+encodeURIComponent(folder));imgs=(await ri.json()).images||[];}catch(e){}argCurrent={folder,data,folderImages:imgs};renderArgEditor();}catch(e){alert("Impossible d'ouvrir cet argumentaire.");}}
+function argCreate(){const f=($('argNew').value||'').trim();if(!f){alert('Indiquez un nom de dossier.');return;}argCurrent={folder:f,data:{titre:f,modele_match:[],blocs:[{t:'p',x:''}]},folderImages:[]};$('argNew').value='';renderArgEditor();}
+function argImgUrl(name){return '/api/argumentaire/image?folder='+encodeURIComponent(argCurrent.folder)+'&name='+encodeURIComponent(name);}
+function argFolderImgs(){const def=(argCurrent.data.images_defaut||[]);return def.length?def:(argCurrent.folderImages||[]);}
+function mkField(label,value,oninput,multiline){const w=document.createElement('div');w.style.marginTop='8px';const l=document.createElement('label');l.textContent=label;w.appendChild(l);const el=document.createElement(multiline?'textarea':'input');el.value=value;if(multiline)el.rows=3;el.oninput=()=>oninput(el.value);w.appendChild(el);return w;}
+function blocContent(b,i){const wrap=document.createElement('div');
+  if(b.t==='puces'){const ta=document.createElement('textarea');ta.rows=3;ta.value=(b.x||[]).join('\n');ta.placeholder='une puce par ligne';ta.oninput=()=>{b.x=ta.value.split('\n').map(s=>s.trim()).filter(Boolean);};wrap.appendChild(ta);}
+  else if(b.t==='table'){const H=b.headers||['Élément','Détail'];const hd=document.createElement('div');hd.style.cssText='display:flex;gap:6px';const h0=document.createElement('input');h0.value=H[0]||'';h0.placeholder='En-tête 1';const h1=document.createElement('input');h1.value=H[1]||'';h1.placeholder='En-tête 2';const setH=()=>{b.headers=[h0.value,h1.value];};h0.oninput=setH;h1.oninput=setH;hd.appendChild(h0);hd.appendChild(h1);wrap.appendChild(hd);const ta=document.createElement('textarea');ta.rows=4;ta.style.marginTop='6px';ta.placeholder='une ligne par entrée : Libellé | Valeur';ta.value=(b.rows||[]).map(r=>Array.isArray(r)?r.join(' | '):'').join('\n');ta.oninput=()=>{b.rows=ta.value.split('\n').map(l=>l.split('|').map(s=>s.trim())).filter(r=>r.length>=2&&(r[0]||r[1]));};wrap.appendChild(ta);}
+  else if(b.t==='image'){
+    if(b.data){const im=document.createElement('img');im.src=b.data;im.style.cssText='max-height:130px;border:1px solid var(--line);border-radius:5px;display:block;margin-bottom:6px';wrap.appendChild(im);}
+    const dz=document.createElement('div');dz.className='dz';dz.tabIndex=0;dz.textContent=b.data?'Image chargée ✓ — cliquez ici puis Ctrl+V pour remplacer (ou déposez / choisissez un fichier)':'Cliquez ici puis Ctrl+V pour coller, ou déposez / choisissez une image';
+    const arm=()=>{argImgTarget=i;activeZone=null;document.querySelectorAll('#argEditor .dz').forEach(z=>z.classList.remove('over'));dz.classList.add('over');const s=$('argstatus');if(s)s.textContent="Prêt : Ctrl+V pour coller l'image dans ce bloc.";};
+    dz.onclick=arm;dz.onfocus=arm;
+    dz.ondragover=e=>{e.preventDefault();dz.classList.add('over');};dz.ondragleave=()=>dz.classList.remove('over');
+    dz.ondrop=e=>{e.preventDefault();dz.classList.remove('over');const f=[...(e.dataTransfer.files||[])].find(x=>x.type&&x.type.startsWith('image/'));if(f){const r=new FileReader();r.onload=()=>{b.data=r.result;renderArgEditor();};r.readAsDataURL(f);}};
+    wrap.appendChild(dz);
+    const fi=document.createElement('input');fi.type='file';fi.accept='image/*';fi.style.display='none';fi.onchange=e=>{const f=e.target.files[0];if(f){const r=new FileReader();r.onload=()=>{b.data=r.result;renderArgEditor();};r.readAsDataURL(f);}};
+    const row=document.createElement('div');row.style.cssText='display:flex;gap:6px;margin-top:6px;flex-wrap:wrap';
+    const fb=document.createElement('button');fb.className='btn btn-ghost';fb.style.cssText='padding:3px 9px';fb.textContent='📎 Choisir un fichier';fb.onclick=()=>fi.click();
+    row.appendChild(fb);row.appendChild(fi);
+    if(b.data){const rm=document.createElement('button');rm.className='btn btn-del';rm.textContent='× retirer';rm.onclick=()=>{b.data='';renderArgEditor();};row.appendChild(rm);}
+    wrap.appendChild(row);
+  }
+  else{const ta=document.createElement('textarea');ta.rows=(b.t==='p')?3:1;ta.value=b.x||'';ta.placeholder=(b.t==='img')?'texte de l\'emplacement (ex : [ Schéma… ])':'texte (marqueurs {client},{qte},{ps},{pp}… autorisés)';ta.oninput=()=>{b.x=ta.value;};wrap.appendChild(ta);}
+  return wrap;}
+function mkBloc(b,i){const box=document.createElement('div');box.style.cssText='border:1px solid var(--line);border-radius:8px;padding:8px;margin:8px 0;background:#fbfdfe';
+  box.ondragover=e=>{if(argDragIdx!=null){e.preventDefault();box.style.borderColor='var(--oneid)';}};
+  box.ondragleave=()=>{box.style.borderColor='var(--line)';};
+  box.ondrop=e=>{e.preventDefault();box.style.borderColor='var(--line)';if(argDragIdx!=null&&argDragIdx!==i){const a=argCurrent.data.blocs;const m=a.splice(argDragIdx,1)[0];a.splice(i,0,m);}argDragIdx=null;renderArgEditor();};
+  const top=document.createElement('div');top.style.cssText='display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:6px';
+  const dh=document.createElement('span');dh.textContent='⠿';dh.title='Glisser pour déplacer ce bloc';dh.draggable=true;dh.style.cssText='cursor:grab;padding:0 4px;color:var(--muted);user-select:none;font-size:17px';dh.ondragstart=e=>{argDragIdx=i;e.dataTransfer.effectAllowed='move';try{e.dataTransfer.setData('text/plain',String(i));}catch(_){}};dh.ondragend=()=>{argDragIdx=null;box.style.borderColor='var(--line)';};
+  const sel=document.createElement('select');const L={p:'Paragraphe',h:'Sous-titre',sous:'Intitulé gras',puces:'Puces',img:'Emplacement image',image:'Image (collée)',table:'Tableau'};Object.keys(L).forEach(t=>{const o=document.createElement('option');o.value=t;o.textContent=L[t];if(b.t===t)o.selected=true;sel.appendChild(o);});sel.style.width='auto';sel.onchange=()=>{b.t=sel.value;renderArgEditor();};const cond=document.createElement('input');cond.placeholder='condition (ex : veeam)';cond.value=b.if||'';cond.style.width='150px';cond.oninput=()=>{b.if=cond.value.trim()||undefined;};const mk=(t,fn)=>{const x=document.createElement('button');x.className='btn btn-ghost';x.style.cssText='padding:2px 8px';x.textContent=t;x.onclick=fn;return x;};top.appendChild(dh);top.appendChild(sel);top.appendChild(cond);top.appendChild(mk('▲',()=>{const a=argCurrent.data.blocs;if(i>0){const x=a[i-1];a[i-1]=a[i];a[i]=x;renderArgEditor();}}));top.appendChild(mk('▼',()=>{const a=argCurrent.data.blocs;if(i<a.length-1){const x=a[i+1];a[i+1]=a[i];a[i]=x;renderArgEditor();}}));top.appendChild(mk('🗑',()=>{argCurrent.data.blocs.splice(i,1);renderArgEditor();}));box.appendChild(top);box.appendChild(blocContent(b,i));return box;}
+function renderArgEditor(){const host=$('argEditor');if(!host)return;if(!argCurrent){host.innerHTML='<p class="hint">Sélectionnez un argumentaire à gauche pour l\'éditer.</p>';return;}const d=argCurrent.data;host.innerHTML='';const h=document.createElement('h2');h.textContent='Édition : '+argCurrent.folder;host.appendChild(h);
+  host.appendChild(mkField('Titre',d.titre||'',v=>{d.titre=v;}));
+  host.appendChild(mkField('Modèles déclencheurs (modele_match, séparés par des virgules)',(d.modele_match||[]).join(', '),v=>{d.modele_match=v.split(',').map(s=>s.trim()).filter(Boolean);}));
+  host.appendChild(mkField('Déclencheur combiné (trigger.all_of, séparés par des virgules)',((d.trigger||{}).all_of||[]).join(', '),v=>{const a=v.split(',').map(s=>s.trim()).filter(Boolean);if(a.length)d.trigger={all_of:a};else delete d.trigger;}));
+  const bt=document.createElement('h3');bt.textContent='Blocs';bt.style.margin='10px 0 4px';host.appendChild(bt);
+  const bl=document.createElement('div');(d.blocs=d.blocs||[]).forEach((b,i)=>bl.appendChild(mkBloc(b,i)));host.appendChild(bl);
+  const add=document.createElement('button');add.className='btn btn-accent';add.textContent='+ Ajouter un bloc';add.onclick=()=>{d.blocs.push({t:'p',x:''});renderArgEditor();};host.appendChild(add);
+  const addImg=document.createElement('button');addImg.className='btn btn-ghost';addImg.style.marginLeft='6px';addImg.textContent='+ Image (à coller)';addImg.onclick=()=>{d.blocs.push({t:'image'});renderArgEditor();};host.appendChild(addImg);
+  if((argCurrent.folderImages||[]).length){const ti=document.createElement('div');ti.style.marginTop='10px';const l=document.createElement('label');l.textContent='Images existantes du produit (fichiers du dossier — insérées via un bloc « Emplacement image »)';ti.appendChild(l);const row=document.createElement('div');row.className='thumbs';argCurrent.folderImages.forEach(n=>{const im=document.createElement('img');im.src=argImgUrl(n);im.title=n;im.style.cssText='height:52px;border:1px solid var(--line);border-radius:5px';row.appendChild(im);});ti.appendChild(row);host.appendChild(ti);}
+  host.appendChild(mkField('Sources (une par ligne)',(d.sources||[]).join('\n'),v=>{d.sources=v.split('\n').map(s=>s.trim()).filter(Boolean);},true));
+  host.appendChild(mkField('Avertissement',d.avertissement||'',v=>{d.avertissement=v;},true));
+  const sv=document.createElement('div');sv.style.marginTop='12px';const sb=document.createElement('button');sb.className='btn btn-primary';sb.textContent='💾 Enregistrer l\'argumentaire';sb.onclick=saveArg;const pv=document.createElement('button');pv.className='btn btn-ghost';pv.style.marginLeft='8px';pv.textContent='👁 Aperçu';pv.onclick=renderArgPreview;const st=document.createElement('span');st.className='msg';st.id='argstatus';st.style.marginLeft='8px';sv.appendChild(sb);sv.appendChild(pv);sv.appendChild(st);host.appendChild(sv);}
+function argEsc(s){return (s==null?'':String(s)).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function closeArgPreview(){$('argPreviewModal').style.display='none';}
+function renderArgPreview(){
+  if(!argCurrent)return;const d=argCurrent.data;let h='<h2 style="color:var(--oneid);margin:0 0 6px">'+argEsc(d.titre||argCurrent.folder)+'</h2>';
+  (d.blocs||[]).forEach(b=>{
+    if(b.if)h+='<div class="small" style="color:#b8860b">▸ condition : '+argEsc(b.if)+'</div>';
+    if(b.t==='p')h+='<p>'+argEsc(b.x||'')+'</p>';
+    else if(b.t==='h')h+='<h3 style="color:var(--oneid);margin:10px 0 4px">'+argEsc(b.x||'')+'</h3>';
+    else if(b.t==='sous')h+='<p style="margin:8px 0 2px"><b>'+argEsc(b.x||'')+'</b></p>';
+    else if(b.t==='puces')h+='<ul style="margin:4px 0 8px">'+(b.x||[]).map(x=>'<li>'+argEsc(x)+'</li>').join('')+'</ul>';
+    else if(b.t==='img'){const imgs=argFolderImgs();if(imgs.length)h+=imgs.map(n=>'<img src="'+argImgUrl(n)+'" style="max-width:100%;border:1px solid var(--line);border-radius:5px;margin:6px 0">').join('');else h+='<p style="color:#c0392b;font-style:italic">'+argEsc(b.x||'[ emplacement image ]')+'</p>';}
+    else if(b.t==='image')h+=(b.data?'<img src="'+b.data+'" style="max-width:100%;border:1px solid var(--line);border-radius:5px;margin:6px 0">':'<p class="small">[ image vide ]</p>');
+    else if(b.t==='table'){const H=b.headers||['Élément','Détail'];h+='<table class="ptab" style="width:100%;margin:6px 0"><thead><tr><th>'+argEsc(H[0])+'</th><th>'+argEsc(H[1])+'</th></tr></thead><tbody>'+(b.rows||[]).map(r=>'<tr><td>'+argEsc(r[0]||'')+'</td><td>'+argEsc(r[1]||'')+'</td></tr>').join('')+'</tbody></table>';}
+  });
+  if((d.sources||[]).length)h+='<p class="small" style="font-style:italic;margin-top:10px">Sources : '+argEsc(d.sources.join(' ; '))+'</p>';
+  if(d.avertissement)h+='<p class="small" style="font-style:italic">'+argEsc(d.avertissement)+'</p>';
+  $('argPreviewBody').innerHTML=h;$('argPreviewModal').style.display='flex';
+}
+async function saveArg(){if(!argCurrent)return;const st=$('argstatus');if(st)st.innerHTML='<span class="spin"></span> Enregistrement…';try{const r=await fetch('/api/argumentaire/save',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({folder:argCurrent.folder,data:argCurrent.data})});if(!r.ok)throw new Error((await r.json()).detail||r.statusText);if(st)st.textContent='✔ Enregistré (pris en compte à la prochaine génération).';argRefresh();}catch(e){if(st)st.textContent='Erreur : '+(e.message||e);}}
+document.addEventListener('paste',e=>{if(argImgTarget==null||!argCurrent)return;const items=(e.clipboardData||{}).items||[];for(const it of items){if(it.type&&it.type.startsWith('image/')){const f=it.getAsFile();if(f){e.preventDefault();const r=new FileReader();r.onload=()=>{const b=argCurrent.data.blocs[argImgTarget];if(b)b.data=r.result;argImgTarget=null;renderArgEditor();};r.readAsDataURL(f);return;}}}});
+/* init */
+buildCats();
+document.querySelectorAll('[data-imgzone="arch"],[data-imgzone="chap"]').forEach(bindZone);
+document.addEventListener('input',e=>{if(e.target.closest('.wrap')){const it=e.target.closest('.item');if(it)updHead(it);save();}});
+$('aff_date').valueAsDate=new Date();
+try{const s=localStorage.getItem('ao_oneid_app');if(s)loadData(JSON.parse(s));}catch(e){}
+if(!document.querySelector('#list-serveurs .item')){addItem('serveurs');addItem('stockages');}
+if(!planTasks.length)planTasks=defaultPlan();
+renderPlan();praToggle();renderKanban();renderSauv();aiToggle();renderPrest();renderContacts();bindCadre();
+loadFichesList();argRefresh();
+</script>
+</body>
+</html>
