@@ -664,7 +664,7 @@ async def recap_admin(payload: dict):
     Entrée JSON : docs ([{name, text}], documents administratifs déjà extraits), cctp_text (str,
     optionnel, ajouté en contexte), provider/model (optionnels). Au moins des docs ou un CCTP.
     Sortie : ``{reference_marche, date_limite_questions, date_limite_offres, checklist,
-    contractuel, questions, ok, raw}``.
+    contractuel, questions, ok, raw, prompt}``.
     Erreurs : 400 si ni document ni CCTP ; 400/502 remontées par llm_complete.
     Effet de bord : un appel réseau au LLM (aucune écriture disque).
     """
@@ -677,7 +677,7 @@ async def recap_admin(payload: dict):
     raw = await run_in_threadpool(llm_complete, sysp(admin_mod.RECAP_ADMIN_PROMPT), user, 6000,
                                   payload.get("provider") or "", payload.get("model") or "")
     res = admin_mod.parse_admin(raw)
-    return {**res, "raw": "" if res["ok"] else (raw or "")[:4000]}
+    return {**res, "raw": "" if res["ok"] else (raw or "")[:4000], "prompt": admin_mod.RECAP_ADMIN_PROMPT}
 
 
 # ---------------------------------------------------------------- Import Excel Dell

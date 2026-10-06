@@ -359,6 +359,20 @@ async function saveSettings(){
         <div><label>Date limite de remise des offres</label><input id="adm_do" oninput="adminMeta('date_limite_offres',this.value)"></div>
       </div>
       <p class="hint" style="margin-top:6px">Valeurs lues dans les documents par l'IA : vérifiez-les (« à préciser » = non trouvée). Statuts : À confirmer · À préparer · À qualifier · Validé (réservé à votre relecture).</p>
+      
+      <!-- Section de diagnostic : Affichage immédiat du prompt -->
+      <div id="adminPromptSectionDiag" style="margin-top:15px; padding:12px; background:#f8f9fa; border-radius:8px; border-left:4px solid #1e7e34;">
+        <h3 style="margin:0 0 8px 0; font-size:14px; color:#1e7e34;">Prompt IA (Diagnostic)</h3>
+        <div id="adminPromptDisplayDiag" style="font-family:monospace; font-size:12px; background:#fff; padding:8px; border-radius:4px; white-space:pre-wrap; max-height:300px; overflow:auto;"></div>
+      </div>
+      
+      <!-- Section d'affichage du prompt et réponse IA -->
+      <div id="adminPromptSection" style="margin-top:15px; padding:12px; background:#f8f9fa; border-radius:8px; border-left:4px solid #1e7e34; display:none;">
+        <h3 style="margin:0 0 8px 0; font-size:14px; color:#1e7e34;">Prompt IA</h3>
+        <div id="adminPromptDisplay" style="font-family:monospace; font-size:12px; background:#fff; padding:8px; border-radius:4px; white-space:pre-wrap; max-height:200px; overflow:auto;"></div>
+        <h3 style="margin:12px 0 8px 0; font-size:14px; color:#1e7e34;">Réponse IA</h3>
+        <div id="adminResponseDisplay" style="font-family:monospace; font-size:12px; background:#fff; padding:8px; border-radius:4px; white-space:pre-wrap; max-height:200px; overflow:auto;"></div>
+      </div>
     </div>
     <div id="adminTables"></div>
   </div>
