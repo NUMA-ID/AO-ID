@@ -507,7 +507,6 @@ async function saveSettings(){
     <div class="card">
       <h2>Structure du dossier &amp; prestations <span class="small">(Kanban)</span></h2>
       <p class="hint">Chaque chapitre = une partie du Word. Glissez-y les points d'attention (rouge = à traiter). Bouton « Décrire l'offre » : choisissez un <b>argumentaire</b>, un <b>complément / options / prérequis</b> et le <b>nombre de jours d'installation</b>. Le Word rend chaque chapitre : titre → argumentaire → complément → durée. L'ordre des chapitres (◀ ▶) = ordre dans le Word.</p>
-      <button class="btn btn-primary" id="goChap" onclick="proposerChapitres()" title="Regroupe automatiquement les points d'attention en chapitres thématiques via l'IA (sans rien inventer).">✨ Proposer des chapitres (IA)</button>
       <button class="btn btn-accent" onclick="addChap()">+ Ajouter un chapitre</button>
       <button class="btn btn-ghost" onclick="renderKanban()">↻ Rafraîchir</button>
       <span class="msg" id="chapstatus" style="margin-left:8px"></span>
